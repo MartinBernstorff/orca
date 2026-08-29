@@ -6,8 +6,7 @@ import {
   resolveWorkspaceStatusInput
 } from '../../../../shared/workspace-statuses'
 
-// Why: the board catalog lives in main-side UI state, so CLI and remote callers can
-// only send a name; resolve it here rather than persisting an unmatched id silently.
+// Why: the board catalog lives in main-side UI state, so only the host can resolve a name.
 export function resolveRpcWorkspaceStatus(
   runtime: OrcaRuntimeService,
   value: string | undefined

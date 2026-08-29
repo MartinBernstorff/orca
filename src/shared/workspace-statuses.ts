@@ -252,8 +252,7 @@ function describeWorkspaceStatuses(statuses: readonly WorkspaceStatusDefinition[
   return statuses.map((status) => `${status.id} (${status.label})`).join(', ')
 }
 
-// Why: a column keeps the id slugged from its label at creation time, so a renamed
-// column's id no longer resembles its name; accept the name as an alias for it.
+// Why: a column's id is slugged from its label only at creation, so a rename leaves it stale.
 export function resolveWorkspaceStatusInput(
   value: string,
   statuses: readonly WorkspaceStatusDefinition[]
@@ -265,9 +264,8 @@ export function resolveWorkspaceStatusInput(
       message: `Workspace status is empty. Available: ${describeWorkspaceStatuses(statuses)}.`
     }
   }
-  const byId = statuses.find((status) => status.id === trimmed)
-  if (byId) {
-    return { ok: true, status: byId.id }
+  if (isWorkspaceStatusId(trimmed, statuses)) {
+    return { ok: true, status: trimmed }
   }
   const slug = slugWorkspaceStatusLabel(trimmed)
   const byLabel = statuses.filter((status) => slugWorkspaceStatusLabel(status.label) === slug)
