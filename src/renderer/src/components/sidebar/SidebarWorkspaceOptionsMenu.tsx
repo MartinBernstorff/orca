@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import { SlidersHorizontal } from 'lucide-react'
+import { Rows3, SlidersHorizontal } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,6 +17,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { DEFAULT_SHOW_SLEEPING_WORKSPACES } from '../../../../shared/constants'
 import { isSleepingSweepExemptionNarrowingList } from './visible-worktrees'
+import { FilterToggleRow } from './FilterToggleRow'
 import SidebarRepositoryFilterSection from './SidebarRepositoryFilterSection'
 import SidebarWorkspaceFilterSection from './SidebarWorkspaceFilterSection'
 import { getSidebarHostVisibilityLabel, shouldShowHostScopeControls } from './sidebar-host-options'
@@ -52,6 +53,8 @@ const SidebarWorkspaceOptionsMenu = React.memo(function SidebarWorkspaceOptionsM
   const setSortBy = useAppStore((s) => s.setSortBy)
   const groupBy = useAppStore((s) => s.groupBy)
   const setGroupBy = useAppStore((s) => s.setGroupBy)
+  const showEmptyWorkspaceStatuses = useAppStore((s) => s.showEmptyWorkspaceStatuses)
+  const setShowEmptyWorkspaceStatuses = useAppStore((s) => s.setShowEmptyWorkspaceStatuses)
   const projectOrderBy = useAppStore((s) => s.projectOrderBy)
   const setProjectOrderBy = useAppStore((s) => s.setProjectOrderBy)
 
@@ -201,6 +204,25 @@ const SidebarWorkspaceOptionsMenu = React.memo(function SidebarWorkspaceOptionsM
         <div className="px-2 pt-0.5 pb-1">
           <SidebarGroupByToggle groupBy={groupBy} setGroupBy={setGroupBy} />
         </div>
+        {/* Why: empty lanes only exist in status grouping, so the switch hides
+            in the other modes rather than sitting there as a dead control. */}
+        {groupBy === 'workspace-status' && (
+          <div className="px-1 pb-1">
+            <FilterToggleRow
+              icon={<Rows3 className="size-3.5" />}
+              label={translate(
+                'auto.components.sidebar.SidebarWorkspaceOptionsMenu.showEmptyStatuses',
+                'Show empty statuses'
+              )}
+              ariaLabel={translate(
+                'auto.components.sidebar.SidebarWorkspaceOptionsMenu.showEmptyStatusesAria',
+                'Show statuses with no workspaces'
+              )}
+              checked={showEmptyWorkspaceStatuses}
+              onChange={setShowEmptyWorkspaceStatuses}
+            />
+          </div>
+        )}
 
         <DropdownMenuSeparator />
         <DropdownMenuSub>

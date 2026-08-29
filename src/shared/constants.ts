@@ -268,6 +268,7 @@ export function getDefaultUIState(): PersistedUIState {
     hideDetachedHeadWorkspaces: false,
     hideWorkspacesFromOtherDevices: false,
     alwaysShowDefaultBranchWorkspace: true,
+    showEmptyWorkspaceStatuses: false,
     showDotfilesByWorktree: {},
     filterRepoIds: [],
     collapsedGroups: [],

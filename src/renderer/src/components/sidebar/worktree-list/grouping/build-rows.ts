@@ -70,7 +70,8 @@ export function buildRows(
   folderWorkspaces: readonly FolderWorkspace[] = [],
   hostLabelById?: ReadonlyMap<string, string>,
   defaultHostId: ExecutionHostId = LOCAL_EXECUTION_HOST_ID,
-  pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy = getPinnedWorktreeDisplayPolicy(settings)
+  pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy = getPinnedWorktreeDisplayPolicy(settings),
+  showEmptyWorkspaceStatuses = false
 ): Row[] {
   const result: Row[] = []
   const projectIndex = buildProjectGroupingIndex(projectGrouping)
@@ -205,7 +206,8 @@ export function buildRows(
     pendingByRepo,
     repoOrder,
     projectOrderBy,
-    folderWorkspaces: renderableFolderWorkspaces
+    folderWorkspaces: renderableFolderWorkspaces,
+    showEmptyWorkspaceStatuses
   })
 
   const sectionContext: SectionAppendContext = {

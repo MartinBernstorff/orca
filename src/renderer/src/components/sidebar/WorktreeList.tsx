@@ -72,6 +72,7 @@ const WorktreeList = React.memo(function WorktreeList({
   )
   const groupBy = useAppStore((s) => s.groupBy)
   const workspaceStatuses = useAppStore((s) => s.workspaceStatuses)
+  const showEmptyWorkspaceStatuses = useAppStore((s) => s.showEmptyWorkspaceStatuses)
   const sortBy = useAppStore((s) => s.sortBy)
   const projectOrderBy = useAppStore((s) => s.projectOrderBy)
   const openModal = useAppStore((s) => s.openModal)
@@ -163,6 +164,7 @@ const WorktreeList = React.memo(function WorktreeList({
     prCache,
     settings,
     workspaceStatuses,
+    showEmptyWorkspaceStatuses,
     effectiveCollapsedGroups,
     projectGrouping,
     visibleReposForRows: visibleScope.visibleReposForRows,
