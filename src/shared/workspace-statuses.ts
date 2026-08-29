@@ -67,7 +67,7 @@ function sanitizeWorkspaceStatusLabel(value: unknown, fallback: string): string 
   return trimmed ? trimmed.slice(0, MAX_STATUS_LABEL_LENGTH) : fallback
 }
 
-function slugWorkspaceStatusLabel(label: string): string {
+export function slugWorkspaceStatusLabel(label: string): string {
   const slug = label
     .trim()
     .toLowerCase()
@@ -242,6 +242,49 @@ export function clampWorkspaceBoardColumnWidth(value: unknown): number {
     WORKSPACE_BOARD_COLUMN_WIDTH_MAX,
     Math.max(WORKSPACE_BOARD_COLUMN_WIDTH_MIN, Math.round(value))
   )
+}
+
+export type WorkspaceStatusResolution =
+  | { ok: true; status: WorkspaceStatus }
+  | { ok: false; message: string }
+
+function describeWorkspaceStatuses(statuses: readonly WorkspaceStatusDefinition[]): string {
+  return statuses.map((status) => `${status.id} (${status.label})`).join(', ')
+}
+
+// Why: a column keeps the id slugged from its label at creation time, so a renamed
+// column's id no longer resembles its name; accept the name as an alias for it.
+export function resolveWorkspaceStatusInput(
+  value: string,
+  statuses: readonly WorkspaceStatusDefinition[]
+): WorkspaceStatusResolution {
+  const trimmed = value.trim()
+  if (!trimmed) {
+    return {
+      ok: false,
+      message: `Workspace status is empty. Available: ${describeWorkspaceStatuses(statuses)}.`
+    }
+  }
+  const byId = statuses.find((status) => status.id === trimmed)
+  if (byId) {
+    return { ok: true, status: byId.id }
+  }
+  const slug = slugWorkspaceStatusLabel(trimmed)
+  const byLabel = statuses.filter((status) => slugWorkspaceStatusLabel(status.label) === slug)
+  const [onlyMatch] = byLabel
+  if (onlyMatch && byLabel.length === 1) {
+    return { ok: true, status: onlyMatch.id }
+  }
+  if (byLabel.length > 1) {
+    return {
+      ok: false,
+      message: `Workspace status "${trimmed}" matches more than one column: ${describeWorkspaceStatuses(byLabel)}. Pass the id instead.`
+    }
+  }
+  return {
+    ok: false,
+    message: `Unknown workspace status "${trimmed}". Available: ${describeWorkspaceStatuses(statuses)}.`
+  }
 }
 
 export function isWorkspaceStatusId(
