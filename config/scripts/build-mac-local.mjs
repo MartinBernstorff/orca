@@ -31,9 +31,18 @@ export function getLocalBuildIdentity() {
 if (process.argv[1] && resolve(process.argv[1]) === resolve(import.meta.filename)) {
   const identity = getLocalBuildIdentity()
   console.log(`[build:mac] local update version ${identity.version}`)
+  // Why: `pnpm run build:mac -- <args>` forwards a literal `--`, which yargs
+  // reads as end-of-options and silently demotes every flag to a positional.
+  const passthroughArgs = process.argv.slice(2).filter((arg) => arg !== '--')
   execFileSync(
     process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm',
-    ['exec', 'electron-builder', '--config', 'config/electron-builder.config.cjs', '--mac'],
+    [
+      'exec',
+      'electron-builder',
+      '--config',
+      'config/electron-builder.config.cjs',
+      ...(passthroughArgs.length > 0 ? passthroughArgs : ['--mac'])
+    ],
     {
       env: {
         ...process.env,
