@@ -60,6 +60,7 @@ export function buildOrderedGroups(args: {
   repoOrder: Map<string, number> | undefined
   projectOrderBy: ProjectOrderBy
   folderWorkspaces?: readonly RenderableFolderWorkspace[]
+  showEmptyWorkspaceStatuses?: boolean
 }): OrderedGroupEntry[] {
   const {
     groupBy,
@@ -75,7 +76,8 @@ export function buildOrderedGroups(args: {
     pendingByRepo,
     repoOrder,
     projectOrderBy,
-    folderWorkspaces = []
+    folderWorkspaces = [],
+    showEmptyWorkspaceStatuses = false
   } = args
 
   const grouped = new Map<string, WorktreeGroupEntry>()
@@ -214,13 +216,15 @@ export function buildOrderedGroups(args: {
       }
     }
   } else if (groupBy === 'workspace-status') {
-    // Why: status grouping is opt-in while the board drawer remains the wider
-    // all-lanes drag target; keep the sidebar compact by omitting empty lanes.
+    // Why: empty lanes cost a header row each, so they stay opt-in — on, they
+    // show the whole pipeline and give every status a sidebar drop target.
     for (const status of workspaceStatuses) {
       const key = getWorkspaceStatusGroupKey(status.id)
       const group = grouped.get(key)
       if (group) {
         orderedGroups.push([key, group])
+      } else if (showEmptyWorkspaceStatuses) {
+        orderedGroups.push([key, { label: status.label, items: [], repoIds: new Set() }])
       }
     }
   } else {

@@ -33,6 +33,7 @@ type SectionRowsArgs = {
   prCache: AppState['prCache'] | null
   settings: AppState['settings']
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
+  showEmptyWorkspaceStatuses: boolean
   effectiveCollapsedGroups: Set<string>
   projectGrouping: ProjectGroupingModel
   visibleReposForRows: readonly Repo[]
@@ -166,7 +167,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
         args.visibleFolderWorkspacesForRows,
         hostLabelById,
         defaultHostId,
-        args.pinnedDisplayPolicy
+        args.pinnedDisplayPolicy,
+        args.showEmptyWorkspaceStatuses
       ),
     [
       args.groupBy,
@@ -189,7 +191,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
       args.newExternalWorktreesInboxByRepo,
       pendingCreations,
       hostLabelById,
-      args.pinnedDisplayPolicy
+      args.pinnedDisplayPolicy,
+      args.showEmptyWorkspaceStatuses
     ]
   )
   const orderedHostOptions = useMemo(

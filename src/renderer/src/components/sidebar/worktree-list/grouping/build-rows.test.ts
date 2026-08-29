@@ -395,3 +395,82 @@ describe('WorktreeList header styles', () => {
     expect(source).toContain('projectHostSetups: projectHostSetupProjection.setups')
   })
 })
+
+describe('empty workspace status lanes', () => {
+  const inProgress = { ...worktree, id: 'wt-1', displayName: 'alpha' }
+
+  function buildStatusRows(showEmptyWorkspaceStatuses: boolean): ReturnType<typeof buildRows> {
+    return buildRows(
+      'workspace-status',
+      [inProgress],
+      repoMap,
+      null,
+      new Set(),
+      undefined,
+      undefined,
+      undefined,
+      {},
+      undefined,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      showEmptyWorkspaceStatuses
+    )
+  }
+
+  it('omits statuses with no workspaces by default', () => {
+    expect(buildStatusRows(false)).toMatchObject([
+      { type: 'header', key: 'workspace-status:in-progress', count: 1 },
+      { type: 'item', worktree: { id: 'wt-1' } }
+    ])
+  })
+
+  it('emits every configured status in configured order when opted in', () => {
+    expect(buildStatusRows(true)).toMatchObject([
+      { type: 'header', key: 'workspace-status:todo', label: 'Todo', count: 0 },
+      { type: 'header', key: 'workspace-status:in-progress', label: 'In progress', count: 1 },
+      { type: 'item', worktree: { id: 'wt-1' } },
+      { type: 'header', key: 'workspace-status:in-review', label: 'In review', count: 0 },
+      { type: 'header', key: 'workspace-status:completed', label: 'Done', count: 0 }
+    ])
+  })
+
+  it('leaves other grouping modes unchanged when opted in', () => {
+    const rows = buildRows(
+      'pr-status',
+      [inProgress],
+      repoMap,
+      null,
+      new Set(),
+      undefined,
+      undefined,
+      undefined,
+      {},
+      undefined,
+      false,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true
+    )
+
+    expect(rows.filter((row) => row.type === 'header')).toHaveLength(1)
+  })
+})
