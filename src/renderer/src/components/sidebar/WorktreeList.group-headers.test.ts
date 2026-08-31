@@ -198,6 +198,20 @@ describe('WorktreeList lineage child card renderer', () => {
     expect(markup).toContain('aria-expanded="true"')
   })
 
+  it('renders a collapse chevron on empty status group headers', async () => {
+    setLineageFixtureState('workspace-status')
+    mockStore.state = {
+      ...mockStore.state,
+      showEmptyWorkspaceStatuses: true
+    }
+    const markup = await renderWorktreeListMarkup()
+    const statusHeaders = markup.match(/data-workspace-status-drop-target=""/g) ?? []
+    const affordances = markup.match(/data-repo-header-collapse-affordance=""/g) ?? []
+
+    expect(statusHeaders.length).toBeGreaterThan(1)
+    expect(affordances).toHaveLength(statusHeaders.length)
+  })
+
   it('renders a collapse chevron on the pinned section header with worktrees', async () => {
     setPinnedFixtureState()
     const markup = await renderWorktreeListMarkup()

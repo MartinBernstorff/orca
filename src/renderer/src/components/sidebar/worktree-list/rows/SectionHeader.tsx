@@ -172,9 +172,10 @@ export function renderWorktreeSectionHeaderRow(args: {
     : null
   const isHeaderCollapsed = ctx.collapsedGroups.has(row.key)
   // Why: repo/project/status/pinned share compact section chrome; flat "All" stays a simple label.
+  // Why: status lanes keep the chevron while empty so collapsing an empty lane stays possible.
   const showHeaderCollapseAffordance =
-    row.count > 0 &&
-    (isRepoHeader || isProjectGroupHeader || headerWorkspaceStatus !== null || isPinnedHeader)
+    headerWorkspaceStatus !== null ||
+    (row.count > 0 && (isRepoHeader || isProjectGroupHeader || isPinnedHeader))
   return (
     <div
       key={vItem.key}
