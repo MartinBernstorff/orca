@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { getFlushWorktreeCardPaddingLeft } from './worktree-list/rows/indentation'
+import { getWorktreeCardLinkedRefLabels } from './worktree-card-linked-ref-labels'
 import {
   hasWorktreeCardDetails,
   WorktreeCardDetailsHover,
@@ -42,6 +43,7 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     metaJiraIssue,
     metaReview,
     metaComment,
+    prDisplay,
     metaAutomationProvenance,
     metaCliProvenance,
     hoverIssue,
@@ -235,6 +237,7 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     ) : (
       detailsAndPortsContent
     )
+  const linkedRefLabels = getWorktreeCardLinkedRefLabels(worktree.linkedLinearIssue, prDisplay)
   const titleRowIndicators = showTitleRowIndicators ? (
     <div className="ml-auto flex shrink-0 items-center gap-1 pr-1.5">{detailsAndPorts}</div>
   ) : null
@@ -264,6 +267,7 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     cardStyle,
     detailsAndPorts,
     titleRowIndicators,
+    linkedRefLabels,
     titleOnlyCard
   }
 }

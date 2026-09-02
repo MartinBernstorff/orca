@@ -86,6 +86,7 @@ export function WorktreeCardHeader({
     showDeleteQuickAction,
     showTitleRowIndicators,
     titleRowIndicators,
+    linkedRefLabels,
     titleWrapper
   } = presentation
 
@@ -262,6 +263,12 @@ export function WorktreeCardHeader({
         )}
 
         {showTitleRowIndicators && titleRowIndicators}
+
+        {linkedRefLabels.length > 0 && (
+          <span className="ml-auto shrink-0 truncate pr-1.5 font-mono text-[10px] leading-none tracking-tight text-muted-foreground/50">
+            {linkedRefLabels.join(' · ')}
+          </span>
+        )}
       </div>
 
       {showHeaderActions && (
