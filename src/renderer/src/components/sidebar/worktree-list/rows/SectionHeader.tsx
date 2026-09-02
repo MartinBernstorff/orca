@@ -339,6 +339,15 @@ export function renderWorktreeSectionHeaderRow(args: {
           </div>
         </div>
 
+        {headerWorkspaceStatus !== null && row.count > 0 ? (
+          <span
+            className="shrink-0 text-[11px] font-medium leading-none tabular-nums text-muted-foreground/60"
+            data-worktree-section-header-count=""
+          >
+            {row.count}
+          </span>
+        ) : null}
+
         <ProjectHeaderActions>
           {showHeaderCollapseAffordance ? (
             <div
