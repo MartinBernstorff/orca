@@ -3,8 +3,6 @@ export const SIDEBAR_TREE_INDENT = 18
 const PROJECT_WORKTREE_CARD_EXTRA_INDENT = 2
 // Why: seats full-row flush-card content under the group header; smaller pullback = more indent.
 export const FLUSH_CARD_CONTENT_PULLBACK = 4
-// Why: offsets the experimental card's fixed status lane so title/meta stay on the tree step.
-export const NEW_CARD_STYLE_STATUS_LANE_EXTRA_PULLBACK = 6
 // Why: keeps a zero-indent flush card off the sidebar edge.
 export const FLUSH_CARD_MIN_CONTENT_INSET = 2
 export const WORKTREE_CARD_SURFACE_MARGIN = 4
@@ -150,40 +148,10 @@ export function getWorktreeCardSurfaceInset(args: {
   return args.isGrouped ? clampDepth(args.groupDepth) * GROUPED_WORKTREE_CARD_SURFACE_INDENT : 0
 }
 
-export function getFlushWorktreeCardPaddingLeft(
-  contentIndent: number,
-  applyNewCardStyleStatusLaneOffset = false
-): string {
-  const pullback =
-    FLUSH_CARD_CONTENT_PULLBACK +
-    (applyNewCardStyleStatusLaneOffset ? NEW_CARD_STYLE_STATUS_LANE_EXTRA_PULLBACK : 0)
+export function getFlushWorktreeCardPaddingLeft(contentIndent: number): string {
   return contentIndent > 0
-    ? `max(${FLUSH_CARD_MIN_CONTENT_INSET}px, calc(${contentIndent}px - ${pullback}px))`
+    ? `max(${FLUSH_CARD_MIN_CONTENT_INSET}px, calc(${contentIndent}px - ${FLUSH_CARD_CONTENT_PULLBACK}px))`
     : `${FLUSH_CARD_MIN_CONTENT_INSET}px`
-}
-
-export function getNewCardStyleParentContentMarginLeft(contentIndent: number): number {
-  if (contentIndent <= 0) {
-    return 0
-  }
-
-  const legacyInnerPadding = Math.max(
-    FLUSH_CARD_MIN_CONTENT_INSET,
-    contentIndent - FLUSH_CARD_CONTENT_PULLBACK
-  )
-  const newInnerPadding = Math.max(
-    FLUSH_CARD_MIN_CONTENT_INSET,
-    contentIndent - FLUSH_CARD_CONTENT_PULLBACK - NEW_CARD_STYLE_STATUS_LANE_EXTRA_PULLBACK
-  )
-  const paddingShift = legacyInnerPadding - newInnerPadding
-  const remainingShift = NEW_CARD_STYLE_STATUS_LANE_EXTRA_PULLBACK - paddingShift
-  if (remainingShift <= 0) {
-    return 0
-  }
-
-  // Why: shallow rows hit the padding floor; finish with margin but never pass the inner edge.
-  const rawMargin = -remainingShift
-  return Math.max(-newInnerPadding, rawMargin)
 }
 
 export function getLineageNestedRowGeometry(args: {

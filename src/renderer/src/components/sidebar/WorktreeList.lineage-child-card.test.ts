@@ -97,20 +97,6 @@ describe('WorktreeList lineage child card renderer', () => {
     expect(childMarkup).toContain('Deleting')
   })
 
-  it('shows the unread bell action on unread nested lineage child cards', async () => {
-    setLineageFixtureState('none', { unreadWorktreeIds: ['child'] })
-    mockStore.state.worktreeCardProperties = ['status', 'inline-agents']
-    const markup = await renderWorktreeListMarkup()
-    const childIndex = markup.indexOf('data-worktree-card-id="child"')
-    const childMarkup = markup.slice(
-      childIndex,
-      markup.indexOf('data-worktree-card-id="grandchild"')
-    )
-
-    expect(childMarkup).toContain('aria-label="Mark as read"')
-    expect(childMarkup).not.toContain('aria-label="Mark as unread"')
-  })
-
   it('lets WorktreeCard own the reconnect dialog for an active disconnected lineage child', async () => {
     setLineageFixtureState()
     const repo = (mockStore.state.repos as Repo[])[0]!

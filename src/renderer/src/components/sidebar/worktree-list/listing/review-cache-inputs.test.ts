@@ -56,7 +56,7 @@ describe('selectWorktreeListReviewCacheInputs', () => {
     expect(selected).toEqual({ prCache, hostedReviewCache: null })
   })
 
-  it('keeps both caches live for new-style folder status displays', () => {
+  it('keeps both caches live for new-style folder review displays', () => {
     const prCache = { branch: {} as never }
     const hostedReviewCache = { branch: {} as never }
     const selected = selectWorktreeListReviewCacheInputs(
@@ -68,7 +68,7 @@ describe('selectWorktreeListReviewCacheInputs', () => {
         settings: { experimentalNewWorktreeCardStyle: true } as never
       },
       'repo',
-      ['status']
+      ['pr']
     )
 
     expect(selected).toEqual({ prCache, hostedReviewCache })

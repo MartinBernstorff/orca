@@ -76,13 +76,6 @@ export type WorktreeCardPropertyOption = {
 
 const BASE_WORKTREE_CARD_PROPERTY_OPTIONS: WorktreeCardPropertyOption[] = [
   {
-    id: 'status',
-    properties: ['status'],
-    get label() {
-      return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.1a0eec0d35', 'Status')
-    }
-  },
-  {
     id: 'comment',
     properties: ['comment'],
     get label() {
@@ -202,15 +195,7 @@ export function getWorktreeCardPropertyOptions({
         : translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.219ebf1961', 'Branch name')
     }
   }
-  if (newCardStyle) {
-    return [...issueOptions, ...BASE_WORKTREE_CARD_PROPERTY_OPTIONS.slice(1, -1), branchOption]
-  }
-  return [
-    BASE_WORKTREE_CARD_PROPERTY_OPTIONS[0],
-    ...issueOptions,
-    ...BASE_WORKTREE_CARD_PROPERTY_OPTIONS.slice(1, -1),
-    branchOption
-  ]
+  return [...issueOptions, ...BASE_WORKTREE_CARD_PROPERTY_OPTIONS.slice(0, -1), branchOption]
 }
 
 export const WORKTREE_CARD_PROPERTY_OPTIONS = getWorktreeCardPropertyOptions()

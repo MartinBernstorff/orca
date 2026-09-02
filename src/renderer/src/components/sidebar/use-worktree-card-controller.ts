@@ -31,7 +31,6 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     prDisplay: review.prDisplay
   })
 
-  const showStatus = foundation.cardProps.includes('status')
   const showIssue = foundation.cardProps.includes('issue')
   const showLinearIssue = foundation.cardProps.includes('linear-issue')
   const showJiraIssue = foundation.cardProps.includes('jira-issue')
@@ -40,7 +39,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
   const showCli = foundation.cardProps.includes('cli')
   const showComment = foundation.cardProps.includes('comment')
   const showPorts = foundation.cardProps.includes('ports')
-  const shouldRefreshHostedReview = foundation.newCardStyle ? showStatus : showPR
+  const shouldRefreshHostedReview = showPR
   const detailsHoverControl = useWorktreeCardDetailsHoverControl()
   const hoverDetailsOpen = detailsHoverControl.hoverOpen
 
@@ -111,7 +110,6 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     worktree,
     repo,
     statusPrDisplay: props.statusPrDisplay,
-    showStatus,
     showIssue,
     showLinearIssue,
     showJiraIssue,
@@ -145,7 +143,6 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     ...review,
     ...linked,
     detailsHoverControl,
-    showStatus,
     showIssue,
     showLinearIssue,
     showJiraIssue,

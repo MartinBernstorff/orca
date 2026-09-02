@@ -26,9 +26,7 @@ export function selectWorktreeListReviewCacheInputs(
 ): WorktreeListReviewCacheInputs {
   const hasFolderWorkspaces = state.folderWorkspaces.length > 0
   const newCardStyle = state.settings?.experimentalNewWorktreeCardStyle === true
-  const folderCardsNeedReview =
-    hasFolderWorkspaces &&
-    (newCardStyle ? cardProperties.includes('status') : cardProperties.includes('pr'))
+  const folderCardsNeedReview = hasFolderWorkspaces && cardProperties.includes('pr')
   const needsPrCache = groupBy === 'pr-status' || folderCardsNeedReview
   const needsHostedReviewCache = newCardStyle && folderCardsNeedReview
 

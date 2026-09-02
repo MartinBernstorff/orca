@@ -106,7 +106,6 @@ export function createWorktreeCardModuleMock(): Record<string, unknown> {
           string,
           { isDeleting?: boolean } | undefined
         >) ?? {}
-      const cardProps = (mockStore.state.worktreeCardProperties as string[] | undefined) ?? []
       const sshState =
         repo?.connectionId && mockStore.state.sshConnectionStates instanceof Map
           ? mockStore.state.sshConnectionStates.get(repo.connectionId)
@@ -141,9 +140,6 @@ export function createWorktreeCardModuleMock(): Record<string, unknown> {
         },
         React.createElement('h2', null, worktree.displayName),
         isDeleting ? React.createElement('span', null, 'Deleting') : null,
-        cardProps.includes('status') && worktree.isUnread
-          ? React.createElement('button', { 'aria-label': 'Mark as read' }, 'Unread')
-          : null,
         lineageChildCount
           ? React.createElement(
               'button',

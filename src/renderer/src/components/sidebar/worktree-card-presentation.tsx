@@ -1,9 +1,6 @@
 import React from 'react'
 
-import {
-  getFlushWorktreeCardPaddingLeft,
-  getNewCardStyleParentContentMarginLeft
-} from './worktree-list/rows/indentation'
+import { getFlushWorktreeCardPaddingLeft } from './worktree-list/rows/indentation'
 import {
   hasWorktreeCardDetails,
   WorktreeCardDetailsHover,
@@ -35,7 +32,6 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     cacheStartedAt,
     hasDetails,
     hasPorts,
-    showStatus,
     showInlineAgentList,
     showLineageChildChip,
     remoteBranchConflict,
@@ -86,9 +82,6 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
   const showConflictOperationBadge =
     !!conflictOperation && conflictOperation !== 'unknown' && conflictOperation !== 'rebase'
   const hasMetadataBadge = showConflictOperationBadge
-  const showUnreadQuickAction = !affiliateListMode && showStatus && !newCardStyle
-  // Why: the slot owns the unread/status lane; legacy keeps the bell toggle, the new card keeps the glyph passive.
-  const showCombinedStatusSlot = showStatus
   const showTitleRowPrimary = compactCards && worktree.isMainWorktree && !isFolder
   const showMetaRowDetails = !newCardStyle && !compactCards && (hasDetails || hasPorts)
   const showTitleRowIndicators = (newCardStyle || compactCards) && (hasDetails || hasPorts)
@@ -185,16 +178,11 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
         )
       : undefined
   // Why: sidebar rows need a small surface inset while content stays aligned with the pre-inset layout.
-  const applyNewCardStyleStatusLaneOffset = newCardStyle && showCombinedStatusSlot
   const cardPaddingLeft = flushSurface
-    ? getFlushWorktreeCardPaddingLeft(contentIndent, applyNewCardStyleStatusLaneOffset)
+    ? getFlushWorktreeCardPaddingLeft(contentIndent)
     : contentIndent > 0
       ? `calc(0.125rem + ${contentIndent}px)`
       : null
-  const parentContentMarginLeft =
-    flushSurface && applyNewCardStyleStatusLaneOffset
-      ? getNewCardStyleParentContentMarginLeft(contentIndent)
-      : 0
   const cardStyle = cardPaddingLeft ? { paddingLeft: cardPaddingLeft } : undefined
   const detailsAndPortsContent =
     hasDetails || hasPorts ? (
@@ -263,8 +251,6 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     showDetachedHeadInMetaRow,
     showBranch,
     showConflictOperationBadge,
-    showUnreadQuickAction,
-    showCombinedStatusSlot,
     showTitleRowPrimary,
     showMetaRowDetails,
     showTitleRowIndicators,
@@ -275,7 +261,6 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     hoverWorkspaceTitle,
     hasHoverDetails,
     titleWrapper,
-    parentContentMarginLeft,
     cardStyle,
     detailsAndPorts,
     titleRowIndicators,

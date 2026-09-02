@@ -52,16 +52,10 @@ export const createRefreshSweepActions = (
     // Only re-fetch PR/issue entries that are already stale — skip fresh ones
     const state = get()
     const cardProps = state.worktreeCardProperties ?? []
-    const rawCardProps = cardProps as readonly string[]
     const shouldRefreshIssues = (state.worktreeCardProperties ?? []).includes('issue')
     const isPRStatusGrouping = state.groupBy === 'pr-status'
     const rightSidebarShowsPR = rightSidebarShowsPullRequestData(state)
-    const shouldRefreshPRs =
-      isPRStatusGrouping ||
-      rightSidebarShowsPR ||
-      (state.settings?.experimentalNewWorktreeCardStyle === true
-        ? cardProps.includes('status')
-        : cardProps.includes('pr') || rawCardProps.includes('ci'))
+    const shouldRefreshPRs = isPRStatusGrouping || rightSidebarShowsPR || cardProps.includes('pr')
     if (!shouldRefreshPRs && !shouldRefreshIssues) {
       return
     }

@@ -71,11 +71,7 @@ export function useVisiblePrRefreshReporting(args: {
       ((currentWorktree.linkedGitLabMR ?? null) === null ||
         (currentWorktree.linkedPR ?? null) !== null)
     const shouldTrackSidebarWorktree = rightSidebarShowsPR && sidebarWorktreeHasGitHubReview
-    const shouldTrackVisibleRows =
-      groupBy === 'pr-status' ||
-      (newCardStyle
-        ? cardProps.includes('status')
-        : cardProps.includes('pr') || cardProps.includes('ci'))
+    const shouldTrackVisibleRows = groupBy === 'pr-status' || cardProps.includes('pr')
     if (!shouldTrackVisibleRows && !shouldTrackSidebarWorktree) {
       if (lastVisibleRefreshKeyRef.current !== NOTHING_TO_TRACK_KEY) {
         lastVisibleRefreshKeyRef.current = NOTHING_TO_TRACK_KEY

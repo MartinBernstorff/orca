@@ -144,13 +144,13 @@ describe('WorktreeCard quick actions', () => {
     gitConflictOperationByWorktree = {}
   })
 
-  it('marks the unread toggle as a workspace-board-preserving action', () => {
+  it('renders no unread toggle now that the status lane is gone', () => {
     const markup = renderToStaticMarkup(
       <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
     )
 
-    expect(markup).toContain('aria-label="Mark as read"')
-    expect(markup).toContain('data-workspace-board-preserve-open=""')
+    expect(markup).not.toContain('aria-label="Mark as read"')
+    expect(markup).not.toContain('aria-label="Mark as unread"')
   })
 
   it('renders repo identity in the detailed metadata row', () => {

@@ -113,7 +113,7 @@ describe('WorktreeCard hosted review refresh', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.clearAllMocks()
-    worktreeCardProperties = ['status']
+    worktreeCardProperties = ['pr']
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)

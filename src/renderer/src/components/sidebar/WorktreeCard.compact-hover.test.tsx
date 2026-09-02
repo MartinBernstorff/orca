@@ -605,7 +605,7 @@ describe('WorktreeCard compact hover details', () => {
     )
   })
 
-  it('keeps status and agent tooltip targets outside the worktree details hover trigger', async () => {
+  it('keeps agent tooltip targets outside the worktree details hover trigger', async () => {
     settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: true }
     worktreeCardProperties = ['status', 'inline-agents']
     agentActivityDisplayMode = 'compact'
@@ -615,14 +615,12 @@ describe('WorktreeCard compact hover details', () => {
     const markup = renderToStaticMarkup(
       <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
     )
-    const statusIndex = markup.indexOf('data-worktree-card-status-slot=""')
     const triggerIndex = markup.indexOf('data-worktree-card-hover-trigger=""')
     const hoverContentIndex = markup.indexOf('data-hover-card-content=""')
     const agentsIndex = markup.indexOf('data-worktree-agents=""')
 
     expectIdentityBodyIsHoverTrigger(markup)
-    expect(statusIndex).toBeGreaterThanOrEqual(0)
-    expect(statusIndex).toBeLessThan(triggerIndex)
+    expect(markup).not.toContain('data-worktree-card-status-slot=""')
     expect(hoverContentIndex).toBeGreaterThan(triggerIndex)
     expect(agentsIndex).toBeGreaterThan(hoverContentIndex)
   })
@@ -688,7 +686,7 @@ describe('WorktreeCard compact hover details', () => {
     expect(markup).not.toContain('data-worktree-card-meta-row=""')
     expect(markup).toContain('data-worktree-card-parent-content=""')
     expect(markup).toContain('items-center')
-    expect(markup).toContain('w-5 items-center')
+    expect(markup).not.toContain('w-5 items-center')
     expect(markup).toContain('text-[13px] leading-5')
   })
 
