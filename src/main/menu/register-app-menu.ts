@@ -6,6 +6,7 @@ import {
   type KeybindingOverrides
 } from '../../shared/keybindings'
 import type { UpdateCheckOptions } from '../../shared/update-status-types'
+import { AUTO_UPDATE_DISABLED } from '../../shared/auto-update-disabled'
 import { translateMain } from '../i18n/main-i18n'
 import { createAppMenuSelectionItem } from './app-menu-selection-item'
 
@@ -142,7 +143,7 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
     label: options.appMenuLabel ?? app.name,
     submenu: [
       { role: 'about' },
-      checkForUpdatesItem,
+      ...(AUTO_UPDATE_DISABLED ? [] : [checkForUpdatesItem]),
       settingsItem,
       { type: 'separator' },
       { role: 'services' },
@@ -327,7 +328,7 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
         : ([
             { type: 'separator' },
             { role: 'about' },
-            checkForUpdatesItem
+            ...(AUTO_UPDATE_DISABLED ? [] : [checkForUpdatesItem])
           ] satisfies Electron.MenuItemConstructorOptions[]))
     ]
   }

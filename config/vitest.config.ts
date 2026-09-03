@@ -15,6 +15,8 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
+    // Fork: auto-update ships disabled, so keep the updater tests on the enabled path.
+    env: { ORCA_ENABLE_AUTO_UPDATE: '1' },
     // Why: Node 26's undefined Web Storage globals prevent Vitest from installing happy-dom's.
     // Why --expose-gc: retention tests need a deterministic collection point to measure what a queue really holds.
     execArgv: ['--no-experimental-webstorage', '--expose-gc'],

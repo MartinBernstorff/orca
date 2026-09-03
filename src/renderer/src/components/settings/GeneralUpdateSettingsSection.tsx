@@ -11,6 +11,10 @@ import { getUpdateCheckClickOptions, getUpdateCheckHint } from '@/lib/update-che
 import { GeneralRemoteServerUpdates } from './GeneralRemoteServerUpdates'
 import { ReleaseChannelSection } from './ReleaseChannelSection'
 import { getReleaseNotesUrlForVersion } from '../../../../shared/release-channel'
+import { AUTO_UPDATE_DISABLED } from '../../../../shared/auto-update-disabled'
+
+// Aliased rather than wrapped in a conditional so upstream edits to the block below still merge cleanly.
+const UpdateCheckSetting = AUTO_UPDATE_DISABLED ? () => null : SearchableSetting
 
 export function GeneralUpdateSettingsSection(): React.JSX.Element {
   const updateStatus = useAppStore((s) => s.updateStatus)
@@ -88,7 +92,7 @@ export function GeneralUpdateSettingsSection(): React.JSX.Element {
         />
       </div>
 
-      <SearchableSetting
+      <UpdateCheckSetting
         title={translate(
           'auto.components.settings.GeneralUpdateSettingsSection.e1a647adc5',
           'Check for Updates'
@@ -256,8 +260,8 @@ export function GeneralUpdateSettingsSection(): React.JSX.Element {
                   { value0: updateStatus.message }
                 ))}
         </p>
-      </SearchableSetting>
-      {channelSwitcherRevealed ? <ReleaseChannelSection /> : null}
+      </UpdateCheckSetting>
+      {channelSwitcherRevealed && !AUTO_UPDATE_DISABLED ? <ReleaseChannelSection /> : null}
       <GeneralRemoteServerUpdates />
     </section>
   )
