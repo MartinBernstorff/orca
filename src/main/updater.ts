@@ -2040,6 +2040,9 @@ export async function showLinuxPackage(): Promise<void> {
 
 export function quitAndInstall(): void {
   if (AUTO_UPDATE_DISABLED) {
+    // Why error, not a silent return: the renderer has already committed to shutdown and waits for
+    // an install or an abort relay.
+    sendInstallFailureStatus({ state: 'error', message: 'Updates are disabled in this build.' })
     return
   }
   if (

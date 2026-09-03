@@ -4,6 +4,7 @@ import menuBarIconRetinaPath from '../../../resources/tray/orca-menu-barTemplate
 import { deferAppKitSceneMutation } from '../appkit-scene-mutation'
 import { createAppIconImage } from '../app-icon'
 import { translateMain } from '../i18n/main-i18n'
+import { AUTO_UPDATE_DISABLED } from '../../shared/auto-update-disabled'
 import { composeTrayAttentionIcon, tintTrayTemplateForAttention } from './tray-attention-icon'
 import { stampTrayDevBadge } from './tray-dev-badge'
 
@@ -272,10 +273,14 @@ export function createSystemTray(opts: SystemTrayOptions): Tray | null {
             label: translateMain('menu.settings', 'Settings'),
             click: safeMenuAction(() => opts.onOpenSettings())
           },
-          {
-            label: translateMain('menu.checkForUpdates', 'Check for Updates...'),
-            click: safeMenuAction(() => opts.onCheckForUpdates())
-          },
+          ...(AUTO_UPDATE_DISABLED
+            ? []
+            : [
+                {
+                  label: translateMain('menu.checkForUpdates', 'Check for Updates...'),
+                  click: safeMenuAction(() => opts.onCheckForUpdates())
+                }
+              ]),
           { type: 'separator' }
         ] as Electron.MenuItemConstructorOptions[])
       : []),
