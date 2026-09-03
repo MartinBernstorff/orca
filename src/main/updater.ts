@@ -17,6 +17,7 @@ import {
   isWindowsSignatureCheckUnavailableFailure,
   isWindowsSignatureMismatchFailure
 } from '../shared/updater-windows-signature-check'
+import { AUTO_UPDATE_DISABLED } from '../shared/auto-update-disabled'
 import { killAllPty } from './ipc/pty'
 import { withUpdaterSpan } from './observability/instrumentation'
 import { loadElectronAutoUpdater, type ElectronAutoUpdater } from './electron-updater-loader'
@@ -1565,6 +1566,9 @@ function runBackgroundUpdateCheck(
 }
 
 export function checkForUpdates(): void {
+  if (AUTO_UPDATE_DISABLED) {
+    return
+  }
   // Why: span records only check launch (always Success), not outcome; dashboards must filter `updater.outcome === 'launched'`, not this span's success rate.
   void withUpdaterSpan({ stage: 'check' }, async (span) => {
     span.setAttribute('updater.outcome', 'launched')
@@ -1587,6 +1591,10 @@ function enableIncludePrerelease(): void {
 
 /** Menu-triggered check — delegates feedback to renderer toasts via userInitiated flag */
 export function checkForUpdatesFromMenu(options?: UpdateCheckOptions): void {
+  if (AUTO_UPDATE_DISABLED) {
+    sendStatus({ state: 'not-available', userInitiated: true })
+    return
+  }
   if (!app.isPackaged || is.dev) {
     sendStatus({ state: 'not-available', userInitiated: true })
     return
@@ -2031,6 +2039,9 @@ export async function showLinuxPackage(): Promise<void> {
 }
 
 export function quitAndInstall(): void {
+  if (AUTO_UPDATE_DISABLED) {
+    return
+  }
   if (
     localBuildSelectionInProgress ||
     pinnedBuildSelectionInProgress ||
@@ -2174,6 +2185,10 @@ export function setupAutoUpdater(
     installMode?: UpdateInstallMode
   }
 ): void {
+  if (AUTO_UPDATE_DISABLED) {
+    mainWindowRef = mainWindow
+    return
+  }
   mainWindowRef = mainWindow
   onBeforeQuitCleanup = opts?.onBeforeQuit ?? null
   persistLastUpdateCheckAt = opts?.setLastUpdateCheckAt ?? null
@@ -2317,6 +2332,9 @@ export function setupAutoUpdater(
 }
 
 export function downloadUpdate(): void {
+  if (AUTO_UPDATE_DISABLED) {
+    return
+  }
   if (localBuildSelectionInProgress || pinnedBuildSelectionInProgress || downloadInFlight) {
     return
   }
