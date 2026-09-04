@@ -39,6 +39,9 @@ function setState(overrides: Record<string, unknown> = {}): void {
     runtimeEnvironmentCatalogHydrated: true,
     alwaysShowDefaultBranchWorkspace: true,
     setAlwaysShowDefaultBranchWorkspace: vi.fn(),
+    showSnoozedWorkspaces: false,
+    setShowSnoozedWorkspaces: vi.fn(),
+    worktreesByRepo: {},
     ...overrides
   }
 }
@@ -116,5 +119,42 @@ describe('SidebarWorkspaceFilterSection', () => {
     render()
 
     expect(rowLabels()).toContain('Hide other-client workspaces')
+  })
+})
+
+describe('SidebarWorkspaceFilterSection snooze row', () => {
+  function worktree(id: string, snoozedUntil: number | null): Record<string, unknown> {
+    return { id, repoId: 'repo1', hostId: 'local', isArchived: false, snoozedUntil }
+  }
+
+  it('offers a snooze reveal row with no count while nothing is snoozed', () => {
+    setState({ worktreesByRepo: { repo1: [worktree('a', null)] } })
+    render()
+    expect(rowLabels()).toContain('Show snoozed')
+  })
+
+  it('counts only workspaces whose wake time is still ahead', () => {
+    const now = Date.now()
+    setState({
+      worktreesByRepo: {
+        repo1: [
+          worktree('future', now + 60_000),
+          worktree('past', now - 60_000),
+          worktree('never', null)
+        ]
+      }
+    })
+    render()
+    expect(rowLabels().find((label) => label.startsWith('Show snoozed'))).toBe('Show snoozed· 1')
+  })
+
+  it('leaves archived snoozed workspaces out of the count', () => {
+    setState({
+      worktreesByRepo: {
+        repo1: [{ ...worktree('gone', Date.now() + 60_000), isArchived: true }]
+      }
+    })
+    render()
+    expect(rowLabels().find((label) => label.startsWith('Show snoozed'))).toBe('Show snoozed')
   })
 })

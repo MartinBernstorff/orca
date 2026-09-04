@@ -20,6 +20,7 @@ function makeBaseline(overrides: Partial<PersistedUIWriteBaseline> = {}): Persis
     sortBy: 'recent',
     projectOrderBy: 'manual',
     showSleepingWorkspaces: true,
+    showSnoozedWorkspaces: false,
     hideDefaultBranchWorkspace: false,
     hideAutomationGeneratedWorkspaces: false,
     hideCliCreatedWorkspaces: false,

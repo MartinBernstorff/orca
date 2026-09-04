@@ -941,6 +941,8 @@ export type UISlice = {
   setHideWorkspacesFromOtherDevices: (v: boolean) => void
   alwaysShowDefaultBranchWorkspace: boolean
   setAlwaysShowDefaultBranchWorkspace: (v: boolean) => void
+  showSnoozedWorkspaces: boolean
+  setShowSnoozedWorkspaces: (v: boolean) => void
   showEmptyWorkspaceStatuses: boolean
   setShowEmptyWorkspaceStatuses: (v: boolean) => void
   showDotfilesByWorktree: Record<string, boolean>
@@ -2196,6 +2198,8 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
   setHideWorkspacesFromOtherDevices: (v) => set({ hideWorkspacesFromOtherDevices: v }),
   alwaysShowDefaultBranchWorkspace: true,
   setAlwaysShowDefaultBranchWorkspace: (v) => set({ alwaysShowDefaultBranchWorkspace: v }),
+  showSnoozedWorkspaces: false,
+  setShowSnoozedWorkspaces: (v) => set({ showSnoozedWorkspaces: v }),
   showEmptyWorkspaceStatuses: false,
   setShowEmptyWorkspaceStatuses: (v) => set({ showEmptyWorkspaceStatuses: v }),
 
@@ -2652,6 +2656,7 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         // Why !== false: profiles written before #8873 have no key, and they are
         // precisely the ones showing the bug, so absence must mean "exempt".
         alwaysShowDefaultBranchWorkspace: ui.alwaysShowDefaultBranchWorkspace !== false,
+        showSnoozedWorkspaces: ui.showSnoozedWorkspaces === true,
         showEmptyWorkspaceStatuses: ui.showEmptyWorkspaceStatuses === true,
         showDotfilesByWorktree: sanitizeShowDotfilesByWorktree(ui.showDotfilesByWorktree),
         // Why: startup hydrates UI before repo catalogs, so defer repo-filter validation to the all-host refresh.

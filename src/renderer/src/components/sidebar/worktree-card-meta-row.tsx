@@ -5,6 +5,7 @@ import { DetachedHeadBadge } from '@/components/DetachedHeadBadge'
 import { RepoBadgeMark } from '@/components/repo/RepoBadgeLabel'
 import { Badge } from '@/components/ui/badge'
 import CacheTimer from './CacheTimer'
+import { SnoozedUntilBadge } from './SnoozedUntilBadge'
 import { CONFLICT_OPERATION_LABELS } from './WorktreeCardHelpers'
 import { TruncatedSidebarLabel } from './truncated-sidebar-label'
 import { getDirectoryName } from './worktree-card-model'
@@ -102,6 +103,8 @@ export function WorktreeCardMetaRow({
             {CONFLICT_OPERATION_LABELS[conflictOperation]}
           </Badge>
         )}
+
+        <SnoozedUntilBadge snoozedUntil={worktree.snoozedUntil} />
 
         {cacheStartedAt != null && <CacheTimer startedAt={cacheStartedAt} ttlMs={cacheTtlMs} />}
       </div>

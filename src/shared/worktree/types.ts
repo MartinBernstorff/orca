@@ -101,6 +101,9 @@ export type Worktree = {
   isArchived: boolean
   isUnread: boolean
   isPinned: boolean
+  /** Epoch ms the workspace stops being hidden from the sidebar. Absent or in
+   *  the past means not snoozed; nothing rewrites it on expiry. */
+  snoozedUntil?: number | null
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

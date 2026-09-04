@@ -115,6 +115,7 @@ export function usePersistedUIWriter(): void {
         hideDetachedHeadWorkspaces: s.hideDetachedHeadWorkspaces,
         hideWorkspacesFromOtherDevices: s.hideWorkspacesFromOtherDevices,
         alwaysShowDefaultBranchWorkspace: s.alwaysShowDefaultBranchWorkspace,
+        showSnoozedWorkspaces: s.showSnoozedWorkspaces,
         showEmptyWorkspaceStatuses: s.showEmptyWorkspaceStatuses,
         showDotfilesByWorktree: s.showDotfilesByWorktree,
         filterRepoIds: s.filterRepoIds,

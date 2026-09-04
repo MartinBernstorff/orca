@@ -54,6 +54,7 @@ const FolderWorkspaceUpdate = z.object({
       isArchived: z.boolean().optional(),
       isUnread: z.boolean().optional(),
       isPinned: z.boolean().optional(),
+      snoozedUntil: OptionalFiniteNumber.nullable(),
       sortOrder: OptionalFiniteNumber,
       manualOrder: OptionalFiniteNumber,
       workspaceStatus: OptionalString,

@@ -151,6 +151,7 @@ export const WORKTREE_METHODS: RpcMethod[] = [
         isArchived: params.isArchived,
         isUnread: params.isUnread,
         isPinned: params.isPinned,
+        snoozedUntil: params.snoozedUntil,
         sortOrder: params.sortOrder,
         manualOrder: params.manualOrder,
         lastActivityAt: params.lastActivityAt,

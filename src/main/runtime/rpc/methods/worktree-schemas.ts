@@ -132,6 +132,7 @@ export const WorktreeSet = WorktreeSelector.extend({
   isArchived: OptionalBoolean,
   isUnread: OptionalBoolean,
   isPinned: OptionalBoolean,
+  snoozedUntil: OptionalFiniteNumber.nullable(),
   sortOrder: OptionalFiniteNumber,
   manualOrder: OptionalFiniteNumber,
   lastActivityAt: OptionalFiniteNumber,

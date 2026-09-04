@@ -51,6 +51,9 @@ export function isDetachedHeadWorkspace(worktree: Worktree): boolean {
 /** Inputs describing sidebar filter settings that the Clear Filters path owns. */
 export type SidebarFilterState = {
   showSleepingWorkspaces: boolean
+  /** Not a Clear Filters concern: snoozing is a per-workspace decision, and
+   *  revealing snoozed rows only ever widens the list. */
+  showSnoozedWorkspaces?: boolean
   filterRepoIds: readonly string[]
   hideDefaultBranchWorkspace: boolean
   hideAutomationGeneratedWorkspaces: boolean

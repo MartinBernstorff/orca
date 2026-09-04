@@ -49,6 +49,8 @@ export type WorktreeMeta = {
   isArchived: boolean
   isUnread: boolean
   isPinned: boolean
+  /** See {@link Worktree.snoozedUntil}. null clears an existing snooze. */
+  snoozedUntil?: number | null
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

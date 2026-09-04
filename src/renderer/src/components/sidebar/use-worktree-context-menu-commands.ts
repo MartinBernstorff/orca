@@ -8,6 +8,7 @@ import {
 } from './worktree-context-menu-delete-intent'
 import { runSleepWorktrees } from './sleep-worktree-flow'
 import { activateAndRevealWorktree } from '@/lib/worktree-activation'
+import { resolveSnoozeUntil, type SnoozePresetId } from '../../../../shared/worktree/snooze'
 import { VIRTUALIZED_SCROLL_ANCHOR_RECORD_EVENT } from '@/hooks/useVirtualizedScrollAnchor'
 import {
   planWorkspaceStatusAssignment,
@@ -45,6 +46,23 @@ export function useWorktreeContextMenuCommands(args: {
     args.updateWorktreeMeta(
       args.worktree.id,
       { isUnread: !args.worktree.isUnread },
+      { executionHostId: args.worktree.hostId ?? 'local' }
+    )
+  }, [args])
+  const handleSnooze = useCallback(
+    (preset: SnoozePresetId) => {
+      args.updateWorktreeMeta(
+        args.worktree.id,
+        { snoozedUntil: resolveSnoozeUntil(preset, Date.now()) },
+        { executionHostId: args.worktree.hostId ?? 'local' }
+      )
+    },
+    [args]
+  )
+  const handleUnsnooze = useCallback(() => {
+    args.updateWorktreeMeta(
+      args.worktree.id,
+      { snoozedUntil: null },
       { executionHostId: args.worktree.hostId ?? 'local' }
     )
   }, [args])
@@ -175,8 +193,10 @@ export function useWorktreeContextMenuCommands(args: {
     handleRemoveProjectFromGroup,
     handleRename,
     handleSleepSubtree,
+    handleSnooze,
     handleSubmitNewProjectGroup,
     handleTogglePin,
-    handleToggleRead
+    handleToggleRead,
+    handleUnsnooze
   }
 }

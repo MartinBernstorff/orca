@@ -30,6 +30,8 @@ import { cn } from '@/lib/utils'
 import { WorktreeOpenInSubMenu } from './WorktreeOpenInMenu'
 import { WorktreeDeveloperMenu } from './WorktreeDeveloperMenu'
 import { WorkspaceSleepMenuItems } from './WorkspaceSleepMenuItems'
+import { WorkspaceSnoozeMenuItems } from './WorkspaceSnoozeMenuItems'
+import { isWorkspaceSnoozed } from '../../../../shared/worktree/snooze'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import { translate } from '@/i18n/i18n'
 import { useOptionalShortcutLabel } from '@/hooks/useShortcutLabel'
@@ -74,8 +76,10 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     handleRemoveProjectFromGroup,
     handleRename,
     handleSleepSubtree,
+    handleSnooze,
     handleTogglePin,
     handleToggleRead,
+    handleUnsnooze,
     hasAnyContextLineage,
     hasParentLink,
     isDeleting,
@@ -188,6 +192,12 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
                   ? translate('auto.components.sidebar.WorktreeContextMenu.697d0f6e1b', 'Unpin')
                   : translate('auto.components.sidebar.WorktreeContextMenu.3baa7d6507', 'Pin')}
               </DropdownMenuItem>
+              <WorkspaceSnoozeMenuItems
+                disabled={isDeleting}
+                isSnoozed={isWorkspaceSnoozed(worktree, Date.now())}
+                onSnooze={handleSnooze}
+                onUnsnooze={handleUnsnooze}
+              />
               <DropdownMenuItem onSelect={handleToggleRead} disabled={isDeleting}>
                 {worktree.isUnread ? (
                   <BellOff className="size-3.5" />

@@ -47,6 +47,7 @@ import {
   isWorkspaceFromOtherDevice
 } from './workspace-creator-visibility'
 import { isDefaultBranchWorkspace } from './default-branch-workspace'
+import { isWorkspaceSnoozed } from '../../../../shared/worktree/snooze'
 import { getWorktreeHostIdentity } from '../../../../shared/worktree/host-qualified-identity'
 
 /**
@@ -64,6 +65,9 @@ import { getWorktreeHostIdentity } from '../../../../shared/worktree/host-qualif
 type VisibleWorktreeOptions = {
   filterRepoIds: readonly string[]
   showSleepingWorkspaces: boolean
+  showSnoozedWorkspaces?: boolean
+  /** Evaluation instant for snooze expiry, so callers control the tick cadence. */
+  now?: number
   tabsByWorktree: Record<string, Pick<TerminalTab, 'id'>[]> | null
   ptyIdsByTabId: Record<string, string[]> | null
   browserTabsByWorktree?: Record<string, { id: string }[]> | null
@@ -93,6 +97,11 @@ export function computeVisibleWorktrees(
 
   // Filter archived
   all = all.filter((w) => !w.isArchived)
+
+  if (opts.showSnoozedWorkspaces !== true) {
+    const now = opts.now ?? Date.now()
+    all = all.filter((w) => !isWorkspaceSnoozed(w, now))
+  }
 
   // Why: sidebar lineage is structural. Archived workspaces stay hidden, but
   // every other valid ancestor can bypass filters so children never orphan.
@@ -302,6 +311,8 @@ export function getVisibleWorktreeIds(): string[] {
   const visibleIds = computeVisibleWorktreeIds(state.worktreesByRepo, sortedIds, {
     filterRepoIds: state.filterRepoIds,
     showSleepingWorkspaces: state.showSleepingWorkspaces,
+    showSnoozedWorkspaces: state.showSnoozedWorkspaces,
+    now: Date.now(),
     tabsByWorktree: state.tabsByWorktree,
     ptyIdsByTabId: state.ptyIdsByTabId,
     browserTabsByWorktree: state.browserTabsByWorktree,

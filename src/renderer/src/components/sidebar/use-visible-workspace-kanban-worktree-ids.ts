@@ -3,6 +3,8 @@ import { useAppStore } from '@/store'
 import type { Repo } from '../../../../shared/repo-types'
 import type { Worktree } from '../../../../shared/worktree/types'
 import { computeVisibleWorktrees } from './visible-worktrees'
+import { useNow } from '@/components/dashboard/useNow'
+import { SNOOZE_EXPIRY_TICK_MS } from './snooze-expiry-tick'
 import { getWorktreeIdsWithLiveAgent } from '@/lib/worktree-activity-state'
 import { getSettingsFocusedExecutionHostId } from '../../../../shared/execution-host'
 import type { AppState } from '@/store/types'
@@ -27,6 +29,8 @@ export function useVisibleWorkspaceKanbanWorktreeIds({
 }: UseVisibleWorkspaceKanbanWorktreeIdsParams): ReadonlySet<string> {
   const worktreesByRepo = useAppStore((s) => s.worktreesByRepo)
   const showSleepingWorkspaces = useAppStore((s) => s.showSleepingWorkspaces)
+  const showSnoozedWorkspaces = useAppStore((s) => s.showSnoozedWorkspaces)
+  const now = useNow(SNOOZE_EXPIRY_TICK_MS)
   const hideDefaultBranchWorkspace = useAppStore((s) => s.hideDefaultBranchWorkspace)
   const hideAutomationGeneratedWorkspaces = useAppStore((s) => s.hideAutomationGeneratedWorkspaces)
   const hideCliCreatedWorkspaces = useAppStore((s) => s.hideCliCreatedWorkspaces)
@@ -72,6 +76,8 @@ export function useVisibleWorkspaceKanbanWorktreeIds({
       computeVisibleWorktrees(worktreesByRepo, sortedIds, {
         filterRepoIds,
         showSleepingWorkspaces,
+        showSnoozedWorkspaces,
+        now,
         tabsByWorktree,
         ptyIdsByTabId,
         browserTabsByWorktree,
@@ -113,6 +119,8 @@ export function useVisibleWorkspaceKanbanWorktreeIds({
     runtimeEnvironments,
     runtimeStatusByEnvironmentId,
     showSleepingWorkspaces,
+    showSnoozedWorkspaces,
+    now,
     tabsByWorktree,
     worktreeIdsWithLiveAgent,
     worktreesByRepo

@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import {
+  AlarmClock,
   CalendarClock,
   Check,
   FolderPlus,
@@ -28,6 +29,7 @@ import {
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import RepoBadgeLabel from '@/components/repo/RepoBadgeLabel'
 import { FilterToggleRow } from './FilterToggleRow'
+import { useSnoozedWorkspaceCount } from './snooze-expiry-tick'
 import { useShortcutLabel } from '@/hooks/useShortcutLabel'
 import { searchRepos } from '@/lib/repo-search'
 import { DEFAULT_SHOW_SLEEPING_WORKSPACES } from '../../../../shared/constants'
@@ -66,6 +68,9 @@ const SidebarFilter = React.memo(function SidebarFilter({
   const setAlwaysShowDefaultBranchWorkspace = useAppStore(
     (s) => s.setAlwaysShowDefaultBranchWorkspace
   )
+  const showSnoozedWorkspaces = useAppStore((s) => s.showSnoozedWorkspaces)
+  const setShowSnoozedWorkspaces = useAppStore((s) => s.setShowSnoozedWorkspaces)
+  const snoozedCount = useSnoozedWorkspaceCount()
   const filterRepoIds = useAppStore((s) => s.filterRepoIds)
   const setFilterRepoIds = useAppStore((s) => s.setFilterRepoIds)
   const repos = useAppStore((s) => s.repos)
@@ -267,6 +272,17 @@ const SidebarFilter = React.memo(function SidebarFilter({
           label={translate('auto.components.sidebar.SidebarFilter.cliCreated', 'Hide CLI-created')}
           checked={hideCliCreatedWorkspaces}
           onChange={setHideCliCreatedWorkspaces}
+        />
+        <FilterToggleRow
+          icon={<AlarmClock className="size-3.5" />}
+          label={translate('auto.components.sidebar.SidebarFilter.snoozed', 'Show snoozed')}
+          ariaLabel={translate(
+            'auto.components.sidebar.SidebarFilter.snoozedAria',
+            'Show workspaces that are snoozed until a later time'
+          )}
+          checked={showSnoozedWorkspaces}
+          onChange={setShowSnoozedWorkspaces}
+          count={snoozedCount}
         />
         <FilterToggleRow
           icon={<GitCommitHorizontal className="size-3.5" />}

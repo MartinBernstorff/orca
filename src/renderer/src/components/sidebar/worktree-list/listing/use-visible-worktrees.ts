@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { useAppStore } from '@/store'
+import { useNow } from '@/components/dashboard/useNow'
+import { SNOOZE_EXPIRY_TICK_MS } from '../../snooze-expiry-tick'
 import { getWorktreeIdsWithLiveAgent } from '@/lib/worktree-activity-state'
 import type { AppState } from '@/store/types'
 import type { Repo } from '../../../../../../shared/repo-types'
@@ -34,6 +36,7 @@ export function useVisibleSidebarWorktrees(args: {
   const { filterState, sortBy, sortedIds, repoMap, worktreeLineageById, settings } = args
   const {
     showSleepingWorkspaces,
+    showSnoozedWorkspaces,
     filterRepoIds,
     hideDefaultBranchWorkspace,
     hideAutomationGeneratedWorkspaces,
@@ -44,6 +47,9 @@ export function useVisibleSidebarWorktrees(args: {
     visibleWorkspaceHostIds,
     workspaceHostScope
   } = filterState
+  // Why a tick and not a render-time Date.now(): a snooze expiring on an idle
+  // sidebar must bring the row back on its own, not wait for unrelated churn.
+  const now = useNow(SNOOZE_EXPIRY_TICK_MS)
   const worktreesByRepo = useAppStore((s) => s.worktreesByRepo)
   const agentStatusEpoch = useAppStore((s) => (!showSleepingWorkspaces ? s.agentStatusEpoch : 0))
   const runtimeEnvironments = useAppStore((s) => s.runtimeEnvironments)
@@ -71,6 +77,8 @@ export function useVisibleSidebarWorktrees(args: {
     return computeVisibleWorktrees(worktreesByRepo, sortedIds, {
       filterRepoIds,
       showSleepingWorkspaces,
+      showSnoozedWorkspaces: showSnoozedWorkspaces === true,
+      now,
       tabsByWorktree,
       ptyIdsByTabId,
       browserTabsByWorktree,
@@ -103,6 +111,8 @@ export function useVisibleSidebarWorktrees(args: {
     agentStatusEpoch,
     filterRepoIds,
     showSleepingWorkspaces,
+    showSnoozedWorkspaces,
+    now,
     hideDefaultBranchWorkspace,
     hideAutomationGeneratedWorkspaces,
     hideCliCreatedWorkspaces,

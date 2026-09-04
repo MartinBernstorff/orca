@@ -15,6 +15,7 @@ export function FilterToggleRow({
   checked,
   onChange,
   shortcutLabel,
+  count,
   indented = false
 }: {
   icon: React.ReactNode
@@ -24,6 +25,8 @@ export function FilterToggleRow({
   checked: boolean
   onChange: (next: boolean) => void
   shortcutLabel?: string
+  /** How many workspaces the row currently applies to. Hidden when 0. */
+  count?: number
   /** Renders the row as a sub-option of the row above it. */
   indented?: boolean
 }) {
@@ -49,6 +52,7 @@ export function FilterToggleRow({
       >
         <span className="text-muted-foreground">{icon}</span>
         {label}
+        {count ? <span className="font-medium text-muted-foreground">· {count}</span> : null}
       </span>
       <span className="inline-flex items-center gap-2">
         {shortcutLabel ? <DropdownMenuShortcut>{shortcutLabel}</DropdownMenuShortcut> : null}

@@ -29,6 +29,7 @@ import {
 } from './folder-workspace-path-status'
 import { toast } from 'sonner'
 import { isDetachedHeadWorkspace } from '@/components/sidebar/visible-worktrees'
+import { isWorkspaceSnoozed } from '../../../shared/worktree/snooze'
 import type { ExecutionHostId } from '../../../shared/execution-host'
 import { findFolderWorkspaceOwner } from './folder-workspace-runtime-owner'
 import type { WorktreeStartupPayload } from '@/lib/worktree-startup-payload'
@@ -297,6 +298,15 @@ export function activateAndRevealWorktree(
   }
   if (state.hideDetachedHeadWorkspaces && isDetachedHeadWorkspace(wt)) {
     state.setHideDetachedHeadWorkspaces(false)
+  }
+  // Why clear rather than reveal: snooze is per-workspace, so unhiding it for
+  // this one activation is the same as ending the snooze.
+  if (isWorkspaceSnoozed(wt, Date.now())) {
+    void state.updateWorktreeMeta(
+      worktreeId,
+      { snoozedUntil: null },
+      { executionHostId: wt.hostId ?? 'local' }
+    )
   }
 
   // 6. Reveal in sidebar

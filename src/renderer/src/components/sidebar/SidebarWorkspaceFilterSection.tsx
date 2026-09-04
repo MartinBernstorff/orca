@@ -1,5 +1,6 @@
 import React from 'react'
 import {
+  AlarmClock,
   CalendarClock,
   GitBranch,
   GitCommitHorizontal,
@@ -10,9 +11,13 @@ import {
 import { useAppStore } from '@/store'
 import { translate } from '@/i18n/i18n'
 import { FilterToggleRow } from './FilterToggleRow'
+import { useSnoozedWorkspaceCount } from './snooze-expiry-tick'
 
 const SidebarWorkspaceFilterSection = React.memo(function SidebarWorkspaceFilterSection() {
   const showSleepingWorkspaces = useAppStore((s) => s.showSleepingWorkspaces)
+  const showSnoozedWorkspaces = useAppStore((s) => s.showSnoozedWorkspaces)
+  const setShowSnoozedWorkspaces = useAppStore((s) => s.setShowSnoozedWorkspaces)
+  const snoozedCount = useSnoozedWorkspaceCount()
   const setShowSleepingWorkspaces = useAppStore((s) => s.setShowSleepingWorkspaces)
   const hideDefaultBranchWorkspace = useAppStore((s) => s.hideDefaultBranchWorkspace)
   const setHideDefaultBranchWorkspace = useAppStore((s) => s.setHideDefaultBranchWorkspace)
@@ -113,6 +118,20 @@ const SidebarWorkspaceFilterSection = React.memo(function SidebarWorkspaceFilter
           onChange={setHideWorkspacesFromOtherDevices}
         />
       )}
+      <FilterToggleRow
+        icon={<AlarmClock className="size-3.5" />}
+        label={translate(
+          'auto.components.sidebar.SidebarWorkspaceFilterSection.snoozed',
+          'Show snoozed'
+        )}
+        ariaLabel={translate(
+          'auto.components.sidebar.SidebarWorkspaceFilterSection.snoozedAria',
+          'Show workspaces that are snoozed until a later time'
+        )}
+        checked={showSnoozedWorkspaces}
+        onChange={setShowSnoozedWorkspaces}
+        count={snoozedCount}
+      />
       <FilterToggleRow
         icon={<GitCommitHorizontal className="size-3.5" />}
         label={translate(

@@ -26,6 +26,7 @@ export type PersistedUIWriteBaseline = {
   hideDetachedHeadWorkspaces: boolean
   hideWorkspacesFromOtherDevices: boolean
   alwaysShowDefaultBranchWorkspace: boolean
+  showSnoozedWorkspaces: boolean
   showEmptyWorkspaceStatuses: boolean
   showDotfilesByWorktree: Record<string, boolean>
   filterRepoIds: readonly string[]
@@ -54,6 +55,7 @@ const PERSISTED_UI_WRITE_BASELINE_FIELD_SET = {
   hideDetachedHeadWorkspaces: true,
   hideWorkspacesFromOtherDevices: true,
   alwaysShowDefaultBranchWorkspace: true,
+  showSnoozedWorkspaces: true,
   showEmptyWorkspaceStatuses: true,
   showDotfilesByWorktree: true,
   filterRepoIds: true,

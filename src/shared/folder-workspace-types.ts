@@ -31,6 +31,8 @@ export type FolderWorkspace = {
   isArchived: boolean
   isUnread: boolean
   isPinned: boolean
+  /** See {@link Worktree.snoozedUntil}. */
+  snoozedUntil?: number | null
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

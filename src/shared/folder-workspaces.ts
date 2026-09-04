@@ -5,6 +5,7 @@ import { normalizeStoredTaskSourceContext } from './task-source-context'
 import { normalizeWorkspaceLinkedItem } from './workspace-linked-item'
 import { isWorkspaceLinkedItemSourceContextMatch } from './workspace-linked-item-source-context'
 import { normalizeWorkspaceCreatorProvenance } from './workspace-creator-provenance'
+import { normalizeSnoozedUntil } from './worktree/snooze'
 
 export function normalizeFolderWorkspaceName(
   name: string | null | undefined,
@@ -83,6 +84,7 @@ export function normalizeFolderWorkspaces(
       isArchived: raw.isArchived === true,
       isUnread: raw.isUnread === true,
       isPinned: raw.isPinned === true,
+      snoozedUntil: normalizeSnoozedUntil(raw.snoozedUntil),
       sortOrder:
         typeof raw.sortOrder === 'number' && Number.isFinite(raw.sortOrder) ? raw.sortOrder : now,
       ...(typeof raw.manualOrder === 'number' && Number.isFinite(raw.manualOrder)
