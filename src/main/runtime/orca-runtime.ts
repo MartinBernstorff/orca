@@ -23072,6 +23072,7 @@ export class OrcaRuntimeService {
         | 'isArchived'
         | 'isUnread'
         | 'isPinned'
+        | 'snoozedUntil'
         | 'sortOrder'
         | 'manualOrder'
         | 'workspaceStatus'

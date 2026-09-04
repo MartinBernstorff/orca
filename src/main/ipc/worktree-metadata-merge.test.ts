@@ -45,3 +45,48 @@ describe('mergeWorktree identity projection', () => {
     expect(worktree.identity).toBeUndefined()
   })
 })
+
+describe('mergeWorktree snooze projection', () => {
+  it('carries a persisted wake time onto the listing row', () => {
+    const worktree = mergeWorktree('repo-1', git, {
+      instanceId: '11111111-1111-4111-8111-111111111111',
+      hostId: 'local',
+      displayName: 'Feature',
+      comment: '',
+      linkedIssue: null,
+      linkedPR: null,
+      linkedLinearIssue: null,
+      isArchived: false,
+      isUnread: false,
+      isPinned: false,
+      snoozedUntil: 1_800_000_000_000,
+      sortOrder: 0,
+      lastActivityAt: 0
+    })
+
+    expect(worktree.snoozedUntil).toBe(1_800_000_000_000)
+  })
+
+  it('projects a missing or unusable wake time as an explicit null', () => {
+    // Why explicit: the catalog reconciler treats an absent key as undefined, and a row
+    // whose snooze reads undefined is adopted over the renderer's live value.
+    expect(mergeWorktree('repo-1', git, undefined).snoozedUntil).toBeNull()
+    expect(
+      mergeWorktree('repo-1', git, {
+        instanceId: '11111111-1111-4111-8111-111111111111',
+        hostId: 'local',
+        displayName: '',
+        comment: '',
+        linkedIssue: null,
+        linkedPR: null,
+        linkedLinearIssue: null,
+        isArchived: false,
+        isUnread: false,
+        isPinned: false,
+        snoozedUntil: Number.NaN,
+        sortOrder: 0,
+        lastActivityAt: 0
+      }).snoozedUntil
+    ).toBeNull()
+  })
+})

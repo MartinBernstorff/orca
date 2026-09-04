@@ -5,6 +5,7 @@ import { DEFAULT_WORKSPACE_STATUS_ID } from '../../shared/workspace-statuses'
 import { getLinkedWorkItemMetadata } from './worktree-linked-work-item-metadata'
 import { normalizeWorkspaceCreatorProvenance } from '../../shared/workspace-creator-provenance'
 import { createWorktreeIdentity } from '../../shared/worktree/identity'
+import { normalizeSnoozedUntil } from '../../shared/worktree/snooze'
 
 /**
  * Merge raw git worktree info with persisted user metadata into a full Worktree.
@@ -57,6 +58,9 @@ export function mergeWorktree(
     isArchived: meta?.isArchived ?? false,
     isUnread: meta?.isUnread ?? false,
     isPinned: meta?.isPinned ?? false,
+    // Why normalize rather than forward: a listing row that omits the key reads as a cleared
+    // snooze to the catalog reconciler, which then adopts it over the renderer's live value.
+    snoozedUntil: normalizeSnoozedUntil(meta?.snoozedUntil),
     sortOrder: meta?.sortOrder ?? 0,
     ...(meta?.manualOrder !== undefined ? { manualOrder: meta.manualOrder } : {}),
     lastActivityAt: meta?.lastActivityAt ?? 0,
