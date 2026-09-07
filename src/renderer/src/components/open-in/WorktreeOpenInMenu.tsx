@@ -231,6 +231,17 @@ function showOpenFailureToast(
   )
 }
 
+export function OpenInEntryIcon({ entry }: { entry: OpenInMenuEntry }): React.JSX.Element {
+  if (entry.target === 'file-manager') {
+    return <FolderOpen className="size-3.5" />
+  }
+  return entry.command ? (
+    <OpenInApplicationIcon application={{ command: entry.command }} size={14} />
+  ) : (
+    <ExternalLink className="size-3.5" />
+  )
+}
+
 function stopMenuPropagation(event: React.SyntheticEvent): void {
   event.stopPropagation()
 }
@@ -285,7 +296,6 @@ export async function openWorktreePath(args: {
   }
 }
 
-/** Launches one launcher row and remembers it, so every "Open in" surface feeds the same last-used memory. */
 export async function openInMenuEntry(args: {
   entry: OpenInMenuEntry
   worktreePath: string
@@ -326,13 +336,7 @@ export function WorktreeOpenInMenuItems({
             }}
             disabled={disabled || availability.disabled}
           >
-            {entry.target === 'file-manager' ? (
-              <FolderOpen className="size-3.5" />
-            ) : entry.command ? (
-              <OpenInApplicationIcon application={{ command: entry.command }} size={14} />
-            ) : (
-              <ExternalLink className="size-3.5" />
-            )}
+            <OpenInEntryIcon entry={entry} />
             <span className="min-w-0 truncate">
               {labelPrefix}
               {entry.label}
@@ -349,7 +353,6 @@ export function WorktreeOpenInMenuItems({
   )
 }
 
-/** Every launcher row plus the settings escape hatch, for any menu surface that offers the full "Open in" list. */
 export function WorktreeOpenInMenuBody({
   worktreePath,
   connectionId,

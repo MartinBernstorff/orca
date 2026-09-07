@@ -1,5 +1,5 @@
 import type React from 'react'
-import { ChevronDown, ExternalLink, FolderOpen } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
 import { getConnectionIdFromState } from '@/lib/connection-owner-resolution'
 import { getLocalFileManagerLabel } from '@/lib/local-file-manager-label'
-import { OpenInApplicationIcon } from '@/lib/open-in-app-catalog'
 import {
   NO_OPEN_IN_APPLICATIONS,
   resolveLastUsedOpenInEntry
@@ -19,6 +18,7 @@ import {
   getOpenInEntryAvailability,
   getWorktreeOpenInEntries,
   openInMenuEntry,
+  OpenInEntryIcon,
   WorktreeOpenInMenuBody
 } from '@/components/open-in/WorktreeOpenInMenu'
 import { translate } from '@/i18n/i18n'
@@ -34,7 +34,8 @@ export function TabBarOpenInButton({
   worktreeId: string
 }): React.JSX.Element | null {
   const worktreePath = useAppStore((s) => s.getKnownWorktreeById(worktreeId)?.path ?? null)
-  const connectionId = useAppStore((s) => getConnectionIdFromState(s, worktreeId) ?? null)
+  // Why: keep the tri-state — `undefined` means the host is gone or ambiguous, which is not the same as a local workspace.
+  const connectionId = useAppStore((s) => getConnectionIdFromState(s, worktreeId))
   const settings = useAppStore((s) => s.settings)
   const openInApplications = useAppStore(
     (s) => s.settings?.openInApplications ?? NO_OPEN_IN_APPLICATIONS
@@ -75,13 +76,7 @@ export function TabBarOpenInButton({
             )}
             aria-label={openInLabel}
           >
-            {primary.target === 'file-manager' ? (
-              <FolderOpen className="size-3.5" />
-            ) : primary.command ? (
-              <OpenInApplicationIcon application={{ command: primary.command }} size={14} />
-            ) : (
-              <ExternalLink className="size-3.5" />
-            )}
+            <OpenInEntryIcon entry={primary} />
           </button>
         </TooltipTrigger>
         <TooltipContent side="bottom" sideOffset={6}>
