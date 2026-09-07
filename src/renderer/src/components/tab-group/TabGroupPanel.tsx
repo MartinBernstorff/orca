@@ -13,7 +13,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import TabBar from '../tab-bar/TabBar'
 
 import { TabBarOpenInButton } from '../tab-bar/TabBarOpenInButton'
-import { TabBarQuickCommandsButton } from '../tab-bar/TabBarQuickCommandsButton'
 import { useTabGroupWorkspaceModel } from './useTabGroupWorkspaceModel'
 import { closeTerminalTab } from '../terminal/terminal-tab-actions'
 import { resolveGroupTabFromVisibleId } from './tab-group-visible-id'
@@ -220,7 +219,7 @@ export default function TabGroupPanel({
 
   const menuButtonClassName =
     'my-auto flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent'
-  // Why: focused-only so quick commands and Close split pane stay with the active pane and unfocused strips stay compact.
+  // Why: focused-only so Open in and Close split pane stay with the active pane and unfocused strips stay compact.
   const focusedActionChromeClassName = `flex shrink-0 items-center gap-0.5 overflow-hidden transition-[opacity] duration-150 ${
     isFocused ? 'ml-1.5 pointer-events-auto opacity-100' : 'pointer-events-none opacity-0 w-0'
   }`
@@ -271,9 +270,6 @@ export default function TabGroupPanel({
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
           >
             <div className={focusedActionChromeClassName}>
-              {isFocused ? (
-                <TabBarQuickCommandsButton worktreeId={worktreeId} groupId={groupId} />
-              ) : null}
               {isFocused ? <TabBarOpenInButton worktreeId={worktreeId} /> : null}
               {isFocused && hasSplitGroups ? (
                 <Tooltip>
