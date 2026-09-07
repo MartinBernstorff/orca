@@ -44,7 +44,7 @@ vi.mock('@/lib/open-in-app-catalog', () => ({
   OpenInApplicationIcon: () => null
 }))
 
-vi.mock('@/components/sidebar/WorktreeOpenInMenu', () => ({
+vi.mock('@/components/open-in/WorktreeOpenInMenu', () => ({
   getWorktreeOpenInEntries: () => [],
   openOpenInAppsSettings: vi.fn(),
   openWorktreePath: vi.fn()

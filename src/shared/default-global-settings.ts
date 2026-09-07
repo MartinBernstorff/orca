@@ -128,6 +128,7 @@ export function buildDefaultSettings(args: {
     experimentalStructuredNativeChat: false,
     nativeChatSessionOptions: {},
     openInApplications: [...DEFAULT_OPEN_IN_APPLICATIONS],
+    lastUsedOpenInApplicationId: null,
     rightSidebarOpenByDefault: true,
     showGitIgnoredFiles: true,
     sourceControlViewMode: 'list',

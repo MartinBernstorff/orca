@@ -12,6 +12,7 @@ import {
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import TabBar from '../tab-bar/TabBar'
 
+import { TabBarOpenInButton } from '../tab-bar/TabBarOpenInButton'
 import { TabBarQuickCommandsButton } from '../tab-bar/TabBarQuickCommandsButton'
 import { useTabGroupWorkspaceModel } from './useTabGroupWorkspaceModel'
 import { closeTerminalTab } from '../terminal/terminal-tab-actions'
@@ -273,6 +274,7 @@ export default function TabGroupPanel({
               {isFocused ? (
                 <TabBarQuickCommandsButton worktreeId={worktreeId} groupId={groupId} />
               ) : null}
+              {isFocused ? <TabBarOpenInButton worktreeId={worktreeId} /> : null}
               {isFocused && hasSplitGroups ? (
                 <Tooltip>
                   <DropdownMenu modal={false}>

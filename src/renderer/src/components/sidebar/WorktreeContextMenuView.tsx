@@ -27,7 +27,7 @@ import {
   FolderTree
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { WorktreeOpenInSubMenu } from './WorktreeOpenInMenu'
+import { WorktreeOpenInSubMenu } from '@/components/open-in/WorktreeOpenInMenu'
 import { WorktreeDeveloperMenu } from './WorktreeDeveloperMenu'
 import { WorkspaceSleepMenuItems } from './WorkspaceSleepMenuItems'
 import { WorkspaceSnoozeMenuItems } from './WorkspaceSnoozeMenuItems'

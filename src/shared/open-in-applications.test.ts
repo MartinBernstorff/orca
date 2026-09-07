@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { DEFAULT_OPEN_IN_APPLICATIONS, normalizeOpenInApplications } from './open-in-applications'
+import {
+  DEFAULT_OPEN_IN_APPLICATIONS,
+  normalizeLastUsedOpenInApplicationId,
+  normalizeOpenInApplications
+} from './open-in-applications'
 
 describe('normalizeOpenInApplications', () => {
   it('trims fields, drops invalid rows, keeps first duplicate id, and caps list', () => {
@@ -50,5 +54,18 @@ describe('normalizeOpenInApplications', () => {
       DEFAULT_OPEN_IN_APPLICATIONS
     )
     expect(normalizeOpenInApplications([], { seedDefaults: true })).toEqual([])
+  })
+})
+
+describe('normalizeLastUsedOpenInApplicationId', () => {
+  it('trims a usable id', () => {
+    expect(normalizeLastUsedOpenInApplicationId('  vscode  ')).toBe('vscode')
+  })
+
+  it('returns null for blank or non-string values', () => {
+    expect(normalizeLastUsedOpenInApplicationId('   ')).toBeNull()
+    expect(normalizeLastUsedOpenInApplicationId(undefined)).toBeNull()
+    expect(normalizeLastUsedOpenInApplicationId(null)).toBeNull()
+    expect(normalizeLastUsedOpenInApplicationId(42)).toBeNull()
   })
 })

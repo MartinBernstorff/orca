@@ -6,6 +6,7 @@ import {
   getOpenInEntryAvailability,
   getLocalFileManagerLabel,
   openOpenInAppsSettings,
+  openInMenuEntry,
   openWorktreePath,
   WorktreeOpenInSubMenu
 } from './WorktreeOpenInMenu'
@@ -21,7 +22,8 @@ const {
   openInFileManagerMock,
   openSettingsPageMock,
   openSettingsTargetMock,
-  toastErrorMock
+  toastErrorMock,
+  updateSettingsMock
 } = vi.hoisted(() => ({
   mockState: {
     settings: {
@@ -33,7 +35,8 @@ const {
   openInFileManagerMock: vi.fn(),
   openSettingsPageMock: vi.fn(),
   openSettingsTargetMock: vi.fn(),
-  toastErrorMock: vi.fn()
+  toastErrorMock: vi.fn(),
+  updateSettingsMock: vi.fn()
 }))
 
 vi.mock('sonner', () => ({
@@ -50,7 +53,8 @@ vi.mock('@/store', () => {
       getState: () => ({
         settings: mockState.settings,
         openSettingsPage: openSettingsPageMock,
-        openSettingsTarget: openSettingsTargetMock
+        openSettingsTarget: openSettingsTargetMock,
+        updateSettings: updateSettingsMock
       })
     }
   )
@@ -93,6 +97,8 @@ describe('WorktreeOpenInMenu', () => {
     openInExternalEditorMock.mockReset()
     openSettingsPageMock.mockReset()
     openSettingsTargetMock.mockReset()
+    updateSettingsMock.mockReset()
+    updateSettingsMock.mockResolvedValue(undefined)
     openInFileManagerMock.mockResolvedValue({ ok: true })
     openInExternalEditorMock.mockResolvedValue({ ok: true })
     Object.defineProperty(globalThis, 'window', {
@@ -208,6 +214,34 @@ describe('WorktreeOpenInMenu', () => {
       command: 'cursor',
       connectionId: null
     })
+  })
+
+  it('records the picked row so the tab-bar button can repeat it', async () => {
+    await openInMenuEntry({
+      entry: { id: 'zed-1', label: 'Zed', target: 'external-editor', command: 'zed' },
+      worktreePath: '/tmp/workspace',
+      connectionId: null
+    })
+
+    expect(updateSettingsMock).toHaveBeenCalledWith({ lastUsedOpenInApplicationId: 'zed-1' })
+    expect(openInExternalEditorMock).toHaveBeenCalledWith({
+      path: '/tmp/workspace',
+      command: 'zed',
+      connectionId: null
+    })
+  })
+
+  it('remembers the file-manager row like any launcher', async () => {
+    await openInMenuEntry({
+      entry: { id: 'file-manager', label: 'Finder', target: 'file-manager' },
+      worktreePath: '/tmp/workspace',
+      connectionId: null
+    })
+
+    expect(updateSettingsMock).toHaveBeenCalledWith({
+      lastUsedOpenInApplicationId: 'file-manager'
+    })
+    expect(openInFileManagerMock).toHaveBeenCalledWith('/tmp/workspace')
   })
 
   it('blocks configured launchers in remote context before calling main IPC', async () => {

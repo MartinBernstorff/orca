@@ -10,7 +10,10 @@ import { normalizeTerminalCustomThemes } from '../../../shared/terminal-custom-t
 import { normalizeTerminalCursorStyleDefault } from '../../../shared/terminal-cursor-style-settings'
 import { normalizeDesktopTerminalScrollbackRows } from '../../../shared/terminal-scrollback-policy'
 import { normalizeTaskProviderSettings } from '../../../shared/task-providers'
-import { normalizeOpenInApplications } from '../../../shared/open-in-applications'
+import {
+  normalizeLastUsedOpenInApplicationId,
+  normalizeOpenInApplications
+} from '../../../shared/open-in-applications'
 import { normalizeTerminalShortcutPolicy } from '../../../shared/keybindings'
 import { normalizeSourceControlGroupOrder } from '../../../shared/source-control-group-order'
 import { normalizeAppIconId } from '../../../shared/app-icon'
@@ -150,6 +153,11 @@ export function updateSettings(
   }
   if ('openInApplications' in updates) {
     sanitizedUpdates.openInApplications = normalizeOpenInApplications(updates.openInApplications)
+  }
+  if ('lastUsedOpenInApplicationId' in updates) {
+    sanitizedUpdates.lastUsedOpenInApplicationId = normalizeLastUsedOpenInApplicationId(
+      updates.lastUsedOpenInApplicationId
+    )
   }
   if ('terminalShortcutPolicy' in updates) {
     sanitizedUpdates.terminalShortcutPolicy = normalizeTerminalShortcutPolicy(

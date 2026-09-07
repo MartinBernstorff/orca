@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { WorktreeOpenInMenuItems } from '@/components/sidebar/WorktreeOpenInMenu'
+import { WorktreeOpenInMenuItems } from '@/components/open-in/WorktreeOpenInMenu'
 import { translate } from '@/i18n/i18n'
 import { cn } from '@/lib/utils'
 

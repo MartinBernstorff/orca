@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import type React from 'react'
 import { ExternalLink, FolderOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -13,7 +13,10 @@ import { isLocalPathOpenBlocked, showLocalPathOpenBlockedToast } from '@/lib/loc
 import { getLocalFileManagerLabel } from '@/lib/local-file-manager-label'
 import { OpenInApplicationIcon } from '@/lib/open-in-app-catalog'
 import { getExternalEditorOpenCapability } from '@/lib/external-editor-open-capability'
-import { NO_OPEN_IN_APPLICATIONS } from '@/lib/open-in-application-selection'
+import {
+  NO_OPEN_IN_APPLICATIONS,
+  recordLastUsedOpenInEntry
+} from '@/lib/open-in-application-selection'
 import type { ShellOpenExternalEditorResult } from '../../../../shared/shell-open-types'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { OpenInApplication } from '../../../../shared/ui-chrome-types'
@@ -282,19 +285,19 @@ export async function openWorktreePath(args: {
   }
 }
 
-function useOpenInWorktreePath({
-  worktreePath,
-  connectionId
-}: WorktreeOpenInMenuItemsProps): (
-  target: 'file-manager' | 'external-editor',
-  command?: string
-) => Promise<void> {
-  return useCallback(
-    async (target, command) => {
-      await openWorktreePath({ target, worktreePath, connectionId, command })
-    },
-    [connectionId, worktreePath]
-  )
+/** Launches one launcher row and remembers it, so every "Open in" surface feeds the same last-used memory. */
+export async function openInMenuEntry(args: {
+  entry: OpenInMenuEntry
+  worktreePath: string
+  connectionId?: string | null
+}): Promise<void> {
+  recordLastUsedOpenInEntry(args.entry.id)
+  await openWorktreePath({
+    target: args.entry.target,
+    worktreePath: args.worktreePath,
+    connectionId: args.connectionId,
+    command: args.entry.command
+  })
 }
 
 export function WorktreeOpenInMenuItems({
@@ -303,7 +306,6 @@ export function WorktreeOpenInMenuItems({
   disabled,
   labelPrefix = ''
 }: WorktreeOpenInMenuItemsProps): React.JSX.Element {
-  const openInWorktreePath = useOpenInWorktreePath({ worktreePath, connectionId })
   const openInApplications = useAppStore(
     (s) => s.settings?.openInApplications ?? NO_OPEN_IN_APPLICATIONS
   )
@@ -320,7 +322,7 @@ export function WorktreeOpenInMenuItems({
             key={entry.id}
             onClick={stopMenuPropagation}
             onSelect={() => {
-              void openInWorktreePath(entry.target, entry.command)
+              void openInMenuEntry({ entry, worktreePath, connectionId })
             }}
             disabled={disabled || availability.disabled}
           >
@@ -347,6 +349,31 @@ export function WorktreeOpenInMenuItems({
   )
 }
 
+/** Every launcher row plus the settings escape hatch, for any menu surface that offers the full "Open in" list. */
+export function WorktreeOpenInMenuBody({
+  worktreePath,
+  connectionId,
+  disabled
+}: WorktreeOpenInMenuItemsProps): React.JSX.Element {
+  return (
+    <>
+      <WorktreeOpenInMenuItems
+        worktreePath={worktreePath}
+        connectionId={connectionId}
+        disabled={disabled}
+      />
+      <DropdownMenuSeparator />
+      <DropdownMenuItem
+        onClick={stopMenuPropagation}
+        onSelect={openOpenInAppsSettings}
+        disabled={disabled}
+      >
+        {translate('auto.components.sidebar.WorktreeOpenInMenu.1417fd8380', 'Customize apps...')}
+      </DropdownMenuItem>
+    </>
+  )
+}
+
 export function WorktreeOpenInSubMenu({
   worktreePath,
   connectionId,
@@ -363,19 +390,11 @@ export function WorktreeOpenInSubMenu({
         onClick={stopMenuPropagation}
         onPointerDown={stopMenuPropagation}
       >
-        <WorktreeOpenInMenuItems
+        <WorktreeOpenInMenuBody
           worktreePath={worktreePath}
           connectionId={connectionId}
           disabled={disabled}
         />
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={stopMenuPropagation}
-          onSelect={openOpenInAppsSettings}
-          disabled={disabled}
-        >
-          {translate('auto.components.sidebar.WorktreeOpenInMenu.1417fd8380', 'Customize apps...')}
-        </DropdownMenuItem>
       </DropdownMenuSubContent>
     </DropdownMenuSub>
   )

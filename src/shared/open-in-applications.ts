@@ -60,3 +60,8 @@ export function normalizeOpenInApplications(
 
   return normalized
 }
+
+export function normalizeLastUsedOpenInApplicationId(value: unknown): string | null {
+  const id = normalizeToken(value)
+  return id ? id : null
+}

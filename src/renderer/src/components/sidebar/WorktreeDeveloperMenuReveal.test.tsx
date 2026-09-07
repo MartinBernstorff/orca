@@ -71,7 +71,7 @@ vi.mock('@/components/ui/dropdown-menu', () => {
   }
 })
 
-vi.mock('./WorktreeOpenInMenu', () => ({ WorktreeOpenInSubMenu: () => null }))
+vi.mock('@/components/open-in/WorktreeOpenInMenu', () => ({ WorktreeOpenInSubMenu: () => null }))
 vi.mock('./ProjectGroupNameDialog', () => ({ ProjectGroupNameDialog: () => null }))
 vi.mock('./WorktreeParentPickerPopover', () => ({ WorktreeParentPickerPopover: () => null }))
 vi.mock('@/lib/worktree-activation', () => ({ activateAndRevealWorktree: vi.fn() }))

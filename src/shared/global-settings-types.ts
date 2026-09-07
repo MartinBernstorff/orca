@@ -211,6 +211,8 @@ export type GlobalSettings = {
   nativeChatSessionOptions?: PersistedNativeChatSessionOptions
   /** Extra launcher rows for the worktree "Open in" submenu. VS Code is always shown first. */
   openInApplications?: OpenInApplication[]
+  /** Last "Open in" row the user picked, so the tab-bar button repeats it without a menu. Stale ids fall back to the first row. */
+  lastUsedOpenInApplicationId?: string | null
   /** Deprecated: migration/backward-compat only. Use PersistedUIState.rightSidebarOpen. */
   rightSidebarOpenByDefault: boolean
   showGitIgnoredFiles?: boolean

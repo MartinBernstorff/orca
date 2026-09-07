@@ -130,7 +130,7 @@ vi.mock('./WorktreeDeveloperMenu', () => ({
   WorktreeDeveloperMenu: () => null
 }))
 
-vi.mock('./WorktreeOpenInMenu', () => ({
+vi.mock('@/components/open-in/WorktreeOpenInMenu', () => ({
   WorktreeOpenInSubMenu: () => null
 }))
 
