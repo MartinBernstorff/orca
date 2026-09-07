@@ -330,7 +330,13 @@ export function renderWorktreeSectionHeaderRow(args: {
 
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-1.5">
-              <div className="min-w-0 truncate text-[13px] font-semibold leading-none">
+              <div
+                className={cn(
+                  'min-w-0 truncate text-[13px] leading-none',
+                  // Why: bold status lane labels read like unhandled-reply workspace rows.
+                  ctx.groupBy === 'workspace-status' ? 'font-medium' : 'font-semibold'
+                )}
+              >
                 {row.label}
               </div>
               <RepoForkIndicator upstream={row.repo?.upstream} />
