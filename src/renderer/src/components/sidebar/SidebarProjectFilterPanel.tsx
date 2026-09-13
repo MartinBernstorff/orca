@@ -155,7 +155,7 @@ export function SidebarProjectFilterPanel({
         wrapperClassName="mx-1 rounded-[7px] border border-border/70 px-2"
         iconClassName="h-3.5 w-3.5"
       />
-      <CommandList className="max-h-48 py-1">
+      <CommandList className="max-h-96 py-1">
         <CommandEmpty className="py-4 text-[11px]">
           {hasRepoFilter
             ? translate(
