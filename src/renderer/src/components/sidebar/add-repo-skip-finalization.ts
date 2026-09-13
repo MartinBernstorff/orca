@@ -1,5 +1,6 @@
 import type { Worktree } from '../../../../shared/worktree/types'
 import { isDefaultBranchWorkspace } from './default-branch-workspace'
+import { withRepoIncludedInFilter } from '@/store/slices/repo-filter-selection'
 
 export type AddRepoSkipFinalizationState = {
   activeRepoId: string | null
@@ -27,8 +28,9 @@ export function finalizeImportedRepoAfterSkip(
   if (state.activeRepoId !== importedRepoId) {
     state.setActiveRepo(importedRepoId)
   }
-  if (state.filterRepoIds.length > 0 && !state.filterRepoIds.includes(importedRepoId)) {
-    state.setFilterRepoIds([])
+  const widenedFilterRepoIds = withRepoIncludedInFilter(state.filterRepoIds, importedRepoId)
+  if (widenedFilterRepoIds) {
+    state.setFilterRepoIds(widenedFilterRepoIds)
   }
   if (state.showActiveOnly) {
     state.setShowActiveOnly(false)

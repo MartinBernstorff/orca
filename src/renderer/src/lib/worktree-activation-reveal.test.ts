@@ -16,9 +16,7 @@ describe('activateAndRevealWorktree', () => {
     })
   })
 
-  it('queues a one-shot initial cwd for the primary activation-created tab', () => {
-    const queueTabInitialCwd = vi.fn()
-    const revealWorktreeInSidebar = vi.fn()
+  function seedStore(overrides: Record<string, unknown> = {}): void {
     useAppStore.setState({
       activeRepoId: null,
       activeWorktreeId: null,
@@ -65,11 +63,19 @@ describe('activateAndRevealWorktree', () => {
       setTabColor: vi.fn(),
       markDefaultTerminalTabsApplied: vi.fn(),
       queueTabStartupCommand: vi.fn(),
-      queueTabInitialCwd,
+      queueTabInitialCwd: vi.fn(),
       queueTabSetupSplit: vi.fn(),
       queueTabIssueCommandSplit: vi.fn(),
-      revealWorktreeInSidebar
+      revealWorktreeInSidebar: vi.fn(),
+      setFilterRepoIds: vi.fn(),
+      ...overrides
     } as never)
+  }
+
+  it('queues a one-shot initial cwd for the primary activation-created tab', () => {
+    const queueTabInitialCwd = vi.fn()
+    const revealWorktreeInSidebar = vi.fn()
+    seedStore({ queueTabInitialCwd, revealWorktreeInSidebar })
 
     const result = activateAndRevealWorktree('wt-1', {
       initialCwd: '/repo/packages/web',
@@ -81,5 +87,23 @@ describe('activateAndRevealWorktree', () => {
     expect(revealWorktreeInSidebar).toHaveBeenCalledWith('wt-1', {
       executionHostId: 'ssh:box'
     })
+  })
+
+  it('adds the target project to an active project filter instead of clearing it', () => {
+    const setFilterRepoIds = vi.fn()
+    seedStore({ filterRepoIds: ['repo-2'], setFilterRepoIds })
+
+    activateAndRevealWorktree('wt-1')
+
+    expect(setFilterRepoIds).toHaveBeenCalledWith(['repo-2', 'repo-1'])
+  })
+
+  it('leaves the project filter alone when it already lists the target project', () => {
+    const setFilterRepoIds = vi.fn()
+    seedStore({ filterRepoIds: ['repo-1'], setFilterRepoIds })
+
+    activateAndRevealWorktree('wt-1')
+
+    expect(setFilterRepoIds).not.toHaveBeenCalled()
   })
 })

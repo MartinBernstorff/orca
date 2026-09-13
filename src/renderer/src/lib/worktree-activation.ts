@@ -30,6 +30,7 @@ import {
 import { toast } from 'sonner'
 import { isDetachedHeadWorkspace } from '@/components/sidebar/visible-worktrees'
 import { isWorkspaceSnoozed } from '../../../shared/worktree/snooze'
+import { withRepoIncludedInFilter } from '@/store/slices/repo-filter-selection'
 import type { ExecutionHostId } from '../../../shared/execution-host'
 import { findFolderWorkspaceOwner } from './folder-workspace-runtime-owner'
 import type { WorktreeStartupPayload } from '@/lib/worktree-startup-payload'
@@ -283,9 +284,10 @@ export function activateAndRevealWorktree(
     useAppStore.getState().queueTabInitialCwd(primaryTabId, opts.initialCwd)
   }
 
-  // 5. Clear sidebar filters hiding the target — reveal needs the card rendered, else it silently no-ops.
-  if (state.filterRepoIds.length > 0 && !state.filterRepoIds.includes(wt.repoId)) {
-    state.setFilterRepoIds([])
+  // 5. Relax sidebar filters hiding the target — reveal needs the card rendered, else it silently no-ops.
+  const widenedFilterRepoIds = withRepoIncludedInFilter(state.filterRepoIds, wt.repoId)
+  if (widenedFilterRepoIds) {
+    state.setFilterRepoIds(widenedFilterRepoIds)
   }
   if (
     state.hideAutomationGeneratedWorkspaces &&
