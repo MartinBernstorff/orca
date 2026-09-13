@@ -4,6 +4,7 @@ import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { RepoIconGlyph } from '@/components/repo/repo-icon'
+import { resolveRepoHeaderColor } from './project-header-color'
 import { SidebarProjectFilterPanel } from './SidebarProjectFilterPanel'
 import type { Repo } from '../../../../shared/repo-types'
 import { translate } from '@/i18n/i18n'
@@ -24,7 +25,7 @@ function TriggerLabel({ selectedRepos }: { selectedRepos: readonly Repo[] }): Re
     <span className="inline-flex min-w-0 items-center gap-1.5 truncate">
       <RepoIconGlyph
         repoIcon={first.repoIcon}
-        color={first.badgeColor}
+        color={resolveRepoHeaderColor(first.badgeColor)}
         className="size-4 shrink-0"
         iconClassName="size-3.5"
       />

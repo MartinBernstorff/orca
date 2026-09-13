@@ -8,6 +8,7 @@ import {
   CommandList
 } from '@/components/ui/command'
 import { RepoIconGlyph } from '@/components/repo/repo-icon'
+import { resolveRepoHeaderColor } from './project-header-color'
 import { cn } from '@/lib/utils'
 import type { Repo } from '../../../../shared/repo-types'
 import { translate } from '@/i18n/i18n'
@@ -98,7 +99,7 @@ export function SidebarProjectFilterPanel({
               <span className="inline-flex min-w-0 flex-1 items-center gap-1.5">
                 <RepoIconGlyph
                   repoIcon={repo.repoIcon}
-                  color={repo.badgeColor}
+                  color={resolveRepoHeaderColor(repo.badgeColor)}
                   className="size-4 shrink-0"
                   iconClassName="size-3.5"
                 />
