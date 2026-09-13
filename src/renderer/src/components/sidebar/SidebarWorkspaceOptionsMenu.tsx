@@ -18,7 +18,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { DEFAULT_SHOW_SLEEPING_WORKSPACES } from '../../../../shared/constants'
 import { isSleepingSweepExemptionNarrowingList } from './visible-worktrees'
 import { FilterToggleRow } from './FilterToggleRow'
-import SidebarRepositoryFilterSection from './SidebarRepositoryFilterSection'
 import SidebarWorkspaceFilterSection from './SidebarWorkspaceFilterSection'
 import { getSidebarHostVisibilityLabel, shouldShowHostScopeControls } from './sidebar-host-options'
 import { useSidebarHostScopeOptions } from './use-sidebar-host-scope-options'
@@ -174,25 +173,20 @@ const SidebarWorkspaceOptionsMenu = React.memo(function SidebarWorkspaceOptionsM
         className="w-72 pb-2"
         data-workspace-board-preserve-open={preserveWorkspaceBoardOpen ? '' : undefined}
       >
-        {/* Why: host + project filters share one section and the same single-row
-            shell as Sort by (label left, value right) so the menu stays flat. */}
-        {(showHostScopeControls || repos.length > 1) && (
+        {/* Why: the project filter now lives inline in the sidebar, so this
+            section is hosts only. */}
+        {showHostScopeControls && (
           <>
             <DropdownMenuLabel>
               {translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.showSection', 'Show')}
             </DropdownMenuLabel>
-            {showHostScopeControls && (
-              <SidebarHostScopeMenuSection
-                hostVisibilityLabel={hostVisibilityLabel}
-                hostOptions={hostOptions}
-                preserveWorkspaceBoardOpen={preserveWorkspaceBoardOpen}
-                setWorkspaceHostScope={setWorkspaceHostScope}
-                visibleWorkspaceHostIds={visibleWorkspaceHostIds}
-                setVisibleWorkspaceHostIds={setVisibleWorkspaceHostIds}
-              />
-            )}
-            <SidebarRepositoryFilterSection
+            <SidebarHostScopeMenuSection
+              hostVisibilityLabel={hostVisibilityLabel}
+              hostOptions={hostOptions}
               preserveWorkspaceBoardOpen={preserveWorkspaceBoardOpen}
+              setWorkspaceHostScope={setWorkspaceHostScope}
+              visibleWorkspaceHostIds={visibleWorkspaceHostIds}
+              setVisibleWorkspaceHostIds={setVisibleWorkspaceHostIds}
             />
             <DropdownMenuSeparator />
           </>
