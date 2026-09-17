@@ -113,6 +113,7 @@ ORCA worktree create --repo id:<repoId> --name related-task --parent-worktree ac
 ORCA worktree create --repo id:<repoId> --name folder-child --parent-worktree folder:<folderId> --json
 ORCA worktree create --name child-task --agent codex --prompt "hi" --json
 ORCA worktree create --name independent-task --no-parent --json
+ORCA worktree create --name review-task --workspace-status "In review" --json
 ORCA worktree set --worktree id:<repoId>::<worktreePath> --display-name "My Task" --json
 ORCA worktree set --worktree active --comment "reproduced bug; testing fix" --json
 ORCA worktree set --worktree active --workspace-status "In review" --json
@@ -166,7 +167,7 @@ ORCA worktree set --worktree active --comment "fix implemented; running integrat
 
 Update after meaningful state changes such as repro, fix, validation, handoff, or blocker. Keep comments short/current; failures are best-effort unless Orca state was requested.
 
-Card status uses `--workspace-status <column>`: pass the board column name (`--workspace-status "Human review"`) or its configured id. An unknown value is rejected and the error lists the available columns.
+Card status uses `--workspace-status <column>` on both `worktree create` and `worktree set`: pass the board column name (`--workspace-status "Human review"`) or its configured id. An unknown value is rejected and the error lists the available columns. On create it places the new card directly in that column; omit it for the default status.
 
 ## Terminals
 
