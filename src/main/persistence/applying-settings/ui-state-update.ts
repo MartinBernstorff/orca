@@ -2,6 +2,7 @@ import type { PersistedState } from '../../../shared/persisted-state-types'
 import {
   getDefaultUIState,
   normalizeAgentActivityDisplayMode,
+  normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../shared/constants'
 import {
@@ -118,6 +119,10 @@ export function updatePersistedUI(
       sanitizedUpdates.worktreeCardProperties !== undefined
         ? normalizeWorktreeCardProperties(sanitizedUpdates.worktreeCardProperties)
         : normalizeWorktreeCardProperties(operations.state.ui?.worktreeCardProperties),
+    worktreeCardInteractions:
+      sanitizedUpdates.worktreeCardInteractions !== undefined
+        ? normalizeWorktreeCardInteractions(sanitizedUpdates.worktreeCardInteractions)
+        : normalizeWorktreeCardInteractions(operations.state.ui?.worktreeCardInteractions),
     agentActivityDisplayMode:
       sanitizedUpdates.agentActivityDisplayMode !== undefined
         ? normalizeAgentActivityDisplayMode(sanitizedUpdates.agentActivityDisplayMode)

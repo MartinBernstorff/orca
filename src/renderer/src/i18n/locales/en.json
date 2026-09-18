@@ -5333,7 +5333,9 @@
           "65a9820bd1": "Agent statuses",
           "219ebf1961": "Branch name",
           "folderPathIdentity": "Branch / folder path",
-          "cli": "Orca CLI"
+          "cli": "Orca CLI",
+          "interactionsSection": "Interactions",
+          "interactionDelete": "Delete button"
         },
         "SshTargetRow": {
           "4677394048": "Connecting…",
@@ -5402,7 +5404,8 @@
           "automationCreated": "Created by automation",
           "branchIdentity": "Branch",
           "branchFolderPathIdentity": "Branch or folder path",
-          "ef18787206": "Queued for deletion"
+          "ef18787206": "Queued for deletion",
+          "deleteQuickAction": "Delete"
         },
         "WorktreeCardAgents": {
           "1b0a156717": "Agents"

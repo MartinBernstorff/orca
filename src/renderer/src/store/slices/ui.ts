@@ -27,6 +27,7 @@ import type {
   WorkspaceHostOrder,
   WorkspaceHostScope,
   WorktreeCardMode,
+  WorktreeCardInteraction,
   WorktreeCardProperty
 } from '../../../../shared/ui-chrome-types'
 import type { ChangelogData, UpdateStatus } from '../../../../shared/update-status-types'
@@ -79,9 +80,11 @@ import {
   DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE,
   DEFAULT_SHOW_SLEEPING_WORKSPACES,
   DEFAULT_STATUS_BAR_ITEMS,
+  DEFAULT_WORKTREE_CARD_INTERACTIONS,
   DEFAULT_WORKTREE_CARD_PROPERTIES,
   getWorktreeCardModeUpdates,
   normalizeAgentActivityDisplayMode,
+  normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../../shared/constants'
 import {
@@ -956,6 +959,8 @@ export type UISlice = {
   _worktreeCardModeDefaulted: boolean
   setWorktreeCardMode: (mode: WorktreeCardMode) => void
   setWorktreeCardProperties: (properties: readonly WorktreeCardProperty[]) => void
+  worktreeCardInteractions: WorktreeCardInteraction[]
+  setWorktreeCardInteractions: (interactions: readonly WorktreeCardInteraction[]) => void
   agentActivityDisplayMode: AgentActivityDisplayMode
   setAgentActivityDisplayMode: (mode: AgentActivityDisplayMode) => void
   workspaceStatuses: WorkspaceStatusDefinition[]
@@ -2278,6 +2283,12 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       .set({ worktreeCardProperties: normalized, _worktreeCardModeDefaulted: false })
       .catch(console.error)
   },
+  worktreeCardInteractions: [...DEFAULT_WORKTREE_CARD_INTERACTIONS],
+  setWorktreeCardInteractions: (interactions) => {
+    const normalized = normalizeWorktreeCardInteractions(interactions)
+    set({ worktreeCardInteractions: normalized })
+    window.api.ui.set({ worktreeCardInteractions: normalized }).catch(console.error)
+  },
   agentActivityDisplayMode: DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE,
   setAgentActivityDisplayMode: (mode) => {
     const normalized = normalizeAgentActivityDisplayMode(mode)
@@ -2669,6 +2680,7 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         editorFontZoomLevel: ui.editorFontZoomLevel ?? 0,
         worktreeCardProperties: normalizeWorktreeCardProperties(ui.worktreeCardProperties),
         _worktreeCardModeDefaulted: ui._worktreeCardModeDefaulted === true,
+        worktreeCardInteractions: normalizeWorktreeCardInteractions(ui.worktreeCardInteractions),
         agentActivityDisplayMode: normalizeAgentActivityDisplayMode(ui.agentActivityDisplayMode),
         workspaceStatuses: normalizeWorkspaceStatuses(ui.workspaceStatuses),
         workspaceBoardOpacity: clampWorkspaceBoardOpacity(ui.workspaceBoardOpacity),

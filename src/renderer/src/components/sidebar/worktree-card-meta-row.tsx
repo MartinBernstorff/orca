@@ -36,7 +36,6 @@ export function WorktreeCardMetaRow({
     showRepoBadgeInMetaRow,
     showHostContextBadge,
     showIdentityInNewCard,
-    hasHoverDetails,
     showBranch,
     showDetachedHeadInMetaRow,
     showConflictOperationBadge,
@@ -69,7 +68,6 @@ export function WorktreeCardMetaRow({
           <TruncatedSidebarLabel
             text={identityDisplay!}
             className="text-[11px] text-muted-foreground leading-none"
-            tooltipEnabled={!hasHoverDetails}
           />
         ) : isFolder && !newCardStyle ? (
           <span
@@ -82,8 +80,6 @@ export function WorktreeCardMetaRow({
           <TruncatedSidebarLabel
             text={branch}
             className="text-[11px] text-muted-foreground leading-none"
-            // Why: whole-card details hover already shows full identity; a nested tooltip would compete for it.
-            tooltipEnabled={!hasHoverDetails}
           />
         ) : showDetachedHeadInMetaRow && detachedHeadDisplay ? (
           <DetachedHeadBadge

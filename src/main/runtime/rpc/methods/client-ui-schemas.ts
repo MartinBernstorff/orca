@@ -6,6 +6,10 @@ import {
 import { isFeatureTipId } from '../../../../shared/feature-tips'
 import { isReleaseChannel, type ReleaseChannel } from '../../../../shared/release-channel'
 import {
+  normalizeWorktreeCardInteractions,
+  WORKTREE_CARD_INTERACTIONS
+} from '../../../../shared/worktree/card-interactions'
+import {
   normalizeWorktreeCardProperties,
   WORKTREE_CARD_PROPERTIES
 } from '../../../../shared/worktree/card-properties'
@@ -27,6 +31,9 @@ const WorktreeCardPropertyParam = z.enum(WORKTREE_CARD_PROPERTIES)
 const WorktreeCardProperties = z
   .array(WorktreeCardPropertyParam)
   .transform((value) => normalizeWorktreeCardProperties(value))
+const WorktreeCardInteractions = z
+  .array(z.enum(WORKTREE_CARD_INTERACTIONS))
+  .transform((value) => normalizeWorktreeCardInteractions(value))
 const STATIC_RIGHT_SIDEBAR_TABS = [
   'explorer',
   'search',
@@ -140,6 +147,7 @@ const UiUpdateFields = z
     uiZoomLevel: z.number().finite().optional(),
     editorFontZoomLevel: z.number().finite().optional(),
     worktreeCardProperties: WorktreeCardProperties.optional(),
+    worktreeCardInteractions: WorktreeCardInteractions.optional(),
     _worktreeCardModeDefaulted: z.boolean().optional(),
     agentActivityDisplayMode: AgentActivityDisplayMode.optional(),
     workspaceStatuses: z.array(WorkspaceStatusDefinition).optional(),
