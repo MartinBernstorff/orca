@@ -17,7 +17,11 @@ import {
   selectRuntimeAwareSshTargetRemoved
 } from '@/store/slices/runtime-environment-ssh'
 import { EMPTY_WORKSPACE_PORTS, type WorktreeCardProps } from './worktree-card-model'
+import type { WorktreeCardInteraction } from '../../../../shared/ui-chrome-types'
 import { getDeleteStateForWorktreeHost } from './worktree-delete-state-host-match'
+
+// Why: a stable empty array keeps the selector from re-rendering every card on unrelated store writes.
+const EMPTY_WORKTREE_CARD_INTERACTIONS: WorktreeCardInteraction[] = []
 
 export function useWorktreeCardFoundation({
   worktree,
@@ -37,6 +41,9 @@ export function useWorktreeCardFoundation({
   const fetchIssue = useAppStore((s) => s.fetchIssue)
   const fetchLinearIssue = useAppStore((s) => s.fetchLinearIssue)
   const cardProps = useAppStore((s) => s.worktreeCardProperties)
+  const cardInteractions = useAppStore(
+    (s) => s.worktreeCardInteractions ?? EMPTY_WORKTREE_CARD_INTERACTIONS
+  )
   const agentActivityDisplayMode =
     useAppStore((s) => s.agentActivityDisplayMode) ?? DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE
   const projectGroups = useAppStore((s) => s.projectGroups)
@@ -206,6 +213,7 @@ export function useWorktreeCardFoundation({
     fetchIssue,
     fetchLinearIssue,
     cardProps,
+    cardInteractions,
     agentActivityDisplayMode,
     projectGroups,
     newCardStyle,

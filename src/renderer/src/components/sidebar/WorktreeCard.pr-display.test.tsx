@@ -353,7 +353,7 @@ describe('WorktreeCard linked PR display', () => {
     expect(markup).not.toContain('>feature/local-branch</span>')
   })
 
-  it('shows task and notes metadata while keeping PR out of the right metadata list', async () => {
+  it('renders the linked Linear ref and no metadata badges on a new card', async () => {
     settings = { experimentalNewWorktreeCardStyle: true }
     worktreeCardProperties = ['status', 'issue', 'linear-issue', 'comment']
     const { default: WorktreeCard } = await import('./WorktreeCard')
@@ -371,17 +371,21 @@ describe('WorktreeCard linked PR display', () => {
       />
     )
 
-    expect(markup).toContain('Linked issue #123')
-    expect(markup).toContain('Linked Linear ENG-123')
+    expect(markup).toContain('>ENG-123</span>')
+    // Why: the details hover is gone, so metadata badges that only opened it went with it.
+    expect(markup).not.toContain('Linked issue #123')
+    expect(markup).not.toContain('Linked Linear ENG-123')
+    expect(markup).not.toContain('Workspace notes')
     expect(markup).not.toContain('PR: Open')
     expect(markup).not.toContain('Linked PR #456')
-    expect(markup).toContain('Workspace notes')
     expect(markup).not.toContain('data-slot="badge"')
     expect(markup).not.toContain('Loading issue')
     expect(markup).not.toContain('Reviewer handoff note')
+    // Why: `pr` is off in this card's properties, so the review ref stays hidden.
+    expect(markup).not.toContain('#456')
   })
 
-  it('shows selected task and notes metadata on compact cards when new card style is on', async () => {
+  it('keeps new card style badge-free even when the compact setting is on', async () => {
     settings = { compactWorktreeCards: true, experimentalNewWorktreeCardStyle: true }
     worktreeCardProperties = ['status', 'issue', 'linear-issue', 'comment']
     const { default: WorktreeCard } = await import('./WorktreeCard')
@@ -399,10 +403,11 @@ describe('WorktreeCard linked PR display', () => {
       />
     )
 
-    expect(markup).toContain('Linked issue #123')
-    expect(markup).toContain('Linked Linear ENG-123')
+    expect(markup).toContain('>ENG-123</span>')
+    expect(markup).not.toContain('Linked issue #123')
+    expect(markup).not.toContain('Linked Linear ENG-123')
     expect(markup).not.toContain('Linked PR #456')
-    expect(markup).toContain('Workspace notes')
+    expect(markup).not.toContain('Workspace notes')
     expect(markup).not.toContain('data-worktree-card-meta-row=""')
     expect(markup).not.toContain('Reviewer handoff note')
   })

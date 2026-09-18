@@ -2,6 +2,7 @@ import type { PersistedState } from '../../../shared/persisted-state-types'
 import {
   getDefaultUIState,
   normalizeAgentActivityDisplayMode,
+  normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../shared/constants'
 import {
@@ -49,6 +50,7 @@ export function getPersistedUI(
       state.ui?.rightSidebarTab
     ),
     worktreeCardProperties: normalizeWorktreeCardProperties(state.ui?.worktreeCardProperties),
+    worktreeCardInteractions: normalizeWorktreeCardInteractions(state.ui?.worktreeCardInteractions),
     agentActivityDisplayMode: normalizeAgentActivityDisplayMode(state.ui?.agentActivityDisplayMode),
     workspaceStatuses: normalizeWorkspaceStatuses(state.ui?.workspaceStatuses),
     workspaceBoardOpacity: clampWorkspaceBoardOpacity(state.ui?.workspaceBoardOpacity),

@@ -22,21 +22,27 @@ describe('worktree card property options', () => {
     expect(options.map((option) => option.label)).not.toContain('Linear issues')
   })
 
-  it('splits issue providers only when new card style is on', () => {
+  it('offers only the properties a new card can still render', () => {
     const options = getWorktreeCardPropertyOptions({ newCardStyle: true })
 
-    expect(options.map((option) => option.id)).not.toContain('tasks')
-    expect(options.map((option) => option.id)).not.toContain('status')
-    expect(options.find((option) => option.id === 'issue')?.properties).toEqual(['issue'])
+    // Why: new card style dropped the metadata badges, so every toggle that only drove
+    // a badge would be a checkbox that changes nothing.
+    expect(options.map((option) => option.id)).toEqual([
+      'linear-issue',
+      'pr',
+      'inline-agents',
+      'branch'
+    ])
     expect(options.find((option) => option.id === 'linear-issue')?.properties).toEqual([
       'linear-issue'
     ])
-    expect(options.find((option) => option.id === 'jira-issue')?.properties).toEqual(['jira-issue'])
-    expect(options.find((option) => option.id === 'automation')?.properties).toEqual(['automation'])
-    expect(options.map((option) => option.label)).toContain('GitHub issues')
-    expect(options.map((option) => option.label)).toContain('Linear issues')
-    expect(options.map((option) => option.label)).toContain('Jira issues')
-    expect(options.map((option) => option.label)).toContain('Automation')
+    expect(options.find((option) => option.id === 'pr')?.properties).toEqual(['pr'])
+    expect(options.map((option) => option.label)).toEqual([
+      'Linear issues',
+      'PR/MR link',
+      'Agent statuses',
+      'Branch name'
+    ])
   })
 
   it('uses branch-only copy by default and without project groups', () => {

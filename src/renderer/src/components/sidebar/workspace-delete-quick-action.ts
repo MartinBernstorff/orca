@@ -92,8 +92,13 @@ export function useWorkspaceDeleteModifierPressed(): boolean {
 
 export function canShowWorkspaceDeleteQuickAction(args: {
   deleteModifierPressed: boolean
+  deleteInteractionEnabled: boolean
   isDeleting: boolean
   isMainWorktree: boolean
 }): boolean {
-  return args.deleteModifierPressed && !args.isDeleting && !args.isMainWorktree
+  return (
+    (args.deleteModifierPressed || args.deleteInteractionEnabled) &&
+    !args.isDeleting &&
+    !args.isMainWorktree
+  )
 }

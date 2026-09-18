@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type {
   AgentActivityDisplayMode,
+  WorktreeCardInteraction,
   WorktreeCardProperty
 } from '../../../../shared/ui-chrome-types'
 import {
@@ -20,7 +21,45 @@ import {
   getWorktreeCardPropertyOptions
 } from './sidebar-workspace-option-items'
 import { PROPERTY_OPTIONS } from './worktree-card-display-property-options'
+import { INTERACTION_OPTIONS } from './worktree-card-interaction-options'
 import { translate } from '@/i18n/i18n'
+
+function WorktreeCardInteractionItems(): React.JSX.Element {
+  const worktreeCardInteractions = useAppStore((s) => s.worktreeCardInteractions)
+  const setWorktreeCardInteractions = useAppStore((s) => s.setWorktreeCardInteractions)
+  const handleChange = useCallback(
+    (interaction: WorktreeCardInteraction, checked: boolean): void => {
+      setWorktreeCardInteractions(
+        checked
+          ? [...worktreeCardInteractions, interaction]
+          : worktreeCardInteractions.filter((entry) => entry !== interaction)
+      )
+    },
+    [setWorktreeCardInteractions, worktreeCardInteractions]
+  )
+
+  return (
+    <>
+      <DropdownMenuSeparator />
+      <DropdownMenuLabel className="px-2 py-1 text-[11px] font-medium text-muted-foreground">
+        {translate(
+          'auto.components.sidebar.SidebarWorkspaceOptionsMenu.interactionsSection',
+          'Interactions'
+        )}
+      </DropdownMenuLabel>
+      {INTERACTION_OPTIONS.map((opt) => (
+        <DropdownMenuCheckboxItem
+          key={opt.id}
+          checked={worktreeCardInteractions.includes(opt.id)}
+          onCheckedChange={(checked) => handleChange(opt.id, checked === true)}
+          onSelect={(e) => e.preventDefault()}
+        >
+          {opt.label}
+        </DropdownMenuCheckboxItem>
+      ))}
+    </>
+  )
+}
 
 type WorktreeCardDisplayMenuSectionProps = {
   preserveWorkspaceBoardOpen: boolean
@@ -87,6 +126,7 @@ export function WorktreeCardDisplayMenuSection({
               {opt.label}
             </DropdownMenuCheckboxItem>
           ))}
+          <WorktreeCardInteractionItems />
         </DropdownMenuSubContent>
       </DropdownMenuSub>
     )
@@ -193,6 +233,7 @@ export function WorktreeCardDisplayMenuSection({
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
+          <WorktreeCardInteractionItems />
         </DropdownMenuSubContent>
       </DropdownMenuSub>
     </>

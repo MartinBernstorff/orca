@@ -45,6 +45,9 @@ export type WorktreeCardProperty =
   // Inline agent-activity list rendered in each workspace card; on by default (see DEFAULT_WORKTREE_CARD_PROPERTIES in shared/constants.ts).
   | 'inline-agents'
 
+/** Opt-in hover affordances on workspace cards (see DEFAULT_WORKTREE_CARD_INTERACTIONS). */
+export type WorktreeCardInteraction = 'delete'
+
 export type WorktreeCardMode = 'Default' | 'Compact'
 
 export type AgentActivityDisplayMode = 'compact' | 'full'

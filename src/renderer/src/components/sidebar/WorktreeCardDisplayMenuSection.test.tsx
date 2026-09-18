@@ -9,9 +9,11 @@ import { WorktreeCardDisplayMenuSection } from './WorktreeCardDisplayMenuSection
 const setWorktreeCardMode = vi.fn()
 const setWorktreeCardProperties = vi.fn()
 const setAgentActivityDisplayMode = vi.fn()
+const setWorktreeCardInteractions = vi.fn()
 
 let settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: false }
 let projectGroups: unknown[] = []
+let worktreeCardInteractions: string[] = []
 let worktreeCardProperties = [
   'status',
   'unread',
@@ -32,8 +34,10 @@ vi.mock('@/store', () => ({
       projectGroups,
       setAgentActivityDisplayMode,
       setWorktreeCardMode,
+      setWorktreeCardInteractions,
       setWorktreeCardProperties,
       settings,
+      worktreeCardInteractions,
       worktreeCardProperties
     })
 }))
@@ -128,7 +132,9 @@ beforeEach(() => {
     'ports',
     'inline-agents'
   ]
+  worktreeCardInteractions = []
   setAgentActivityDisplayMode.mockReset()
+  setWorktreeCardInteractions.mockReset()
   setWorktreeCardMode.mockReset()
   setWorktreeCardProperties.mockReset()
 })
@@ -166,6 +172,23 @@ describe('WorktreeCardDisplayMenuSection', () => {
 
     expect(container?.textContent).toContain('Branch name')
     expect(container?.textContent).not.toContain('Branch / folder path')
+  })
+
+  it('toggles the hover delete interaction from the card display menu', () => {
+    settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: true }
+
+    renderMenu()
+
+    const deleteInteractionButton = [
+      ...(container?.querySelectorAll<HTMLButtonElement>('button') ?? [])
+    ].find((button) => button.textContent === 'Delete button')
+    expect(deleteInteractionButton?.dataset.checked).toBe('false')
+
+    act(() => {
+      deleteInteractionButton?.click()
+    })
+
+    expect(setWorktreeCardInteractions).toHaveBeenCalledWith(['delete'])
   })
 
   it('mentions folder paths when project groups can create folder workspaces', () => {

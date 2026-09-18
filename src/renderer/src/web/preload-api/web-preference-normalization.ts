@@ -2,6 +2,7 @@ import { normalizeAutoRenameBranchFromWorkDefaultOn } from '../../../../shared/a
 import {
   getDefaultSettings,
   normalizeAgentActivityDisplayMode,
+  normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../../shared/constants'
 import { normalizeContextualTourIds } from '../../../../shared/contextual-tours'
@@ -43,6 +44,9 @@ export function mergeWebUIState(
     ),
     worktreeCardProperties: normalizeWorktreeCardProperties(
       safeUpdates.worktreeCardProperties ?? base.worktreeCardProperties
+    ),
+    worktreeCardInteractions: normalizeWorktreeCardInteractions(
+      safeUpdates.worktreeCardInteractions ?? base.worktreeCardInteractions
     ),
     _worktreeCardModeDefaulted:
       safeUpdates._worktreeCardModeDefaulted ?? base._worktreeCardModeDefaulted,

@@ -80,11 +80,12 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     openModal: foundation.openModal
   })
 
-  // Why: delete is destructive, so it only appears while holding Option/Alt, not in the ordinary hover chrome.
+  // Why: delete is destructive, so it only appears while holding Option/Alt unless the user opts into the hover interaction.
   const showDeleteQuickAction =
     !props.affiliateListMode &&
     canShowWorkspaceDeleteQuickAction({
       deleteModifierPressed: linked.deleteModifierPressed,
+      deleteInteractionEnabled: foundation.cardInteractions.includes('delete'),
       isDeleting: linked.isDeleting,
       isMainWorktree: worktree.isMainWorktree
     })

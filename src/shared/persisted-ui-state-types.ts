@@ -19,6 +19,7 @@ import type {
   VisibleWorkspaceHostIds,
   WorkspaceHostOrder,
   WorkspaceHostScope,
+  WorktreeCardInteraction,
   WorktreeCardProperty
 } from './ui-chrome-types'
 import type { WorkspaceStatusDefinition } from './worktree/types'
@@ -80,6 +81,8 @@ export type PersistedUIState = {
   uiZoomLevel: number
   editorFontZoomLevel: number
   worktreeCardProperties: WorktreeCardProperty[]
+  /** Opt-in hover affordances on workspace cards; absent means none. */
+  worktreeCardInteractions?: WorktreeCardInteraction[]
   /** One-shot migration flag for deriving card properties from the two worktree card modes. */
   _worktreeCardModeDefaulted?: boolean
   agentActivityDisplayMode?: AgentActivityDisplayMode

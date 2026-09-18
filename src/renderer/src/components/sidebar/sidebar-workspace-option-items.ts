@@ -136,17 +136,10 @@ const TASK_WORKTREE_CARD_PROPERTY_OPTION: WorktreeCardPropertyOption = {
   }
 }
 
-const ISSUE_WORKTREE_CARD_PROPERTY_OPTIONS: WorktreeCardPropertyOption[] = [
-  {
-    id: 'issue',
-    properties: ['issue'],
-    get label() {
-      return translate(
-        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.bdd23b4e07',
-        'GitHub issues'
-      )
-    }
-  },
+// Why: new card style dropped the metadata badges, so the only linked refs it can
+// still show are the ones on the linked-refs row. A toggle for anything else would
+// be a checkbox that changes nothing.
+const NEW_CARD_LINKED_REF_PROPERTY_OPTIONS: WorktreeCardPropertyOption[] = [
   {
     id: 'linear-issue',
     properties: ['linear-issue'],
@@ -158,12 +151,12 @@ const ISSUE_WORKTREE_CARD_PROPERTY_OPTIONS: WorktreeCardPropertyOption[] = [
     }
   },
   {
-    id: 'jira-issue',
-    properties: ['jira-issue'],
+    id: 'pr',
+    properties: ['pr'],
     get label() {
       return translate(
-        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.jiraIssues',
-        'Jira issues'
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.b8dcc6f321',
+        'PR/MR link'
       )
     }
   }
@@ -178,9 +171,6 @@ export function getWorktreeCardPropertyOptions({
   newCardStyle = false,
   hasProjectGroups = false
 }: WorktreeCardPropertyOptionsInput = {}): WorktreeCardPropertyOption[] {
-  const issueOptions = newCardStyle
-    ? ISSUE_WORKTREE_CARD_PROPERTY_OPTIONS
-    : [TASK_WORKTREE_CARD_PROPERTY_OPTION]
   const branchOption: WorktreeCardPropertyOption = {
     id: 'branch',
     properties: ['branch'],
@@ -195,7 +185,18 @@ export function getWorktreeCardPropertyOptions({
         : translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.219ebf1961', 'Branch name')
     }
   }
-  return [...issueOptions, ...BASE_WORKTREE_CARD_PROPERTY_OPTIONS.slice(0, -1), branchOption]
+  if (newCardStyle) {
+    return [
+      ...NEW_CARD_LINKED_REF_PROPERTY_OPTIONS,
+      ...BASE_WORKTREE_CARD_PROPERTY_OPTIONS.filter((option) => option.id === 'inline-agents'),
+      branchOption
+    ]
+  }
+  return [
+    TASK_WORKTREE_CARD_PROPERTY_OPTION,
+    ...BASE_WORKTREE_CARD_PROPERTY_OPTIONS.slice(0, -1),
+    branchOption
+  ]
 }
 
 export const WORKTREE_CARD_PROPERTY_OPTIONS = getWorktreeCardPropertyOptions()
