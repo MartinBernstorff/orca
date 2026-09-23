@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { getRepoExecutionHostId } from './execution-host'
 import type { Repo } from './repo-types'
 import {
   getNewWorkspaceDialogEligibleRepos,
@@ -45,6 +46,65 @@ describe('new workspace dialog repo selection', () => {
     expect(resolveNewWorkspaceDialogRepoId({ eligibleRepos, activeRepoId: 'active' })).toBe(
       'active'
     )
+  })
+
+  describe('with a sidebar project filter', () => {
+    const eligibleRepos = [makeRepo('a'), makeRepo('b'), makeRepo('c')]
+
+    it('keeps the active repo when it is filtered in', () => {
+      expect(
+        resolveNewWorkspaceDialogRepoId({
+          eligibleRepos,
+          activeRepoId: 'c',
+          filterRepoIds: ['b', 'c']
+        })
+      ).toBe('c')
+    })
+
+    it('falls back to the first filtered repo in repo order when the active repo is filtered out', () => {
+      expect(
+        resolveNewWorkspaceDialogRepoId({
+          eligibleRepos,
+          activeRepoId: 'a',
+          filterRepoIds: ['c', 'b']
+        })
+      ).toBe('b')
+    })
+
+    it('ignores a filter that only names stale repos', () => {
+      expect(
+        resolveNewWorkspaceDialogRepoId({
+          eligibleRepos,
+          activeRepoId: 'a',
+          filterRepoIds: ['gone']
+        })
+      ).toBe('a')
+    })
+
+    it('lets explicit draft and initial repos bypass the filter', () => {
+      expect(
+        resolveNewWorkspaceDialogRepoId({ eligibleRepos, initialRepoId: 'a', filterRepoIds: ['b'] })
+      ).toBe('a')
+      expect(
+        resolveNewWorkspaceDialogRepoId({ eligibleRepos, draftRepoId: 'a', filterRepoIds: ['b'] })
+      ).toBe('a')
+    })
+
+    it('only picks a focused-host repo from within the filter', () => {
+      const repos = [
+        makeRepo('remote-out', { connectionId: 'ssh-1' }),
+        makeRepo('local-in'),
+        makeRepo('remote-in', { connectionId: 'ssh-1' })
+      ]
+      const focusedHostScope = getRepoExecutionHostId(repos[0])
+      expect(
+        resolveNewWorkspaceDialogRepoId({
+          eligibleRepos: repos,
+          focusedHostScope,
+          filterRepoIds: ['local-in', 'remote-in']
+        })
+      ).toBe('remote-in')
+    })
   })
 
   it('returns null for create-base prefetch when the dialog default is a folder repo', () => {

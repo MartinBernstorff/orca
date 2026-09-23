@@ -27,27 +27,34 @@ export function resolveNewWorkspaceDialogRepoId({
   draftRepoId,
   initialRepoId,
   activeRepoId,
-  focusedHostScope
+  focusedHostScope,
+  filterRepoIds
 }: {
   eligibleRepos: readonly NewWorkspaceDialogRepo[]
   draftRepoId?: string | null
   initialRepoId?: string | null
   activeRepoId?: string | null
   focusedHostScope?: ExecutionHostScope | null
+  filterRepoIds?: readonly string[]
 }): string {
   // Why: every new-workspace dialog should seed the repo the same way. Mobile
   // mirrors this locally because Metro cannot bundle root shared runtime modules.
+  const filteredRepos = filterRepoIds?.length
+    ? eligibleRepos.filter((repo) => filterRepoIds.includes(repo.id))
+    : []
+  // Why: implicit defaults stay within the sidebar project filter; explicit picks (draft, initial) don't.
+  const defaultPool = filteredRepos.length > 0 ? filteredRepos : eligibleRepos
   const focusedHostRepo =
     focusedHostScope && focusedHostScope !== ALL_EXECUTION_HOSTS_SCOPE
-      ? eligibleRepos.find((repo) => getRepoExecutionHostId(repo) === focusedHostScope)
+      ? defaultPool.find((repo) => getRepoExecutionHostId(repo) === focusedHostScope)
       : undefined
 
   const resolvedRepo =
     (draftRepoId && eligibleRepos.find((repo) => repo.id === draftRepoId)) ||
     (initialRepoId && eligibleRepos.find((repo) => repo.id === initialRepoId)) ||
-    (activeRepoId && eligibleRepos.find((repo) => repo.id === activeRepoId)) ||
+    (activeRepoId && defaultPool.find((repo) => repo.id === activeRepoId)) ||
     focusedHostRepo ||
-    eligibleRepos[0]
+    defaultPool[0]
 
   return resolvedRepo?.id ?? ''
 }
@@ -58,6 +65,7 @@ export function resolveNewWorkspaceDialogGitRepoId(args: {
   initialRepoId?: string | null
   activeRepoId?: string | null
   focusedHostScope?: ExecutionHostScope | null
+  filterRepoIds?: readonly string[]
 }): string | null {
   const repoId = resolveNewWorkspaceDialogRepoId(args)
   const repo = repoId ? args.eligibleRepos.find((entry) => entry.id === repoId) : null

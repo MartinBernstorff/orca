@@ -127,6 +127,8 @@ export function useComposerTargetStore(options: ComposerStateInput, decisions: C
 
   const workspaceHostScope = useAppStore((s) => s.workspaceHostScope)
 
+  const filterRepoIds = useAppStore((s) => s.filterRepoIds)
+
   const eligibleRepos = useMemo(() => getComposerEligibleRepos(repos), [repos])
 
   const hostOptions = useMemo(
@@ -212,6 +214,7 @@ export function useComposerTargetStore(options: ComposerStateInput, decisions: C
     runtimeEnvironments,
     runtimeStatusByEnvironmentId,
     workspaceHostScope,
+    filterRepoIds,
     eligibleRepos,
     hostOptions,
     actionableHostIds,

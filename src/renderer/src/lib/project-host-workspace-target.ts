@@ -43,6 +43,7 @@ type ProjectHostWorkspaceTargetInput = {
   projectHostSetupId?: string | null
   focusedHostScope?: ExecutionHostScope | null
   actionableHostIds?: ReadonlySet<ExecutionHostId>
+  filterRepoIds?: readonly string[]
 }
 
 type ProjectSetupModel = {

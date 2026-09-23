@@ -487,7 +487,8 @@ function getComposerPrefetchRepoId(
     eligibleRepos,
     initialRepoId,
     activeRepoId: resolveComposerActiveRepoId(state.repos, eligibleRepos, state.activeRepoId),
-    focusedHostScope: state.workspaceHostScope
+    focusedHostScope: state.workspaceHostScope,
+    filterRepoIds: state.filterRepoIds
   })
 }
 
@@ -499,7 +500,8 @@ function getComposerDefaultWorkspaceTarget(state: ReturnType<typeof useAppStore.
     projects: state.projects,
     projectHostSetups: state.projectHostSetups,
     activeRepoId,
-    focusedHostScope: state.workspaceHostScope
+    focusedHostScope: state.workspaceHostScope,
+    filterRepoIds: state.filterRepoIds
   })
   return resolution.status === 'ready' ? resolution.target : null
 }
