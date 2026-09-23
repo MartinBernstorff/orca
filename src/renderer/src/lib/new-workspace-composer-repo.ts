@@ -39,20 +39,23 @@ export function resolveComposerRepoId({
   draftRepoId,
   initialRepoId,
   activeRepoId,
-  focusedHostScope
+  focusedHostScope,
+  filterRepoIds
 }: {
   eligibleRepos: readonly Repo[]
   draftRepoId?: string | null
   initialRepoId?: string | null
   activeRepoId?: string | null
   focusedHostScope?: ExecutionHostScope | null
+  filterRepoIds?: readonly string[]
 }): string {
   return resolveNewWorkspaceDialogRepoId({
     eligibleRepos,
     draftRepoId,
     initialRepoId,
     activeRepoId,
-    focusedHostScope
+    focusedHostScope,
+    filterRepoIds
   })
 }
 
@@ -62,6 +65,7 @@ export function resolveComposerGitRepoId(args: {
   initialRepoId?: string | null
   activeRepoId?: string | null
   focusedHostScope?: ExecutionHostScope | null
+  filterRepoIds?: readonly string[]
 }): string | null {
   return resolveNewWorkspaceDialogGitRepoId(args)
 }

@@ -5,6 +5,7 @@ type ComposerInitialTargetStateInput = Pick<
   | 'actionableHostIds'
   | 'eligibleRepos'
   | 'decisions'
+  | 'filterRepoIds'
   | 'initialProjectGroupId'
   | 'initialRepoId'
   | 'initialTaskSourceContext'
@@ -31,6 +32,7 @@ export function useComposerInitialTargetState(input: ComposerInitialTargetStateI
     actionableHostIds,
     decisions,
     eligibleRepos,
+    filterRepoIds,
     initialProjectGroupId,
     initialRepoId,
     initialTaskSourceContext,
@@ -85,7 +87,8 @@ export function useComposerInitialTargetState(input: ComposerInitialTargetStateI
     hostId: initialRunSeed.hostId,
     projectHostSetupId: initialRunSeed.projectHostSetupId,
     focusedHostScope: workspaceHostScope,
-    actionableHostIds
+    actionableHostIds,
+    filterRepoIds
   })
 
   const resolvedInitialRepoId =
