@@ -342,6 +342,7 @@ export function useWorktreeContextMenuModel({
   )
 
   return {
+    ...commands,
     activeContextWorktrees,
     allWorktrees,
     batchDeleteWorktrees,
@@ -360,7 +361,6 @@ export function useWorktreeContextMenuModel({
     eligibleParentCount,
     effectiveSelectedWorktrees,
     folderWorkspaceId,
-    ...commands,
     handleCloseAutoFocus,
     handleOpenParentPicker,
     handleParentPickerOpenChange,

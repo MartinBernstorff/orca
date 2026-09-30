@@ -7,7 +7,13 @@ import {
   DropdownMenuSubTrigger
 } from '@/components/ui/dropdown-menu'
 import { translate } from '@/i18n/i18n'
-import { SNOOZE_PRESET_IDS, type SnoozePresetId } from '../../../../shared/worktree/snooze'
+import { useNow } from '@/hooks/use-now'
+import {
+  isWorkspaceSnoozed,
+  SNOOZE_PRESET_IDS,
+  type SnoozePresetId
+} from '../../../../shared/worktree/snooze'
+import { SNOOZE_EXPIRY_TICK_MS } from './snooze-expiry-tick'
 
 function getSnoozePresetLabel(preset: SnoozePresetId): string {
   switch (preset) {
@@ -30,16 +36,17 @@ function getSnoozePresetLabel(preset: SnoozePresetId): string {
 
 export function WorkspaceSnoozeMenuItems({
   disabled,
-  isSnoozed,
+  snoozedUntil,
   onSnooze,
   onUnsnooze
 }: {
   disabled: boolean
-  isSnoozed: boolean
+  snoozedUntil: number | null | undefined
   onSnooze: (preset: SnoozePresetId) => void
   onUnsnooze: () => void
 }): JSX.Element {
-  if (isSnoozed) {
+  const now = useNow(SNOOZE_EXPIRY_TICK_MS, snoozedUntil != null)
+  if (isWorkspaceSnoozed({ snoozedUntil }, now)) {
     return (
       <DropdownMenuItem onSelect={onUnsnooze} disabled={disabled}>
         <AlarmClockOff className="size-3.5" />

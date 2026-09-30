@@ -47,15 +47,9 @@ describe('AgentStateDot', () => {
   it('renders working as a yellow spinner', () => {
     const markup = renderMarkup('working')
 
-    expect(markup).toContain('border-yellow-500')
-    expect(markup).toContain('border-t-transparent')
-    // Why: rotation must come from the compositor-driven CSS animation, not a
-    // JS clock writing per-element styles on the input thread (STA-3328).
-    expect(markup).toContain('agent-working-spinner')
+    // The spinner's own classes and animation contract belong to AgentWorkingSpinner.test.tsx;
+    // this pins only that 'working' reaches for it.
     expect(markup).toContain('data-agent-spinner')
-    // Why: under reduced motion the top border is filled so the static ring
-    // reads as a complete marker, not a broken partial spinner (#9515).
-    expect(markup).toContain('motion-reduce:border-t-yellow-500')
   })
 
   it('renders monitoring as a static yellow heartbeat glyph', () => {
@@ -93,6 +87,15 @@ describe('AgentStateDot', () => {
     }
   )
 
+  it('renders unverifiable as an amber dashed ring, never the done check or the spinner', () => {
+    const markup = renderMarkup('unverifiable')
+
+    expect(markup).toContain('lucide-circle-dashed')
+    expect(markup).toContain('text-amber-500')
+    expect(markup).not.toContain('lucide-circle-check')
+    expect(markup).not.toContain('data-agent-spinner')
+  })
+
   it.each(['blocked', 'interrupted'] satisfies AgentDotState[])(
     'renders %s as a red attention dot',
     (state) => {
@@ -112,6 +115,7 @@ describe('AgentStateDot', () => {
     'failed',
     'done',
     'idle',
+    'unverifiable',
     'permission'
   ] satisfies AgentDotState[]
 

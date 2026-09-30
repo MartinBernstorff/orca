@@ -5,7 +5,7 @@ import { formatUiRelativeTime } from '@/i18n/relative-time-format'
 import { translate } from '@/i18n/i18n'
 import { normalizeSnoozedUntil } from '../../../../shared/worktree/snooze'
 import { SNOOZE_EXPIRY_TICK_MS } from './snooze-expiry-tick'
-import { useNow } from '@/components/dashboard/useNow'
+import { useNow } from '@/hooks/use-now'
 
 /**
  * Wake-time marker for a snoozed card. Only ever visible while the "Show

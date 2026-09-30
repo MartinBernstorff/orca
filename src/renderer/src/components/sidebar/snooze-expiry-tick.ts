@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { useNow } from '@/components/dashboard/useNow'
+import { useNow } from '@/hooks/use-now'
 import { useAppStore } from '@/store'
 import { getAllWorktreesFromState } from '@/store/selectors'
 import type { Worktree } from '../../../../shared/worktree/types'

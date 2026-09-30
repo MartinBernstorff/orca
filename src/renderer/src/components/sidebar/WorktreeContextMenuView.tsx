@@ -31,7 +31,6 @@ import { WorktreeOpenInSubMenu } from '@/components/open-in/WorktreeOpenInMenu'
 import { WorktreeDeveloperMenu } from './WorktreeDeveloperMenu'
 import { WorkspaceSleepMenuItems } from './WorkspaceSleepMenuItems'
 import { WorkspaceSnoozeMenuItems } from './WorkspaceSnoozeMenuItems'
-import { isWorkspaceSnoozed } from '../../../../shared/worktree/snooze'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import { translate } from '@/i18n/i18n'
 import { useOptionalShortcutLabel } from '@/hooks/useShortcutLabel'
@@ -66,6 +65,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     handleAssignWorkspaceStatus,
     handleCloseAutoFocus,
     handleCloseTerminals,
+    handleCopyName,
     handleCopyPath,
     handleCreateGroupFromRepo,
     handleDelete,
@@ -185,6 +185,13 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
                 <Copy className="size-3.5" />
                 {translate('auto.components.sidebar.WorktreeContextMenu.3350101edb', 'Copy Path')}
               </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleCopyName} disabled={isDeleting}>
+                <Copy className="size-3.5" />
+                {translate(
+                  'auto.components.sidebar.WorktreeContextMenu.copyWorktreeName',
+                  'Copy Worktree Name'
+                )}
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onSelect={handleTogglePin} disabled={isDeleting}>
                 {worktree.isPinned ? <PinOff className="size-3.5" /> : <Pin className="size-3.5" />}
@@ -194,7 +201,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
               </DropdownMenuItem>
               <WorkspaceSnoozeMenuItems
                 disabled={isDeleting}
-                isSnoozed={isWorkspaceSnoozed(worktree, Date.now())}
+                snoozedUntil={worktree.snoozedUntil}
                 onSnooze={handleSnooze}
                 onUnsnooze={handleUnsnooze}
               />
