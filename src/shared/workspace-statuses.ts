@@ -276,12 +276,12 @@ export function resolveWorkspaceStatusInput(
   if (byLabel.length > 1) {
     return {
       ok: false,
-      message: `Workspace status "${trimmed}" matches more than one column: ${describeWorkspaceStatuses(byLabel)}. Pass the id instead.`
+      message: `Workspace status "${String(trimmed)}" matches more than one column: ${describeWorkspaceStatuses(byLabel)}. Pass the id instead.`
     }
   }
   return {
     ok: false,
-    message: `Unknown workspace status "${trimmed}". Available: ${describeWorkspaceStatuses(statuses)}.`
+    message: `Unknown workspace status "${String(trimmed)}". Available: ${describeWorkspaceStatuses(statuses)}.`
   }
 }
 
