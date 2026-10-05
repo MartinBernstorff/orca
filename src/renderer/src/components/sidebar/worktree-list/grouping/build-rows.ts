@@ -5,6 +5,8 @@ import type { ProjectOrderBy } from '../../../../../../shared/ui-chrome-types'
 import type { WorktreeLineage } from '../../../../../../shared/worktree/lineage-types'
 import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shared/worktree/types'
 import { cloneDefaultWorkspaceStatuses } from '../../../../../../shared/workspace-statuses'
+import { normalizeNestedGroupBy } from '../../../../../../shared/sidebar-group-by-levels'
+import type { NestedSidebarGroupBy } from '../../../../../../shared/sidebar-group-by-levels'
 import type { AppState } from '../../../../store/types'
 import { LOCAL_EXECUTION_HOST_ID } from '../../../../../../shared/execution-host'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
@@ -71,7 +73,8 @@ export function buildRows(
   hostLabelById?: ReadonlyMap<string, string>,
   defaultHostId: ExecutionHostId = LOCAL_EXECUTION_HOST_ID,
   pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy = getPinnedWorktreeDisplayPolicy(settings),
-  showEmptyWorkspaceStatuses = false
+  showEmptyWorkspaceStatuses = false,
+  nestedGroupBy: readonly NestedSidebarGroupBy[] = []
 ): Row[] {
   const result: Row[] = []
   const projectIndex = buildProjectGroupingIndex(projectGrouping)
@@ -227,7 +230,12 @@ export function buildRows(
     lineageById,
     worktreeMap,
     nestLineage,
-    cyclicLineageIds
+    cyclicLineageIds,
+    nestedGroupBy: normalizeNestedGroupBy(groupBy, nestedGroupBy),
+    prCache,
+    settings,
+    repoOrder,
+    projectOrderBy
   }
 
   if (groupBy !== 'repo' || projectGroups.length === 0) {

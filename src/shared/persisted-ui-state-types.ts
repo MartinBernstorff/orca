@@ -38,6 +38,8 @@ export type PersistedUIState = {
   markdownTocPanelWidth?: number
   combinedDiffFileTreeWidth?: number
   groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority'
+  /** Group by levels below `groupBy`; absent on profiles written before nested grouping. */
+  nestedGroupBy?: Exclude<PersistedUIState['groupBy'], 'none'>[]
   sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
   /** Project header ordering in `groupBy: 'repo'`, independent of `sortBy`: 'manual' uses persisted order + header drag, 'recent' by latest visible activity. */
   projectOrderBy: ProjectOrderBy

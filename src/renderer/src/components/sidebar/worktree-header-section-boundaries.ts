@@ -32,7 +32,8 @@ function findProjectGroupHeaderRenderRowIndex(rows: readonly RenderRow[], groupI
 function findNextHeaderRenderRowIndex(rows: readonly RenderRow[], startIndex: number): number {
   for (let index = startIndex; index < rows.length; index++) {
     const row = rows[index]
-    if (row?.type === 'header' || row?.type === 'host-header') {
+    // Why: nested Group by lanes sit inside their section rather than ending it.
+    if ((row?.type === 'header' && !row.nestDepth) || row?.type === 'host-header') {
       return index
     }
   }
@@ -52,7 +53,7 @@ function findProjectGroupSectionEndIndex(
     if (row.type === 'host-header') {
       return index
     }
-    if (row.type !== 'header') {
+    if (row.type !== 'header' || row.nestDepth) {
       continue
     }
     const rowDepth = row.projectGroupDepth ?? 0
