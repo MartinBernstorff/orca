@@ -58,6 +58,8 @@ function Sidebar({
     [settings, systemPrefersDark]
   ) as React.CSSProperties | undefined
   const { nativeDropTarget, dropHandlers, affordance } = useSidebarProjectDrop()
+  // Why: re-sorting under the pointer moves the row the user is about to click.
+  const [pointerOverSidebar, setPointerOverSidebar] = React.useState(false)
   const {
     workspaceBoardOpen,
     workspaceBoardRenderedOpen,
@@ -111,6 +113,8 @@ function Sidebar({
         className="relative min-h-0 flex-shrink-0 bg-worktree-sidebar flex flex-col overflow-hidden scrollbar-sleek-parent"
         style={leftSidebarStyle}
         {...dropHandlers}
+        onPointerEnter={() => setPointerOverSidebar(true)}
+        onPointerLeave={() => setPointerOverSidebar(false)}
       >
         {sidebarOpen && (
           <>
@@ -126,6 +130,7 @@ function Sidebar({
               onWorkspaceBoardDragPreviewStart={previewWorkspaceBoardFromDrag}
               onWorkspaceBoardDragPreviewCommit={solidifyWorkspaceBoardFromDrag}
               onWorkspaceBoardDragPreviewCancel={cancelWorkspaceBoardDragPreview}
+              freezeOrder={pointerOverSidebar}
             />
 
             <div className="relative shrink-0">
