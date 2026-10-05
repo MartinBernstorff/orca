@@ -1192,23 +1192,6 @@ const onboardingGhosttyDiscoveredSchema = z
   .strict()
 const onboardingGhosttyImportClickedSchema = z.object({ cohort: cohortSchema }).strict()
 
-// Smart-sort telemetry: measures whether the redesign concentrates users in Class 1-3, and flags Smart→Recent abandonment as a regression.
-const smartSortClassDistributionSchema = z
-  .object({
-    class_1: z.number().int().nonnegative(),
-    class_2: z.number().int().nonnegative(),
-    class_3: z.number().int().nonnegative(),
-    class_4: z.number().int().nonnegative(),
-    total_worktrees: z.number().int().nonnegative()
-  })
-  .strict()
-const smartSortClass1PromotionSchema = z
-  .object({
-    cause: z.enum(['blocked', 'waiting', 'title-heuristic'])
-  })
-  .strict()
-// Why `_v` not `z.object({})`: empty zod object infers as TS `{}` ("anything"), breaking the `keyof EventMap[N]` roster probes.
-const smartToRecentSwitchSchema = z.object({ _v: z.literal(1).optional() }).strict()
 const onboardingGhosttyImportFailedSchema = z
   .object({
     // `'no_config'` is reserved for future use; call sites currently emit `'empty_diff'` or `'unknown'`.
@@ -1518,11 +1501,7 @@ export const eventSchemas = {
   editor_external_change_conflict_shown: editorExternalChangeConflictShownSchema,
   editor_external_change_conflict_action: editorExternalChangeConflictActionSchema,
 
-  direct_ssh_reconnect_operation: directSshReconnectOperationSchema,
-
-  smart_sort_class_distribution: smartSortClassDistributionSchema,
-  smart_sort_class_1_promotion: smartSortClass1PromotionSchema,
-  smart_to_recent_switch: smartToRecentSwitchSchema
+  direct_ssh_reconnect_operation: directSshReconnectOperationSchema
 } as const
 
 export type EventMap = { [N in keyof typeof eventSchemas]: z.infer<(typeof eventSchemas)[N]> }

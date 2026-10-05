@@ -36,6 +36,10 @@ export type FolderWorkspace = {
   snoozedUntil?: number | null
   /** See {@link Worktree.priority}. */
   priority?: WorkspacePriority | null
+  /** See {@link Worktree.promptCount}. Written only by main. */
+  promptCount?: number
+  /** See {@link Worktree.lastPromptAt}. */
+  lastPromptAt?: number
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

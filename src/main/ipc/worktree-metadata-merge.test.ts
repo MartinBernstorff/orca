@@ -116,3 +116,32 @@ describe('mergeWorktree priority projection', () => {
     expect(mergeWorktree('repo-1', git, { ...meta, priority: 'p0' as never }).priority).toBeNull()
   })
 })
+
+describe('mergeWorktree engagement projection', () => {
+  const meta = {
+    instanceId: '11111111-1111-4111-8111-111111111111',
+    hostId: 'local' as const,
+    displayName: '',
+    comment: '',
+    linkedIssue: null,
+    linkedPR: null,
+    linkedLinearIssue: null,
+    isArchived: false,
+    isUnread: false,
+    isPinned: false,
+    sortOrder: 0,
+    lastActivityAt: 0
+  }
+
+  it('keeps the persisted prompt count across a listing refresh', () => {
+    const merged = mergeWorktree('repo-1', git, { ...meta, promptCount: 7, lastPromptAt: 42 })
+    expect(merged).toMatchObject({ promptCount: 7, lastPromptAt: 42 })
+  })
+
+  it('projects a missing count as an explicit zero', () => {
+    expect(mergeWorktree('repo-1', git, undefined)).toMatchObject({
+      promptCount: 0,
+      lastPromptAt: 0
+    })
+  })
+})

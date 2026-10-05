@@ -10,9 +10,7 @@ function make(id: string, overrides: Partial<Worktree>): Worktree {
 }
 
 function sortIds(worktrees: Worktree[]): string[] {
-  return [...worktrees]
-    .sort(buildWorktreeComparator('priority', repoMap, NOW, new Map()))
-    .map((w) => w.id)
+  return [...worktrees].sort(buildWorktreeComparator('priority', repoMap, NOW)).map((w) => w.id)
 }
 
 describe('priority sort', () => {

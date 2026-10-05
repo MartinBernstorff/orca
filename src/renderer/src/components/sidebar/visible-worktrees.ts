@@ -22,7 +22,7 @@ import {
   worktreeMatchesVisibleHost
 } from './visible-worktree-host-scope'
 import type { Worktree } from '../../../../shared/worktree/types'
-import { buildWorktreeComparator, sortWorktreesSmart } from './smart-sort'
+import { buildWorktreeComparator } from './smart-sort'
 import { getWorktreeIdsWithLiveAgent, isInactiveWorkspace } from '@/lib/worktree-activity-state'
 import { useAppStore } from '@/store'
 import { getAllWorktreesFromState, getRepoMapFromState } from '@/store/selectors'
@@ -286,27 +286,9 @@ export function getVisibleWorktreeIds(): string[] {
   // Hoist repoMap so it's built once and reused across all branches below.
   const repoMap = getRepoMapFromState(state)
 
-  let sortedIds: string[]
-
-  if (state.sortBy === 'smart') {
-    sortedIds = sortWorktreesSmart(
-      allWorktrees,
-      state.tabsByWorktree,
-      repoMap,
-      state.agentStatusByPaneKey,
-      state.runtimePaneTitlesByTabId,
-      state.ptyIdsByTabId,
-      state.migrationUnsupportedByPtyId,
-      state.terminalLayoutsByTabId
-    ).map((w) => w.id)
-  } else {
-    // Why empty map: non-smart branches don't read attentionByWorktree, but
-    // the param is required to keep smart-mode callers honest at the type level.
-    const sorted = [...allWorktrees].sort(
-      buildWorktreeComparator(state.sortBy, repoMap, Date.now(), new Map())
-    )
-    sortedIds = sorted.map((w) => w.id)
-  }
+  const sortedIds = [...allWorktrees]
+    .sort(buildWorktreeComparator(state.sortBy, repoMap, Date.now()))
+    .map((w) => w.id)
 
   const visibleIds = computeVisibleWorktreeIds(state.worktreesByRepo, sortedIds, {
     filterRepoIds: state.filterRepoIds,

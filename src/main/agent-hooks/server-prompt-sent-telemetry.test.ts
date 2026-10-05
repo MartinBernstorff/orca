@@ -80,6 +80,28 @@ describe('AgentHookServer prompt-sent telemetry', () => {
     })
   })
 
+  it('notifies prompt-submitted subscribers once per SSH prompt, never for its replay', () => {
+    const server = new AgentHookServer()
+    const submitted = vi.fn()
+    server.subscribePromptSubmitted(submitted)
+    const envelope = {
+      paneKey: PANE,
+      tabId: 'tab-1',
+      worktreeId: 'wt-1',
+      hasExplicitPrompt: true,
+      payload: { state: 'working', prompt: 'remote prompt', agentType: 'codex' }
+    }
+
+    server.ingestRemote(envelope, 'conn-1')
+    server.ingestRemote({ ...envelope, payload: { ...envelope.payload, state: 'done' } }, 'conn-1')
+    server.ingestRemote({ ...envelope, isReplay: true }, 'conn-1')
+
+    expect(submitted).toHaveBeenCalledTimes(1)
+    expect(submitted).toHaveBeenCalledWith(
+      expect.objectContaining({ paneKey: PANE, tabId: 'tab-1', worktreeId: 'wt-1' })
+    )
+  })
+
   it('dedupes adjacent same-turn reports without considering hook state', () => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)

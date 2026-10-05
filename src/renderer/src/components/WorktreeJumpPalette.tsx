@@ -1108,7 +1108,6 @@ function WorktreeJumpPaletteContent({
     return sortWorktreesSmart(
       scope,
       tabsByWorktree,
-      repoMap,
       agentStatusByPaneKey,
       runtimePaneTitlesByTabId,
       ptyIdsByTabId,
@@ -1120,7 +1119,6 @@ function WorktreeJumpPaletteContent({
     allWorktrees,
     filterPredicate,
     tabsByWorktree,
-    repoMap,
     agentStatusByPaneKey,
     runtimePaneTitlesByTabId,
     ptyIdsByTabId,

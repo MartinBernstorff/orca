@@ -121,7 +121,6 @@ const WorktreeList = React.memo(function WorktreeList({
   )
   const { visibleWorktrees, pairedDeviceIdsByEnvironment } = useVisibleSidebarWorktrees({
     filterState,
-    sortBy,
     sortedIds,
     repoMap,
     worktreeLineageById,

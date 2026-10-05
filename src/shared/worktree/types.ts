@@ -107,6 +107,10 @@ export type Worktree = {
   snoozedUntil?: number | null
   /** User-set priority. Absent or null means no priority. */
   priority?: WorkspacePriority | null
+  /** Prompts submitted to agents in this workspace, counted by the host that ingests agent status. Drives Engagement sort. */
+  promptCount?: number
+  /** Epoch ms of the newest counted prompt; Engagement sort tie-breaker. */
+  lastPromptAt?: number
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

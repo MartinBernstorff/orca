@@ -7,6 +7,7 @@ import { normalizeWorkspaceCreatorProvenance } from '../../shared/workspace-crea
 import { createWorktreeIdentity } from '../../shared/worktree/identity'
 import { normalizeSnoozedUntil } from '../../shared/worktree/snooze'
 import { normalizeWorkspacePriority } from '../../shared/worktree/priority'
+import { normalizeWorkspaceEngagement } from '../../shared/worktree/engagement'
 
 /**
  * Merge raw git worktree info with persisted user metadata into a full Worktree.
@@ -64,6 +65,8 @@ export function mergeWorktree(
     snoozedUntil: normalizeSnoozedUntil(meta?.snoozedUntil),
     // Why always present: same catalog-reconciler reason as snoozedUntil.
     priority: normalizeWorkspacePriority(meta?.priority),
+    // Why always present: a listing refresh must never read as a reset count.
+    ...normalizeWorkspaceEngagement(meta ?? {}),
     sortOrder: meta?.sortOrder ?? 0,
     ...(meta?.manualOrder !== undefined ? { manualOrder: meta.manualOrder } : {}),
     lastActivityAt: meta?.lastActivityAt ?? 0,
