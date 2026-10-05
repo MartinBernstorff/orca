@@ -31,6 +31,15 @@ export const GROUP_BY_OPTIONS = [
     }
   },
   {
+    id: 'engagement',
+    get label() {
+      return translate(
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.engagement',
+        'Engagement'
+      )
+    }
+  },
+  {
     id: 'repo',
     get label() {
       return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.2170d553cf', 'Project')
@@ -216,17 +225,18 @@ export const SORT_OPTIONS = [
     description: null
   },
   {
+    // Why 'smart': the wire/storage id predates Engagement; old hosts, clients and mobile still speak it.
     id: 'smart',
     get label() {
       return translate(
-        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.503462f2b4',
-        'Agent Activity'
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.engagement',
+        'Engagement'
       )
     },
     get description() {
       return translate(
-        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.b759bb87ee',
-        'Agents that need attention, then most recent activity.'
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.engagementSortDescription',
+        'Most prompts submitted first, then the most recent prompt.'
       )
     }
   },

@@ -62,7 +62,7 @@ describe('Store', () => {
   afterEach(() => {
     rmSync(testState.dir, { recursive: true, force: true })
   })
-  it('preserves persisted smart sort value', async () => {
+  it('keeps a saved Agent Activity (smart) sort, which now means Engagement', async () => {
     writeDataFile({
       schemaVersion: 1,
       repos: [],

@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react'
 import type React from 'react'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 import type { WorkspaceStatus } from '../../../../../../shared/worktree/types'
 import type { HostSectionRow } from '../../host-section-rows'
 import { PINNED_GROUP_KEY } from '../grouping/group-keys'
@@ -10,7 +11,7 @@ import type { WorktreeDropCommitContext } from './drop-commit-context'
 import type { WorktreeDragSession } from './use-session'
 import type { WorktreeDragRuntime } from './use-runtime'
 
-// Drag-and-drop onto a status section header or a status-grouped row, including the
+// Drag-and-drop onto a status/pin/engagement section header or a status-grouped row, including the
 // document-level fallback used when the pointer leaves the sidebar mid-drag.
 export function useWorkspaceStatusRowDrag(args: {
   ctx: WorktreeDropCommitContext
@@ -23,12 +24,17 @@ export function useWorkspaceStatusRowDrag(args: {
   onPinWorktree: (worktreeId: string) => void
 }) {
   const { ctx, session, runtime, scrollRef, rows, groupBy } = args
-  const { setDragOverStatus, setPinDragOver, clearWorktreeDrag } = runtime
+  const { setDragOverStatus, setDragOverEngagement, setPinDragOver, clearWorktreeDrag } = runtime
 
   const hasWorkspaceDropTargets = useMemo(
     () =>
       groupBy === 'workspace-status' ||
-      rows.some((row) => row.type === 'header' && row.key === PINNED_GROUP_KEY),
+      groupBy === 'engagement' ||
+      rows.some(
+        (row) =>
+          row.type === 'header' &&
+          (row.key === PINNED_GROUP_KEY || row.laneGroupBy === 'engagement')
+      ),
     [groupBy, rows]
   )
 
@@ -78,10 +84,34 @@ export function useWorkspaceStatusRowDrag(args: {
     [setPinDragOver]
   )
 
+  const handleWorkspaceEngagementDragOver = useCallback(
+    (event: React.DragEvent, engagement: WorkspaceEngagement) => {
+      if (!hasWorkspaceDragData(event.dataTransfer)) {
+        return
+      }
+      event.preventDefault()
+      event.dataTransfer.dropEffect = 'move'
+      setDragOverEngagement(engagement)
+    },
+    [setDragOverEngagement]
+  )
+
+  const handleWorkspaceEngagementDragLeave = useCallback(
+    (event: React.DragEvent) => {
+      const relatedTarget = event.relatedTarget
+      if (relatedTarget instanceof Node && event.currentTarget.contains(relatedTarget)) {
+        return
+      }
+      setDragOverEngagement(null)
+    },
+    [setDragOverEngagement]
+  )
+
   const handleWorkspaceStatusDragFinish = useCallback(() => {
     setDragOverStatus(null)
+    setDragOverEngagement(null)
     setPinDragOver(false)
-  }, [setDragOverStatus, setPinDragOver])
+  }, [setDragOverEngagement, setDragOverStatus, setPinDragOver])
 
   const handleWorkspaceStatusDrop = useCallback(
     (event: React.DragEvent, status: WorkspaceStatus) => {
@@ -125,6 +155,11 @@ export function useWorkspaceStatusRowDrag(args: {
       ctx.onMoveWorktreesToStatus(session.getReorderDraggedIds(ids), status),
     [ctx, session]
   )
+  const setWorktreesEngagementForDocumentDrop = useCallback(
+    (ids: readonly string[], engagement: WorkspaceEngagement) =>
+      ctx.onSetWorktreesEngagement(session.getReorderDraggedIds(ids), engagement),
+    [ctx, session]
+  )
 
   useWorkspaceStatusDocumentDrop(
     scrollRef,
@@ -134,7 +169,8 @@ export function useWorkspaceStatusRowDrag(args: {
     hasWorkspaceDropTargets,
     {
       onMoveWorktreesToStatus: moveWorktreesToStatusForDocumentDrop,
-      onPinWorktrees: ctx.onPinWorktrees
+      onPinWorktrees: ctx.onPinWorktrees,
+      onSetWorktreesEngagement: setWorktreesEngagementForDocumentDrop
     }
   )
 
@@ -143,6 +179,8 @@ export function useWorkspaceStatusRowDrag(args: {
     handleWorkspaceStatusDragLeave,
     handleWorkspacePinDragOver,
     handleWorkspacePinDragLeave,
+    handleWorkspaceEngagementDragOver,
+    handleWorkspaceEngagementDragLeave,
     handleWorkspaceStatusDrop
   }
 }

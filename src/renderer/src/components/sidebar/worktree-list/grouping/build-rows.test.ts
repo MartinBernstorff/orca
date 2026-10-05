@@ -384,7 +384,7 @@ describe('WorktreeList header styles', () => {
     const source = readSectionHeaderRowSource()
 
     expect(source).toContain('resolveProjectGroupHeaderColor({')
-    expect(source).toContain('headerKey: row.key')
+    expect(source).toContain('headerKey: headerLaneKey')
     expect(source).toContain('color={repoHeaderColor}')
   })
 

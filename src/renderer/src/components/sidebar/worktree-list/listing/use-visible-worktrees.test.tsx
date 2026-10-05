@@ -40,7 +40,6 @@ describe('useVisibleSidebarWorktrees', () => {
           visibleWorkspaceHostIds: null,
           workspaceHostScope: 'all'
         },
-        sortBy: 'recent',
         sortedIds: [local.id, ssh.id],
         repoMap: new Map([[repo.id, repo]]),
         worktreeLineageById: {},
@@ -76,7 +75,6 @@ describe('useVisibleSidebarWorktrees', () => {
           visibleWorkspaceHostIds: ['ssh:box'],
           workspaceHostScope: 'all'
         },
-        sortBy: 'recent',
         sortedIds: [local.id, ssh.id],
         repoMap: new Map([[repo.id, repo]]),
         worktreeLineageById: {},

@@ -56,6 +56,7 @@ export type WorktreeSidebarLineageDropTarget = WorktreeSidebarStatusDropTarget &
 export const NO_WORKTREE_SIDEBAR_DROP_TARGET: WorktreeSidebarLineageDropTarget = {
   status: null,
   isPinDrop: false,
+  engagement: null,
   lineageParentId: null
 }
 
@@ -83,7 +84,7 @@ export function updateLatestWorktreeStatusDropTarget(
   preview: WorktreeSidebarDropPreview | null
 ): void {
   drag.latestStatusDropTarget =
-    target.status || target.isPinDrop || target.lineageParentId
+    target.status || target.isPinDrop || target.engagement || target.lineageParentId
       ? {
           target,
           preview,

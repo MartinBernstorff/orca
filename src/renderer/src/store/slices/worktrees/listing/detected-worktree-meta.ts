@@ -118,6 +118,7 @@ export function getFolderWorkspaceMetaUpdates(
     | 'isPinned'
     | 'snoozedUntil'
     | 'priority'
+    | 'engagement'
     | 'sortOrder'
     | 'manualOrder'
     | 'lastActivityAt'
@@ -138,6 +139,7 @@ export function getFolderWorkspaceMetaUpdates(
       | 'isPinned'
       | 'snoozedUntil'
       | 'priority'
+      | 'engagement'
       | 'sortOrder'
       | 'manualOrder'
       | 'lastActivityAt'
@@ -171,6 +173,9 @@ export function getFolderWorkspaceMetaUpdates(
   }
   if (updates.priority !== undefined) {
     next.priority = updates.priority
+  }
+  if (updates.engagement !== undefined) {
+    next.engagement = updates.engagement
   }
   if (updates.sortOrder !== undefined) {
     next.sortOrder = updates.sortOrder

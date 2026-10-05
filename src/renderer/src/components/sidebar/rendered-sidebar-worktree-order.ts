@@ -83,7 +83,8 @@ export function computeRenderedSidebarWorktrees(
     undefined,
     defaultHostId,
     pinnedDisplayPolicy,
-    state.showEmptyWorkspaceStatuses
+    state.showEmptyWorkspaceStatuses,
+    state.nestedGroupBy
   )
 
   // Why lazy: with no host filter, addHostSectionRows is a pass-through, so skip building the whole host registry on a keystroke.

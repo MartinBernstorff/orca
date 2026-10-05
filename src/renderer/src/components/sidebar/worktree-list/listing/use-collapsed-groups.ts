@@ -6,6 +6,7 @@ import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shar
 import type { WorktreeLineage } from '../../../../../../shared/worktree/lineage-types'
 import { PINNED_GROUP_KEY, getLineageGroupKey } from '../grouping/group-keys'
 import type { PinnedWorktreeDisplayPolicy, WorktreeGroupBy } from '../grouping/row-types'
+import type { NestedSidebarGroupBy } from '../../../../../../shared/sidebar-group-by-levels'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
 import { getGroupKeysForWorktree } from '../grouping/worktree-group-keys'
 import { getFolderWorkspaceRevealGroupKeys } from '../navigation/folder-reveal'
@@ -19,6 +20,7 @@ export function useEffectiveCollapsedGroups(args: {
   collapsedGroups: Set<string>
   agentSendTargetWorktreeId: string | null
   groupBy: WorktreeGroupBy
+  nestedGroupBy: readonly NestedSidebarGroupBy[]
   pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy
   visibleWorktrees: readonly Worktree[]
   repoMap: Map<string, Repo>
@@ -36,6 +38,7 @@ export function useEffectiveCollapsedGroups(args: {
     collapsedGroups,
     agentSendTargetWorktreeId,
     groupBy,
+    nestedGroupBy,
     pinnedDisplayPolicy,
     visibleWorktrees,
     repoMap,
@@ -61,7 +64,7 @@ export function useEffectiveCollapsedGroups(args: {
         agentSendTargetWorktreeId,
         folderWorkspaces,
         projectGroups,
-        { groupBy, workspaceStatuses, defaultHostId }
+        { groupBy, nestedGroupBy, workspaceStatuses, defaultHostId }
       )
       if (folderKeys.length === 0) {
         return collapsedGroups
@@ -87,7 +90,8 @@ export function useEffectiveCollapsedGroups(args: {
         workspaceStatuses,
         settings,
         projectGroups,
-        projectGrouping
+        projectGrouping,
+        nestedGroupBy
       )) {
         next.delete(groupKey)
       }
@@ -105,6 +109,7 @@ export function useEffectiveCollapsedGroups(args: {
     agentSendTargetWorktreeId,
     collapsedGroups,
     groupBy,
+    nestedGroupBy,
     pinnedDisplayPolicy,
     visibleWorktrees,
     prCache,

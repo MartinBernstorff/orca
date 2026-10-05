@@ -19,6 +19,13 @@ import {
   getWorkspacePriorityLaneFromKey,
   getWorkspacePriorityLaneKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagement,
+  getWorkspaceEngagementFromLaneKey,
+  getWorkspaceEngagementLabel,
+  getWorkspaceEngagementLaneKey
+} from '../../workspace-engagement-meta'
+import { WORKSPACE_ENGAGEMENTS } from '../../../../../../shared/worktree/engagement'
 import { PR_GROUP_META, PR_GROUP_ORDER, getPRGroupKey, getPRLaneKey } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import { addRepoIdToGroup, getProjectGroupingForRepo } from './project-grouping'
@@ -50,6 +57,9 @@ function getLaneLabelForKey(
   }
   if (groupBy === 'priority') {
     return getWorkspacePriorityLabel(getWorkspacePriorityLaneFromKey(key))
+  }
+  if (groupBy === 'engagement') {
+    return getWorkspaceEngagementLabel(getWorkspaceEngagementFromLaneKey(key))
   }
   return key
 }
@@ -109,6 +119,10 @@ export function buildOrderedGroups(args: {
       const lane = getWorkspacePriorityLane(w)
       key = getWorkspacePriorityLaneKey(lane)
       label = getWorkspacePriorityLabel(lane)
+    } else if (groupBy === 'engagement') {
+      const engagement = getWorkspaceEngagement(w)
+      key = getWorkspaceEngagementLaneKey(engagement)
+      label = getWorkspaceEngagementLabel(engagement)
     } else {
       const prGroup = getPRGroupKey(w, repoMap, prCache, settings)
       key = getPRLaneKey(prGroup)
@@ -236,6 +250,19 @@ export function buildOrderedGroups(args: {
       if (group) {
         orderedGroups.push([key, group])
       }
+    }
+  } else if (groupBy === 'engagement') {
+    // Why: both lanes always render, even empty or nested, so each header stays a drop target.
+    for (const engagement of WORKSPACE_ENGAGEMENTS) {
+      const key = getWorkspaceEngagementLaneKey(engagement)
+      orderedGroups.push([
+        key,
+        grouped.get(key) ?? {
+          label: getWorkspaceEngagementLabel(engagement),
+          items: [],
+          repoIds: new Set()
+        }
+      ])
     }
   } else if (groupBy === 'workspace-status') {
     // Why: empty lanes cost a header row each, so they stay opt-in — on, they

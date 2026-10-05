@@ -14,9 +14,12 @@ import type {
   WorkspaceStatus,
   WorkspaceStatusDefinition
 } from '../../../../../../shared/worktree/types'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 import type { GroupHeaderRow, WorktreeGroupBy } from '../grouping/row-types'
 import { PINNED_GROUP_KEY } from '../grouping/group-keys'
 import { getWorkspaceStatusFromGroupKey } from '../../workspace-status'
+import { getWorkspaceEngagementFromLaneKey } from '../../workspace-engagement-meta'
+import { getSectionHeaderDropTarget } from './section-header-drop-target'
 import { getVirtualRowTransform } from '../viewport/virtual-rows'
 import { resolveProjectGroupHeaderColor } from '../../project-header-color'
 import { getRepoHeaderCreateState } from '../../repo-header-create-state'
@@ -50,6 +53,7 @@ export type SectionHeaderRowContext = {
   sshConnectionStates: AppState['sshConnectionStates']
   highlightedRevealRowKey: string | null
   dragOverStatus: WorkspaceStatus | null
+  dragOverEngagement: WorkspaceEngagement | null
   pinDragOver: boolean
   headerDrag: WorktreeSidebarHeaderDrag
   getCachedFolderWorkspacePathStatus: (request: {
@@ -65,6 +69,8 @@ export type SectionHeaderRowContext = {
   onWorkspaceStatusDragLeave: (event: React.DragEvent) => void
   onWorkspacePinDragOver: (event: React.DragEvent) => void
   onWorkspacePinDragLeave: (event: React.DragEvent) => void
+  onWorkspaceEngagementDragOver: (event: React.DragEvent, engagement: WorkspaceEngagement) => void
+  onWorkspaceEngagementDragLeave: (event: React.DragEvent) => void
   onWorkspaceStatusDrop: (event: React.DragEvent, status: WorkspaceStatus) => void
 }
 
@@ -87,6 +93,10 @@ export function renderWorktreeSectionHeaderRow(args: {
 }): React.JSX.Element {
   const { ctx, row, vItem, isActiveStickyHeader } = args
   const { headerDrag } = ctx
+  // Why: a nested header's key is its full path; lane identity lives in laneKey/laneGroupBy.
+  const headerGroupBy = row.laneGroupBy ?? ctx.groupBy
+  const headerLaneKey = row.laneKey ?? row.key
+  const nestDepth = row.nestDepth ?? 0
   const isRepoHeader = ctx.groupBy === 'repo' && row.repo !== undefined
   const isProjectGroupHeader = ctx.groupBy === 'repo' && row.projectGroup !== undefined
   const projectIdForHeader = isRepoHeader ? row.repo!.id : undefined
@@ -138,13 +148,19 @@ export function renderWorktreeSectionHeaderRow(args: {
     headerDrag.projectGroupDrag.state.draggingGroupId !== null &&
     headerDrag.projectGroupDrag.state.draggingGroupId === projectGroupIdForHeader
   const headerWorkspaceStatus =
-    ctx.groupBy === 'workspace-status'
-      ? getWorkspaceStatusFromGroupKey(row.key, ctx.workspaceStatuses)
+    headerGroupBy === 'workspace-status'
+      ? getWorkspaceStatusFromGroupKey(headerLaneKey, ctx.workspaceStatuses)
       : null
   const isPinnedHeader = row.key === PINNED_GROUP_KEY
+  const headerDropTarget = getSectionHeaderDropTarget(ctx, {
+    status: headerWorkspaceStatus,
+    engagement:
+      headerGroupBy === 'engagement' ? getWorkspaceEngagementFromLaneKey(headerLaneKey) : null,
+    isPinned: isPinnedHeader
+  })
   const repoHeaderColor = resolveProjectGroupHeaderColor({
-    groupBy: ctx.groupBy,
-    headerKey: row.key,
+    groupBy: headerGroupBy,
+    headerKey: headerLaneKey,
     badgeColor: row.repo?.badgeColor
   })
   const createState = row.repo
@@ -226,9 +242,7 @@ export function renderWorktreeSectionHeaderRow(args: {
             : undefined
         }
         data-project-group-header-drag-handle={isDraggableProjectGroupHeader ? '' : undefined}
-        data-workspace-status-drop-target={headerWorkspaceStatus ? '' : undefined}
-        data-workspace-status={headerWorkspaceStatus ?? undefined}
-        data-workspace-pin-drop-target={isPinnedHeader ? '' : undefined}
+        {...headerDropTarget.props}
         className={cn(
           // Why: no row-level grab — only the title surface below shows the hand;
           // actions use cursor-pointer so … / + never look reorderable.
@@ -238,40 +252,17 @@ export function renderWorktreeSectionHeaderRow(args: {
             'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/50',
           (isDraggingThis || isDraggingThisProjectGroup) &&
             'bg-accent/80 ring-1 ring-ring/40 shadow-md rounded-md scale-[1.01]',
-          headerWorkspaceStatus &&
-            ctx.dragOverStatus === headerWorkspaceStatus &&
-            'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
-          isPinnedHeader &&
-            ctx.pinDragOver &&
+          headerDropTarget.isDragOver &&
             'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
           row.repo && 'overflow-hidden'
         )}
         style={{
           // Why: non-project headers like "All" are flat-list labels; don't reserve project hierarchy indent.
           paddingLeft:
-            isRepoHeader || isProjectGroupHeader
-              ? getProjectGroupHeaderPaddingLeft(row.projectGroupDepth ?? 0)
+            isRepoHeader || isProjectGroupHeader || nestDepth > 0
+              ? getProjectGroupHeaderPaddingLeft((row.projectGroupDepth ?? 0) + nestDepth)
               : WORKTREE_SECTION_HEADER_PADDING_LEFT
         }}
-        onDragOver={
-          isPinnedHeader
-            ? ctx.onWorkspacePinDragOver
-            : headerWorkspaceStatus
-              ? (event) => ctx.onWorkspaceStatusDragOver(event, headerWorkspaceStatus)
-              : undefined
-        }
-        onDragLeave={
-          isPinnedHeader
-            ? ctx.onWorkspacePinDragLeave
-            : headerWorkspaceStatus
-              ? ctx.onWorkspaceStatusDragLeave
-              : undefined
-        }
-        onDrop={
-          headerWorkspaceStatus
-            ? (event) => ctx.onWorkspaceStatusDrop(event, headerWorkspaceStatus)
-            : undefined
-        }
         onPointerDown={
           isDraggableRepoHeader && projectIdForHeader
             ? (event) => headerDrag.repoDrag.onHandlePointerDown(event, projectIdForHeader)
@@ -334,7 +325,7 @@ export function renderWorktreeSectionHeaderRow(args: {
                 className={cn(
                   'min-w-0 truncate text-[13px] leading-none',
                   // Why: bold status lane labels read like unhandled-reply workspace rows.
-                  ctx.groupBy === 'workspace-status' ? 'font-medium' : 'font-semibold'
+                  headerGroupBy === 'workspace-status' ? 'font-medium' : 'font-semibold'
                 )}
               >
                 {row.label}

@@ -60,3 +60,18 @@ describe('normalizeFolderWorkspaces host attribution', () => {
     expect(inherited.connectionId).toBe('ssh-group')
   })
 })
+
+describe('normalizeFolderWorkspaces engagement', () => {
+  it('keeps a stored engagement and defaults a missing one to queued', () => {
+    const [engaged, unset] = normalizeFolderWorkspaces(
+      [
+        { id: 'ws-1', projectGroupId: 'group-1', name: 'Engaged', engagement: 'engaged' },
+        { id: 'ws-2', projectGroupId: 'group-1', name: 'Unset' }
+      ],
+      [folderGroup]
+    )
+
+    expect(engaged.engagement).toBe('engaged')
+    expect(unset.engagement).toBe('queued')
+  })
+})

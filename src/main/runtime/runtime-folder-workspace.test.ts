@@ -122,6 +122,8 @@ describe('mergeRuntimeFolderWorkspace', () => {
       isArchived: false,
       isUnread: false,
       isPinned: false,
+      promptCount: 0,
+      lastPromptAt: 0,
       sortOrder: 0,
       lastActivityAt: 0,
       workspaceStatus: 'in-progress',

@@ -258,12 +258,12 @@ describe('closed-sidebar Cmd+1-9 ordering (#9497)', () => {
     ])
   })
 
-  it('keeps the sort layer intact for smart and comparator sort modes', () => {
+  it('keeps the sort layer intact for comparator sort modes', () => {
     const main = makeMainWorktree('wt-main')
     const older = makeWorktree('wt-older', { displayName: 'b-older', lastActivityAt: 1 })
     const newer = makeWorktree('wt-newer', { displayName: 'a-newer', lastActivityAt: 999 })
 
-    seedStore([older, newer, main], { sortBy: 'smart' })
+    seedStore([older, newer, main], { sortBy: 'recent' })
     expect(getVisibleWorktreeIds()).toEqual(['wt-main', 'wt-newer', 'wt-older'])
 
     seedStore([older, newer, main], { sortBy: 'name' })

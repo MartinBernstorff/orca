@@ -41,7 +41,7 @@ export type AttentionCause = 'blocked' | 'waiting' | 'title-heuristic'
  *     falling back to the current `working` `stateStartedAt`.
  *   - Class 4: `0` — comparator drops to `effectiveRecentActivity` for idle ordering.
  *
- * `cause` is set only when `cls === 1`; feeds the `smart_sort_class_1_promotion` telemetry event.
+ * `cause` is set only when `cls === 1`.
  */
 export type WorktreeAttention = {
   cls: SmartClass

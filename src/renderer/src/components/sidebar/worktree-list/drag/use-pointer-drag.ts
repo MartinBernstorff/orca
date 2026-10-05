@@ -58,6 +58,7 @@ export function useWorktreePointerDrag(args: {
     suppressWorktreeClickUntilRef,
     setWorktreeDragState,
     setDragOverStatus,
+    setDragOverEngagement,
     setPinDragOver
   } = runtime
 
@@ -75,12 +76,14 @@ export function useWorktreePointerDrag(args: {
       shouldShowWorkspaceBoardDropIndicator,
       setWorktreeDragState,
       setDragOverStatus,
+      setDragOverEngagement,
       setPinDragOver
     })
   }, [
     ctx,
     onWorkspaceBoardDragPreviewCommit,
     onWorkspaceBoardDragPreviewStart,
+    setDragOverEngagement,
     setDragOverStatus,
     setPinDragOver,
     setWorktreeDragState,

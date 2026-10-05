@@ -8,10 +8,19 @@ import {
   getWorkspacePriorityLane,
   getWorkspacePriorityLaneKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagement,
+  getWorkspaceEngagementLaneKey
+} from '../../workspace-engagement-meta'
 import { ALL_GROUP_KEY, getPRGroupKey, getProjectGroupHeaderKey } from './group-keys'
 import { buildProjectGroupingIndex, getProjectGroupingForRepo } from './project-grouping'
 import type { ProjectGroupingModel } from './project-grouping'
 import type { WorktreeGroupBy } from './row-types'
+import {
+  getNestedGroupPathKeys,
+  normalizeNestedGroupBy,
+  type NestedSidebarGroupBy
+} from '../../../../../../shared/sidebar-group-by-levels'
 
 export function getGroupKeyForWorktree(
   groupBy: WorktreeGroupBy,
@@ -31,6 +40,9 @@ export function getGroupKeyForWorktree(
   if (groupBy === 'priority') {
     return getWorkspacePriorityLaneKey(getWorkspacePriorityLane(worktree))
   }
+  if (groupBy === 'engagement') {
+    return getWorkspaceEngagementLaneKey(getWorkspaceEngagement(worktree))
+  }
   if (groupBy === 'repo') {
     return getProjectGroupingForRepo(
       worktree.repoId,
@@ -49,7 +61,8 @@ export function getGroupKeysForWorktree(
   workspaceStatuses: readonly WorkspaceStatusDefinition[] = cloneDefaultWorkspaceStatuses(),
   settings?: AppState['settings'],
   projectGroups: readonly ProjectGroup[] = [],
-  projectGrouping?: ProjectGroupingModel
+  projectGrouping?: ProjectGroupingModel,
+  nestedGroupBy: readonly NestedSidebarGroupBy[] = []
 ): string[] {
   const groupKey = getGroupKeyForWorktree(
     groupBy,
@@ -63,8 +76,22 @@ export function getGroupKeysForWorktree(
   if (!groupKey) {
     return []
   }
+  const nestedKeys = getNestedGroupPathKeys(
+    groupKey,
+    normalizeNestedGroupBy(groupBy, nestedGroupBy),
+    (level) =>
+      getGroupKeyForWorktree(
+        level,
+        worktree,
+        repoMap,
+        prCache,
+        workspaceStatuses,
+        settings,
+        projectGrouping
+      )
+  )
   if (groupBy !== 'repo') {
-    return [groupKey]
+    return [groupKey, ...nestedKeys]
   }
   const repo = repoMap.get(worktree.repoId)
   const groupIds: string[] = []
@@ -83,5 +110,5 @@ export function getGroupKeysForWorktree(
     const parentId = group.parentGroupId ?? null
     currentGroupId = parentId && groupsById.has(parentId) ? parentId : null
   }
-  return [...groupIds.map((id) => getProjectGroupHeaderKey(id)), groupKey]
+  return [...groupIds.map((id) => getProjectGroupHeaderKey(id)), groupKey, ...nestedKeys]
 }

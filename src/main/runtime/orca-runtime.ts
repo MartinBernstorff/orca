@@ -23074,6 +23074,7 @@ export class OrcaRuntimeService {
         | 'isPinned'
         | 'snoozedUntil'
         | 'priority'
+        | 'engagement'
         | 'sortOrder'
         | 'manualOrder'
         | 'workspaceStatus'
@@ -34699,6 +34700,12 @@ export class OrcaRuntimeService {
   notifyBranchRenamed(repoId: string): void {
     this.invalidateResolvedWorktreeCache()
     this.invalidateWorktreeScanCacheForRepo(repoId)
+    this.notifyWorktreesChanged(repoId)
+  }
+
+  /** Re-list after a main-authored metadata write (e.g. prompt counts) so renderers and paired clients pick it up. */
+  notifyWorktreeMetaChanged(repoId: string): void {
+    this.invalidateResolvedWorktreeCache()
     this.notifyWorktreesChanged(repoId)
   }
 

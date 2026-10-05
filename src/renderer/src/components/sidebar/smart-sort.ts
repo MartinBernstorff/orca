@@ -15,6 +15,7 @@ import {
   type WorktreeAttention
 } from './smart-attention'
 
+// Why 'smart' still names Engagement: the id is persisted and on the wire, so only its meaning changed (MB-158).
 export type SortBy = 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
 
 // Why: a newly-created worktree's lastActivityAt is stamped at the moment
@@ -70,49 +71,51 @@ export function compareWorktreeSortLabel(
   return getWorktreeSortLabel(a).localeCompare(getWorktreeSortLabel(b))
 }
 
-/**
- * Build a comparator for sorting worktrees based on the current sort mode.
- *
- * Smart mode requires `attentionByWorktree` — a per-worktree class +
- * timestamp map built once before sorting (see `buildAttentionByWorktree`).
- * Why non-optional: a forgotten caller would silently regress every worktree
- * to Class 4 (idle) and degrade the comparator to recent-activity ordering;
- * making the param required surfaces the omission as a typecheck error.
- */
+// Why: the Cmd+J palette still ranks by agent attention; it is no longer a sidebar sort mode.
+export function buildSmartAttentionComparator(
+  now: number,
+  attentionByWorktree: Map<string, WorktreeAttention>
+): (a: Worktree, b: Worktree) => number {
+  return (a, b) => {
+    const aw = attentionByWorktree.get(a.id) ?? IDLE
+    const bw = attentionByWorktree.get(b.id) ?? IDLE
+    return (
+      // Why: 1 < 2 < 3 < 4 — lower class outranks higher.
+      aw.cls - bw.cls ||
+      // Why: within a class, the more recent attention event ranks first.
+      bw.attentionTimestamp - aw.attentionTimestamp ||
+      // Why: idle worktrees fall through to recency (and the create-grace
+      // floor for brand-new worktrees) before alphabetical.
+      effectiveRecentActivity(b, now) - effectiveRecentActivity(a, now) ||
+      compareWorktreeSortLabel(a, b)
+    )
+  }
+}
+
+/** Build a comparator for sorting worktrees based on the current sort mode. */
 export function buildWorktreeComparator(
   sortBy: SortBy,
   repoMap: Map<string, Repo>,
-  now: number,
-  attentionByWorktree: Map<string, WorktreeAttention>
+  now: number
 ): (a: Worktree, b: Worktree) => number {
   return (a, b) => {
     switch (sortBy) {
       case 'name':
         return compareWorktreeSortLabel(a, b)
-      case 'smart': {
-        const aw = attentionByWorktree.get(a.id) ?? IDLE
-        const bw = attentionByWorktree.get(b.id) ?? IDLE
+      case 'smart':
         return (
-          // Why: 1 < 2 < 3 < 4 — lower class outranks higher.
-          aw.cls - bw.cls ||
-          // Why: within a class, the more recent attention event ranks first.
-          bw.attentionTimestamp - aw.attentionTimestamp ||
-          // Why: idle worktrees fall through to recency (and the create-grace
-          // floor for brand-new worktrees) before alphabetical.
-          effectiveRecentActivity(b, now) - effectiveRecentActivity(a, now) ||
+          (b.promptCount ?? 0) - (a.promptCount ?? 0) ||
+          (b.lastPromptAt ?? 0) - (a.lastPromptAt ?? 0) ||
           compareWorktreeSortLabel(a, b)
         )
-      }
       case 'recent':
         // Why effectiveRecentActivity (not raw lastActivityAt): newly-created
         // worktrees get a CREATE_GRACE_MS floor on top of lastActivityAt so
         // ambient PTY bumps in other worktrees don't immediately push them
         // down. See CREATE_GRACE_MS above.
         //
-        // Why not sortOrder: sortOrder is a snapshot of the smart-sort
-        // ranking that only gets repersisted while the user is in "Smart"
-        // mode, so it's frozen in Recent mode and ignores new terminal
-        // events, meta edits, etc. lastActivityAt is the real "recency"
+        // Why not sortOrder: sortOrder is a frozen legacy smart-sort
+        // snapshot that ignores new terminal events, meta edits, etc. lastActivityAt is the real "recency"
         // signal — bumped by bumpWorktreeActivity (PTY spawn, background
         // events) and by meaningful meta edits (comment, isUnread).
         return (
@@ -161,7 +164,6 @@ export function buildWorktreeComparator(
 export function sortWorktreesSmart(
   worktrees: Worktree[],
   tabsByWorktree: Record<string, TerminalTab[]>,
-  repoMap: Map<string, Repo>,
   agentStatusByPaneKey: Record<string, AgentStatusEntry>,
   runtimePaneTitlesByTabId: Record<string, Record<number, string>>,
   ptyIdsByTabId: Record<string, string[]>,
@@ -195,5 +197,5 @@ export function sortWorktreesSmart(
     terminalLayoutsByTabId
   )
 
-  return [...worktrees].sort(buildWorktreeComparator('smart', repoMap, now, attentionByWorktree))
+  return [...worktrees].sort(buildSmartAttentionComparator(now, attentionByWorktree))
 }

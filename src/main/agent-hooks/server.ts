@@ -121,6 +121,11 @@ import {
 } from '../../shared/agent-session-resume'
 import { isCommandCodeNewTurnWhileWorking } from '../../shared/command-code-turn-boundary'
 import {
+  detectPromptSubmission,
+  type AgentPromptSubmittedEvent,
+  type PromptSubmissionDedupeEntry
+} from './prompt-submission-dedupe'
+import {
   buildSpoolHookBody,
   drainAgentHookSpool,
   launchTokenHash,
@@ -242,12 +247,6 @@ type LastStatusFile = {
   version: number
   entries: Record<string, PersistedAgentHookEventPayload>
   authorityCommitments?: Record<string, PersistedAgentHookAuthorityCommitment>
-}
-
-type AgentPromptSentDedupeEntry = {
-  agentKind: AgentKind
-  promptHash: string
-  promptInteractionKey?: string
 }
 
 function agentTypeToPromptSentAgentKind(agentType: AgentType | undefined): AgentKind {
@@ -710,6 +709,7 @@ export class AgentHookServer {
   // plugin event bus (and future consumers) need an additive subscription
   // that also works in headless serve, where no window listener exists.
   private enrichedStatusListeners = new Set<(payload: EnrichedAgentHookEventPayload) => void>()
+  private promptSubmittedListeners = new Set<(event: AgentPromptSubmittedEvent) => void>()
   // Why: set via start()'s userDataPath so the class has no direct Electron dependency (mockable in vitest node env).
   private endpointDir: string | null = null
   private endpointFilePathCache: string | null = null
@@ -740,7 +740,7 @@ export class AgentHookServer {
   private statusPersistTimer: ReturnType<typeof setTimeout> | null = null
   private assistantMessageRetryTimers = new Map<string, ReturnType<typeof setTimeout>>()
   private codexSubagentPollTimers = new Map<string, ReturnType<typeof setTimeout>>()
-  private promptSentDedupeByPaneKey = new Map<string, AgentPromptSentDedupeEntry>()
+  private promptSentDedupeByPaneKey = new Map<string, PromptSubmissionDedupeEntry>()
   private activeHookTurnCompletedAtByPaneKey = new Map<string, number>()
   private promptSentHashSalt = randomBytes(16).toString('hex')
   private closedAgentStatusTabIds = new Set<string>()
@@ -800,6 +800,14 @@ export class AgentHookServer {
     this.providerSessionChangeListeners.add(listener)
     return () => {
       this.providerSessionChangeListeners.delete(listener)
+    }
+  }
+
+  /** Fires once per live prompt submission (local, WSL, and SSH ingress), never for replays. */
+  subscribePromptSubmitted(listener: (event: AgentPromptSubmittedEvent) => void): () => void {
+    this.promptSubmittedListeners.add(listener)
+    return () => {
+      this.promptSubmittedListeners.delete(listener)
     }
   }
 
@@ -1341,54 +1349,42 @@ export class AgentHookServer {
     payload: AgentHookEventPayload,
     previousStatus: EnrichedAgentHookEventPayload | undefined
   ): void {
-    if (payload.isReplay === true || payload.hasExplicitPrompt !== true) {
+    const next = detectPromptSubmission(
+      {
+        isReplay: payload.isReplay,
+        hasExplicitPrompt: payload.hasExplicitPrompt,
+        restoredUnconfirmed: payload.restoredUnconfirmed,
+        state: payload.payload.state,
+        interrupted: payload.payload.interrupted,
+        sessionBoundary: payload.payload.sessionBoundary,
+        prompt: payload.payload.prompt,
+        promptInteractionKey: payload.promptInteractionKey,
+        agentKind: agentTypeToPromptSentAgentKind(payload.payload.agentType)
+      },
+      previousStatus?.payload.state,
+      this.promptSentDedupeByPaneKey.get(payload.paneKey),
+      (prompt) => this.hashPromptForTelemetryDedupe(prompt)
+    )
+    if (!next) {
       return
     }
-    const prompt = payload.payload.prompt?.trim() ?? ''
-    if (prompt.length === 0) {
-      return
+    this.promptSentDedupeByPaneKey.set(payload.paneKey, next)
+    for (const listener of this.promptSubmittedListeners) {
+      try {
+        listener({
+          paneKey: payload.paneKey,
+          tabId: payload.tabId,
+          worktreeId: payload.worktreeId,
+          submittedAt: Date.now()
+        })
+      } catch (err) {
+        console.error('[agent-hooks] prompt-submitted listener threw', err)
+      }
     }
-    const agentKind = agentTypeToPromptSentAgentKind(payload.payload.agentType)
-    const promptHash = this.hashPromptForTelemetryDedupe(prompt)
-    const promptInteractionKey =
-      typeof payload.promptInteractionKey === 'string' &&
-      payload.promptInteractionKey.trim().length > 0
-        ? payload.promptInteractionKey.trim()
-        : undefined
-    const previousDedupe = this.promptSentDedupeByPaneKey.get(payload.paneKey)
-    const isCompletedTurnBoundary =
-      previousStatus?.payload.state === 'done' && payload.payload.state === 'working'
-    if (
-      previousDedupe?.agentKind === agentKind &&
-      previousDedupe.promptInteractionKey !== undefined &&
-      previousDedupe.promptInteractionKey === promptInteractionKey &&
-      (agentKind === 'opencode' || previousDedupe.promptHash === promptHash)
-    ) {
-      return
-    }
-    if (
-      previousDedupe?.agentKind === agentKind &&
-      previousDedupe.promptHash === promptHash &&
-      !(
-        previousStatus?.payload.state === 'done' &&
-        payload.payload.state === 'done' &&
-        previousDedupe.promptInteractionKey !== undefined &&
-        promptInteractionKey !== undefined &&
-        previousDedupe.promptInteractionKey !== promptInteractionKey
-      ) &&
-      !isCompletedTurnBoundary
-    ) {
-      return
-    }
-    this.promptSentDedupeByPaneKey.set(payload.paneKey, {
-      agentKind,
-      promptHash,
-      promptInteractionKey
-    })
     try {
       // Why: hooks prove a turn was submitted but not which UI launched the terminal; keep attribution low-cardinality.
       track('agent_prompt_sent', {
-        agent_kind: agentKind,
+        agent_kind: next.agentKind,
         launch_source: 'unknown',
         request_kind: 'followup',
         ...getCohortAtEmit()

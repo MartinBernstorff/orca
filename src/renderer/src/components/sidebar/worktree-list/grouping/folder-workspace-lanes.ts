@@ -9,6 +9,10 @@ import {
   getWorkspacePriorityLane,
   getWorkspacePriorityLaneKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagement,
+  getWorkspaceEngagementLaneKey
+} from '../../workspace-engagement-meta'
 import { ALL_GROUP_KEY, getPRLaneKey } from './group-keys'
 import type { WorktreeGroupBy } from './row-types'
 
@@ -66,6 +70,8 @@ export function getFolderWorkspaceLaneKey(
       return getPRLaneKey('in-progress')
     case 'priority':
       return getWorkspacePriorityLaneKey(getWorkspacePriorityLane(pair.folderWorkspace))
+    case 'engagement':
+      return getWorkspaceEngagementLaneKey(getWorkspaceEngagement(pair.folderWorkspace))
     case 'none':
       return ALL_GROUP_KEY
   }

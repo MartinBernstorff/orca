@@ -46,6 +46,7 @@ import { relaunchApp } from './app-relaunch'
 import { StatsCollector, initStatsPath } from './stats/collector'
 import { initSshHostKeyStoreFile } from './ssh/ssh-host-key-store'
 import { AgentSessionTransitionRecorder } from './stats/agent-session-transition-recorder'
+import { recordPromptOnWorkspace } from './agent-hooks/workspace-prompt-counter'
 import { ClaudeUsageStore, initClaudeUsagePath } from './claude-usage/store'
 import { CodexUsageStore, initCodexUsagePath } from './codex-usage/store'
 import { OpenCodeUsageStore, initOpenCodeUsagePath } from './opencode-usage/store'
@@ -2677,6 +2678,20 @@ void app.whenReady().then(async () => {
   })
   agentHookServer.subscribePaneStatusClear((clear) => {
     agentSessionRecorder.onCleared(clear)
+  })
+  agentHookServer.subscribePromptSubmitted((event) => {
+    const currentStore = store
+    const currentRuntime = runtime
+    if (!currentStore || !currentRuntime) {
+      return
+    }
+    recordPromptOnWorkspace(event, {
+      store: currentStore,
+      resolveWorktreeIdForPaneKey: (paneKey) =>
+        currentRuntime.getTerminalWorktreeIdForPaneKey(paneKey),
+      notifyWorktreeMetaChanged: (repoId) => currentRuntime.notifyWorktreeMetaChanged(repoId),
+      notifyFolderWorkspaceChanged: () => currentRuntime.notifyFolderWorkspaceChanged()
+    })
   })
   claudeUsage = new ClaudeUsageStore(store)
   codexUsage = new CodexUsageStore(store)

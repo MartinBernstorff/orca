@@ -45,6 +45,7 @@ type WorktreeListProps = {
   onWorkspaceBoardDragPreviewStart?: () => void
   onWorkspaceBoardDragPreviewCommit?: () => void
   onWorkspaceBoardDragPreviewCancel?: () => void
+  freezeOrder?: boolean
 }
 
 const WorktreeList = React.memo(function WorktreeList({
@@ -53,7 +54,8 @@ const WorktreeList = React.memo(function WorktreeList({
   workspaceBoardOpen = false,
   onWorkspaceBoardDragPreviewStart = NOOP_WORKSPACE_BOARD_DRAG_PREVIEW_CALLBACK,
   onWorkspaceBoardDragPreviewCommit = NOOP_WORKSPACE_BOARD_DRAG_PREVIEW_CALLBACK,
-  onWorkspaceBoardDragPreviewCancel = NOOP_WORKSPACE_BOARD_DRAG_PREVIEW_CALLBACK
+  onWorkspaceBoardDragPreviewCancel = NOOP_WORKSPACE_BOARD_DRAG_PREVIEW_CALLBACK,
+  freezeOrder = false
 }: WorktreeListProps) {
   // ── Granular selectors (each is a primitive or shallow-stable ref) ──
   const allWorktrees = useAllWorktrees()
@@ -71,6 +73,7 @@ const WorktreeList = React.memo(function WorktreeList({
     [activeWorkspaceKey, activeWorktreeId]
   )
   const groupBy = useAppStore((s) => s.groupBy)
+  const nestedGroupBy = useAppStore((s) => s.nestedGroupBy)
   const workspaceStatuses = useAppStore((s) => s.workspaceStatuses)
   const showEmptyWorkspaceStatuses = useAppStore((s) => s.showEmptyWorkspaceStatuses)
   const sortBy = useAppStore((s) => s.sortBy)
@@ -106,14 +109,18 @@ const WorktreeList = React.memo(function WorktreeList({
 
   const agentSendTargetWorktreeId = useAgentSendTargetWorktreeId()
   const { filterState, hasFilters, clearFilters } = useSidebarWorktreeFilters()
-  const sortedIds = useSidebarWorktreeSortOrder({ allWorktrees, repoMap, sortBy })
+  const sortedIds = useSidebarWorktreeSortOrder({
+    allWorktrees,
+    repoMap,
+    sortBy,
+    freezeOrder
+  })
   const manualOrderCatalog = useMemo(
     () => buildWorktreeManualOrderCatalog({ worktrees: allWorktrees, folderWorkspaces }),
     [allWorktrees, folderWorkspaces]
   )
   const { visibleWorktrees, pairedDeviceIdsByEnvironment } = useVisibleSidebarWorktrees({
     filterState,
-    sortBy,
     sortedIds,
     repoMap,
     worktreeLineageById,
@@ -124,6 +131,7 @@ const WorktreeList = React.memo(function WorktreeList({
     collapsedGroups,
     agentSendTargetWorktreeId,
     groupBy,
+    nestedGroupBy,
     pinnedDisplayPolicy,
     visibleWorktrees,
     repoMap,
@@ -153,6 +161,7 @@ const WorktreeList = React.memo(function WorktreeList({
   })
   const rowModel = useSidebarSectionRows({
     groupBy,
+    nestedGroupBy,
     projectOrderBy,
     pinnedDisplayPolicy,
     defaultHostId,
@@ -345,6 +354,7 @@ const WorktreeList = React.memo(function WorktreeList({
         onMoveWorktreesToStatusAtIndex={statusMutations.moveWorktreesToStatusAtIndex}
         onPinWorktree={statusMutations.pinWorktree}
         onPinWorktrees={statusMutations.pinWorktrees}
+        onSetWorktreesEngagement={statusMutations.setWorktreesEngagement}
         onDropWorktreesOnWorkspaceBoard={statusMutations.dropWorktreesOnWorkspaceBoard}
         workspaceBoardOpen={workspaceBoardOpen}
         onWorkspaceBoardDragPreviewStart={onWorkspaceBoardDragPreviewStart}

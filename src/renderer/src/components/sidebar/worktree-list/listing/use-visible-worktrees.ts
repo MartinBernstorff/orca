@@ -16,7 +16,6 @@ import {
   getVisibleWorktreeBrowserActivityTabs,
   getVisibleWorktreeTerminalActivityTabs
 } from '../../visible-worktree-activity-inputs'
-import type { SortBy } from '../../smart-sort'
 import type { SidebarWorktreeFilters } from './use-filters'
 import { useReusedArrayIdentity } from './use-reused-array-identity'
 
@@ -26,14 +25,13 @@ const EMPTY_WORKTREE_ID_SET: ReadonlySet<string> = new Set()
 // shared utility so card order matches Cmd+1–9 numbering.
 export function useVisibleSidebarWorktrees(args: {
   filterState: SidebarWorktreeFilters['filterState']
-  sortBy: SortBy
   sortedIds: string[]
   repoMap: Map<string, Repo>
   worktreeLineageById: Record<string, WorktreeLineage>
   settings: AppState['settings']
   agentSendTargetWorktreeId: string | null
 }) {
-  const { filterState, sortBy, sortedIds, repoMap, worktreeLineageById, settings } = args
+  const { filterState, sortedIds, repoMap, worktreeLineageById, settings } = args
   const {
     showSleepingWorkspaces,
     showSnoozedWorkspaces,
@@ -62,8 +60,8 @@ export function useVisibleSidebarWorktrees(args: {
     [hideWorkspacesFromOtherDevices, runtimeEnvironments, runtimeStatusByEnvironmentId]
   )
 
-  // Read tabsByWorktree when needed for filtering or sorting
-  const needsActivityMaps = !showSleepingWorkspaces || sortBy === 'smart'
+  // Read tabsByWorktree only when the sleeping filter needs it
+  const needsActivityMaps = !showSleepingWorkspaces
   const tabsByWorktree = useAppStore((s) =>
     needsActivityMaps ? getVisibleWorktreeTerminalActivityTabs(s.tabsByWorktree) : null
   )
