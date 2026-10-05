@@ -216,7 +216,8 @@ export const SORT_OPTIONS = [
     description: null
   },
   {
-    id: 'engagement',
+    // Why 'smart': the wire/storage id predates Engagement; old hosts, clients and mobile still speak it.
+    id: 'smart',
     get label() {
       return translate(
         'auto.components.sidebar.SidebarWorkspaceOptionsMenu.engagement',

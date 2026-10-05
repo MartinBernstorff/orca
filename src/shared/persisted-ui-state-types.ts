@@ -38,7 +38,7 @@ export type PersistedUIState = {
   markdownTocPanelWidth?: number
   combinedDiffFileTreeWidth?: number
   groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority'
-  sortBy: 'name' | 'engagement' | 'recent' | 'repo' | 'manual' | 'priority'
+  sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
   /** Project header ordering in `groupBy: 'repo'`, independent of `sortBy`: 'manual' uses persisted order + header drag, 'recent' by latest visible activity. */
   projectOrderBy: ProjectOrderBy
   /** Deprecated; the Active only filter is retired and ignored on hydration. */
@@ -162,7 +162,7 @@ export type PersistedUIState = {
   /** Saved bounds for the pop-out dashboard window so it restores to its last
    *  position/size. Independent of the main window's bounds. */
   dashboardPopoutBounds?: { x: number; y: number; width: number; height: number } | null
-  /** One-shot flag: 'recent' once meant the smart sort (v1→v2 rename), migrated once (now to 'engagement') so the new last-activity 'recent' isn't re-clobbered. */
+  /** One-shot flag: 'recent' once meant the smart sort (v1→v2 rename), migrated to 'smart' once so the new last-activity 'recent' isn't re-clobbered. */
   _sortBySmartMigrated?: boolean
   /** LEGACY inline-agents flag, stamped unconditionally every load so it can't gate migration; kept only for rollback forward-compat (real gate: _inlineAgentsDefaultedForAllUsers). */
   _inlineAgentsDefaultedForExperiment?: boolean

@@ -106,8 +106,7 @@ function patchOnlyUpdate(
     update.groupBy = next.groupMode === 'workspaceStatus' ? 'workspace-status' : 'repo'
   }
   if ('sortMode' in patch) {
-    // Why cast: mobile still sends the retired 'smart' sort; the host maps it to 'engagement'.
-    update.sortBy = next.sortMode as PersistedUIState['sortBy']
+    update.sortBy = next.sortMode
   }
   if ('hideSleeping' in patch) {
     update.hideSleepingWorkspaces = next.hideSleeping
@@ -128,7 +127,7 @@ function patchOnlyUpdate(
 function legacyWholeSnapshotUpdate(next: MobileViewState): Partial<PersistedUIState> {
   return {
     groupBy: next.groupMode === 'workspaceStatus' ? 'workspace-status' : 'repo',
-    sortBy: next.sortMode as PersistedUIState['sortBy'],
+    sortBy: next.sortMode,
     hideSleepingWorkspaces: next.hideSleeping,
     hideDefaultBranchWorkspace: next.hideDefaultBranch,
     filterRepoIds: next.filterRepoIds,

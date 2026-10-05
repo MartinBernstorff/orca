@@ -363,7 +363,7 @@ describe('client UI RPC methods', () => {
     const ui: PersistedUIState = {
       ...getDefaultUIState(),
       groupBy: 'none',
-      sortBy: 'engagement',
+      sortBy: 'smart',
       showActiveOnly: true,
       filterRepoIds: ['repo-1']
     }

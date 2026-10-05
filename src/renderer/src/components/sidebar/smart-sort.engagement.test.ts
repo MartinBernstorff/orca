@@ -10,7 +10,7 @@ function make(id: string, overrides: Partial<Worktree>): Worktree {
 }
 
 function sortIds(worktrees: Worktree[]): string[] {
-  return [...worktrees].sort(buildWorktreeComparator('engagement', repoMap, NOW)).map((w) => w.id)
+  return [...worktrees].sort(buildWorktreeComparator('smart', repoMap, NOW)).map((w) => w.id)
 }
 
 describe('engagement sort', () => {

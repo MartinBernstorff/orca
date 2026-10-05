@@ -188,7 +188,7 @@ export function normalizeLoadedUiState(
     // Why persist rather than notify inline: the flip lands during load, before any
     // window exists, and it must survive a crash before the user ever sees the notice.
     osc52ClipboardDefaultOnNoticePending: osc52ClipboardNoticePending,
-    sortBy: migrate ? ('engagement' as const) : sort,
+    sortBy: migrate ? ('smart' as const) : sort,
     showDotfilesByWorktree: normalizeShowDotfilesByWorktree(parsed.ui?.showDotfilesByWorktree),
     workspaceStatuses,
     _workspaceStatusesDefaultOrderMigrated: true,

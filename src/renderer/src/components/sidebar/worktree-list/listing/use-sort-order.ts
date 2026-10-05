@@ -76,7 +76,7 @@ export function useSidebarWorktreeSortOrder(args: {
 
   // Why: sortOrder seeds Manual sort for never-dragged workspaces and the palette's cold start, so keep it tracking Engagement.
   useEffect(() => {
-    if (sortBy !== 'engagement' || sortedIds.length === 0) {
+    if (sortBy !== 'smart' || sortedIds.length === 0) {
       return
     }
     // Why: sortOrder lives in each host's worktreeMeta, so persist each host's ids on that host.

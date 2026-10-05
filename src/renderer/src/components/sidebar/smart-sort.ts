@@ -15,7 +15,8 @@ import {
   type WorktreeAttention
 } from './smart-attention'
 
-export type SortBy = 'name' | 'engagement' | 'recent' | 'repo' | 'manual' | 'priority'
+// Why 'smart' still names Engagement: the id is persisted and on the wire, so only its meaning changed (MB-158).
+export type SortBy = 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
 
 // Why: a newly-created worktree's lastActivityAt is stamped at the moment
 // createLocalWorktree finishes git + setup-runner prep (often several seconds
@@ -101,7 +102,7 @@ export function buildWorktreeComparator(
     switch (sortBy) {
       case 'name':
         return compareWorktreeSortLabel(a, b)
-      case 'engagement':
+      case 'smart':
         return (
           (b.promptCount ?? 0) - (a.promptCount ?? 0) ||
           (b.lastPromptAt ?? 0) - (a.lastPromptAt ?? 0) ||
