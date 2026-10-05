@@ -123,6 +123,23 @@ describe('nested group by', () => {
     ])
   })
 
+  it('indents every nested header of a three-level Group by to the depth of its rows', () => {
+    const rows = rowsFor('priority', ['workspace-status', 'pr-status'], [urgentReview, lowReview])
+    // Mirrors SectionHeader: nested headers pad by projectGroupDepth + nestDepth.
+    const headerDepth = new Map(
+      rows.flatMap((row) =>
+        row.type === 'header' && row.nestDepth
+          ? [[row.key, (row.projectGroupDepth ?? 0) + row.nestDepth] as const]
+          : []
+      )
+    )
+
+    expect([...headerDepth.values()]).toEqual([1, 2, 1, 2])
+    for (const [, sectionKey, groupDepth] of itemSummary(rows)) {
+      expect(headerDepth.get(sectionKey as string)).toBe(groupDepth)
+    }
+  })
+
   it('hides every descendant of a collapsed parent and nothing else', () => {
     const rows = rowsFor('priority', ['workspace-status'], all, new Set([URGENT]))
 
