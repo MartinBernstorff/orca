@@ -6,9 +6,10 @@ import type { Repo } from '../../../../../../shared/repo-types'
 import type { Worktree } from '../../../../../../shared/worktree/types'
 import { buildWorktreeComparator, type SortBy } from '../../smart-sort'
 import { useReusedArrayIdentity } from './use-reused-array-identity'
+import { useFrozenSortOrder } from './frozen-sort-order'
 
 // Debounce re-sort after a sortEpoch bump so background score changes don't jar row positions.
-const SORT_SETTLE_MS = 3_000
+export const SORT_SETTLE_MS = 3_000
 
 // Why debounce: background activity bumps sortEpoch often; settle to coalesce so rows don't jump.
 // Structural changes (add/remove) bypass the debounce so a new worktree appears at its sorted position immediately.
@@ -43,8 +44,10 @@ export function useSidebarWorktreeSortOrder(args: {
   allWorktrees: readonly Worktree[]
   repoMap: Map<string, Repo>
   sortBy: SortBy
+  /** Pointer is over the sidebar: keep the rendered order; pending re-sorts apply once false. */
+  freezeOrder?: boolean
 }): string[] {
-  const { allWorktrees, repoMap, sortBy } = args
+  const { allWorktrees, repoMap, sortBy, freezeOrder = false } = args
   // Non-archived count — detects structural changes (add/remove) so the debounce below can apply immediately.
   const worktreeCount = useMemo(() => {
     let count = 0
@@ -67,7 +70,9 @@ export function useSidebarWorktreeSortOrder(args: {
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSortEpoch, repoMap, sortBy])
   // Why: stable ID order prevents rank-only refreshes from echoing an unchanged snapshot.
-  const sortedIds = useReusedArrayIdentity(recomputedSortedIds)
+  const recomputedIds = useReusedArrayIdentity(recomputedSortedIds)
+  // Why exempt manual: its re-sorts are the user's own drops, which must land immediately.
+  const sortedIds = useFrozenSortOrder(recomputedIds, sortBy, freezeOrder && sortBy !== 'manual')
 
   // Why: sortOrder seeds Manual sort for never-dragged workspaces and the palette's cold start, so keep it tracking Engagement.
   useEffect(() => {
