@@ -10,6 +10,7 @@ import { runSleepWorktrees } from './sleep-worktree-flow'
 import { activateAndRevealWorktree } from '@/lib/worktree-activation'
 import { resolveSnoozeUntil, type SnoozePresetId } from '../../../../shared/worktree/snooze'
 import type { WorkspacePriorityLane } from './workspace-priority-meta'
+import type { WorkspaceEngagement } from '../../../../shared/worktree/engagement'
 import { VIRTUALIZED_SCROLL_ANCHOR_RECORD_EVENT } from '@/hooks/useVirtualizedScrollAnchor'
 import {
   planWorkspaceStatusAssignment,
@@ -75,6 +76,20 @@ export function useWorktreeContextMenuCommands(args: {
           args.updateWorktreeMeta(
             worktree.id,
             { priority },
+            { executionHostId: worktree.hostId ?? 'local' }
+          )
+        )
+      )
+    },
+    [args]
+  )
+  const handleSetEngagement = useCallback(
+    (engagement: WorkspaceEngagement) => {
+      void Promise.all(
+        args.activeContextWorktrees.map((worktree) =>
+          args.updateWorktreeMeta(
+            worktree.id,
+            { engagement },
             { executionHostId: worktree.hostId ?? 'local' }
           )
         )
@@ -208,6 +223,7 @@ export function useWorktreeContextMenuCommands(args: {
     handleOpenParent,
     handleRemoveProjectFromGroup,
     handleRename,
+    handleSetEngagement,
     handleSetPriority,
     handleSleepSubtree,
     handleSnooze,

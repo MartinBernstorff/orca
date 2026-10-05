@@ -5,6 +5,7 @@ import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import { TaskSourceContextSchema } from '../../../../shared/task-source-context-schema'
 import { WorkspaceLinkedItemSchema } from '../../../../shared/workspace-linked-item-schema'
 import { WorkspacePrioritySchema } from '../../../../shared/worktree/priority-schema'
+import { WorkspaceEngagementSchema } from '../../../../shared/worktree/engagement-schema'
 import { isWorkspaceLinkedItemSourceContextMatch } from '../../../../shared/workspace-linked-item-source-context'
 import { resolveRpcWorkspaceCreatorProvenance } from '../workspace-creator-context'
 import { DiffCommentSchema } from '../../../../shared/diff-comment-schema'
@@ -43,7 +44,7 @@ const FolderWorkspaceCreate = z
   })
   .superRefine(assertLinkedTaskSourceContextMatch)
 
-const FolderWorkspaceUpdate = z.object({
+export const FolderWorkspaceUpdate = z.object({
   folderWorkspaceId: requiredString('Missing folder workspace id'),
   updates: z
     .object({
@@ -57,6 +58,7 @@ const FolderWorkspaceUpdate = z.object({
       isPinned: z.boolean().optional(),
       snoozedUntil: OptionalFiniteNumber.nullable(),
       priority: WorkspacePrioritySchema.nullable().optional(),
+      engagement: WorkspaceEngagementSchema.optional(),
       sortOrder: OptionalFiniteNumber,
       manualOrder: OptionalFiniteNumber,
       workspaceStatus: OptionalString,

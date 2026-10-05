@@ -8,6 +8,10 @@ import {
   getWorkspacePriorityLane,
   getWorkspacePriorityLaneKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagement,
+  getWorkspaceEngagementLaneKey
+} from '../../workspace-engagement-meta'
 import { ALL_GROUP_KEY, getPRGroupKey, getProjectGroupHeaderKey } from './group-keys'
 import { buildProjectGroupingIndex, getProjectGroupingForRepo } from './project-grouping'
 import type { ProjectGroupingModel } from './project-grouping'
@@ -30,6 +34,9 @@ export function getGroupKeyForWorktree(
   }
   if (groupBy === 'priority') {
     return getWorkspacePriorityLaneKey(getWorkspacePriorityLane(worktree))
+  }
+  if (groupBy === 'engagement') {
+    return getWorkspaceEngagementLaneKey(getWorkspaceEngagement(worktree))
   }
   if (groupBy === 'repo') {
     return getProjectGroupingForRepo(

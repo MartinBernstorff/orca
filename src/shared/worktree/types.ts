@@ -7,6 +7,7 @@ import type { EphemeralVmCheckoutMode } from '../orca-yaml-hook-types'
 import type { BuiltInWorktreeVisibilitySourceId } from '../repo-types'
 import type { WorktreeIdentity } from './identity'
 import type { WorkspacePriority } from './priority'
+import type { WorkspaceEngagement } from './engagement'
 
 export type WorkspaceLinkedItem = {
   provider: 'github' | 'gitlab' | 'linear' | 'jira'
@@ -107,6 +108,8 @@ export type Worktree = {
   snoozedUntil?: number | null
   /** User-set priority. Absent or null means no priority. */
   priority?: WorkspacePriority | null
+  /** User-set engagement. Absent means Queued; nothing changes it automatically. */
+  engagement?: WorkspaceEngagement
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

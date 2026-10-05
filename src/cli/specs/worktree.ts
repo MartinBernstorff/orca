@@ -82,7 +82,7 @@ export const WORKTREE_COMMAND_SPECS: CommandSpec[] = [
     path: ['worktree', 'set'],
     summary: 'Update Orca metadata for a worktree',
     usage:
-      'orca worktree set --worktree <selector> [--display-name <name>] [--issue <number|null>] [--linear-issue <identifier-or-url|null>] [--comment <text>] [--workspace-status <column>] [--priority <urgent|high|medium|low|none>] [--parent-worktree <selector>|--no-parent] [--json]',
+      'orca worktree set --worktree <selector> [--display-name <name>] [--issue <number|null>] [--linear-issue <identifier-or-url|null>] [--comment <text>] [--workspace-status <column>] [--priority <urgent|high|medium|low|none>] [--engagement <engaged|queued>] [--parent-worktree <selector>|--no-parent] [--json]',
     allowedFlags: [
       ...GLOBAL_FLAGS,
       'worktree',
@@ -92,6 +92,7 @@ export const WORKTREE_COMMAND_SPECS: CommandSpec[] = [
       'comment',
       'workspace-status',
       'priority',
+      'engagement',
       'parent-worktree',
       'no-parent'
     ],
@@ -103,7 +104,8 @@ export const WORKTREE_COMMAND_SPECS: CommandSpec[] = [
     examples: [
       'orca worktree set --worktree active --linear-issue STA-335 --json',
       'orca worktree set --worktree active --linear-issue null --json',
-      'orca worktree set --worktree active --priority high --json'
+      'orca worktree set --worktree active --priority high --json',
+      'orca worktree set --worktree active --engagement engaged --json'
     ]
   },
   {

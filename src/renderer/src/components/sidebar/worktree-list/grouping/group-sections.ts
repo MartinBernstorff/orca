@@ -10,6 +10,10 @@ import {
   getWorkspacePriorityLaneHeaderMeta,
   getWorkspacePriorityLaneFromKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagementFromLaneKey,
+  getWorkspaceEngagementLaneHeaderMeta
+} from '../../workspace-engagement-meta'
 import { PROJECT_GROUP_META, PR_GROUP_META } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import type { NoticeHostContext } from './host-labels'
@@ -129,7 +133,9 @@ export function appendOrderedGroups(
               const meta =
                 groupBy === 'priority'
                   ? getWorkspacePriorityLaneHeaderMeta(getWorkspacePriorityLaneFromKey(key))
-                  : PR_GROUP_META[key.replace(/^pr:/, '') as PRGroupKey]
+                  : groupBy === 'engagement'
+                    ? getWorkspaceEngagementLaneHeaderMeta(getWorkspaceEngagementFromLaneKey(key))
+                    : PR_GROUP_META[key.replace(/^pr:/, '') as PRGroupKey]
               return {
                 type: 'header' as const,
                 key,

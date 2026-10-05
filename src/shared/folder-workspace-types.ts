@@ -1,4 +1,5 @@
 import type { WorkspacePriority } from './worktree/priority'
+import type { WorkspaceEngagement } from './worktree/engagement'
 import type { ExecutionHostId } from './execution-host'
 import type { TaskSourceContext } from './task-source-context'
 import type { TuiAgent } from './tui-agent'
@@ -36,6 +37,8 @@ export type FolderWorkspace = {
   snoozedUntil?: number | null
   /** See {@link Worktree.priority}. */
   priority?: WorkspacePriority | null
+  /** See {@link Worktree.engagement}. */
+  engagement?: WorkspaceEngagement
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

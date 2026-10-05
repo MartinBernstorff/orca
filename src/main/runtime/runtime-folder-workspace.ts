@@ -61,6 +61,7 @@ export function mergeRuntimeFolderWorkspace(
     isPinned: meta.isPinned ?? false,
     ...(meta.snoozedUntil != null ? { snoozedUntil: meta.snoozedUntil } : {}),
     ...(meta.priority != null ? { priority: meta.priority } : {}),
+    ...(meta.engagement !== undefined ? { engagement: meta.engagement } : {}),
     sortOrder: meta.sortOrder ?? 0,
     ...(meta.manualOrder !== undefined ? { manualOrder: meta.manualOrder } : {}),
     lastActivityAt: meta.lastActivityAt ?? 0,

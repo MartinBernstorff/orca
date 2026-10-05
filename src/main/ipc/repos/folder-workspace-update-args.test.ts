@@ -47,3 +47,23 @@ describe('FolderWorkspaceUpdateArgs priority field', () => {
     ).toBe(false)
   })
 })
+
+describe('FolderWorkspaceUpdateArgs engagement field', () => {
+  it('keeps an engagement', () => {
+    expect(
+      FolderWorkspaceUpdateArgs.parse({
+        folderWorkspaceId: 'fw-1',
+        updates: { engagement: 'engaged' }
+      }).updates.engagement
+    ).toBe('engaged')
+  })
+
+  it('rejects an unknown engagement', () => {
+    expect(
+      FolderWorkspaceUpdateArgs.safeParse({
+        folderWorkspaceId: 'fw-1',
+        updates: { engagement: 'busy' }
+      }).success
+    ).toBe(false)
+  })
+})
