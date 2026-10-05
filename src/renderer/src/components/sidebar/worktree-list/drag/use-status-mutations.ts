@@ -5,6 +5,7 @@ import type {
   WorkspaceStatusDefinition,
   Worktree
 } from '../../../../../../shared/worktree/types'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 import type { WorktreeMeta } from '../../../../../../shared/worktree/meta-types'
 import type { WorktreeMetaBatchUpdate } from '../../../../store/slices/worktree-helpers'
 import { getWorkspaceStatus, getWorkspaceStatusGroupKey } from '../../workspace-status'
@@ -17,9 +18,10 @@ import {
 import { buildWorkspaceKanbanSidebarDropUpdates } from '../../workspace-kanban-sidebar-drop'
 import type { SortBy } from '../../smart-sort'
 import type { WorktreeStatusDropAtIndexArgs } from './drop-commit-context'
+import { buildWorkspaceEngagementDropUpdates } from './engagement-drop'
 import type { WorktreeManualOrderCatalog } from '../../worktree-manual-order-catalog'
 
-// Every write a sidebar drop can make: status changes, pin, manual order, and the board lane drop.
+// Every write a sidebar drop can make: status changes, pin, engagement, manual order, and the board lane drop.
 export function useWorktreeStatusMutations(args: {
   worktreeMap: Map<string, Worktree>
   manualOrderCatalog: WorktreeManualOrderCatalog
@@ -132,6 +134,16 @@ export function useWorktreeStatusMutations(args: {
     [setWorktreesPinnedAndReveal]
   )
 
+  const setWorktreesEngagement = useCallback(
+    (worktreeIds: readonly string[], engagement: WorkspaceEngagement) => {
+      const updates = buildWorkspaceEngagementDropUpdates({ worktreeIds, engagement, worktreeMap })
+      if (updates.length > 0) {
+        void updateWorktreesMeta(updates)
+      }
+    },
+    [updateWorktreesMeta, worktreeMap]
+  )
+
   const reorderWorktrees = useCallback(
     (reorderArgs: {
       groups: readonly WorktreeDragGroup[]
@@ -204,6 +216,7 @@ export function useWorktreeStatusMutations(args: {
     moveWorktreesToStatusAtIndex,
     pinWorktree,
     pinWorktrees,
+    setWorktreesEngagement,
     reorderWorktrees,
     shouldShowWorkspaceBoardDropIndicator,
     dropWorktreesOnWorkspaceBoard

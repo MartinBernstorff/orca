@@ -16,13 +16,15 @@ export function useWorktreeDropCommitContext(args: {
   onMoveWorktreesToStatusAtIndex: WorktreeDropCommitContext['onMoveWorktreesToStatusAtIndex']
   onReorderWorktrees: WorktreeDropCommitContext['onReorderWorktrees']
   onPinWorktrees: WorktreeDropCommitContext['onPinWorktrees']
+  onSetWorktreesEngagement: WorktreeDropCommitContext['onSetWorktreesEngagement']
 }): WorktreeDropCommitContext {
   const { scrollRef, workspaceStatuses, session, lineageDrop, runtime } = args
   const {
     onMoveWorktreesToStatus,
     onMoveWorktreesToStatusAtIndex,
     onReorderWorktrees,
-    onPinWorktrees
+    onPinWorktrees,
+    onSetWorktreesEngagement
   } = args
   return useMemo<WorktreeDropCommitContext>(
     () => ({
@@ -40,7 +42,8 @@ export function useWorktreeDropCommitContext(args: {
       onMoveWorktreesToStatus,
       onMoveWorktreesToStatusAtIndex,
       onReorderWorktrees,
-      onPinWorktrees
+      onPinWorktrees,
+      onSetWorktreesEngagement
     }),
     [
       lineageDrop.clearReorderedWorktreeParents,
@@ -50,6 +53,7 @@ export function useWorktreeDropCommitContext(args: {
       onMoveWorktreesToStatusAtIndex,
       onPinWorktrees,
       onReorderWorktrees,
+      onSetWorktreesEngagement,
       runtime.clearWorktreeDrag,
       scrollRef,
       session.computeWorktreeDrop,

@@ -28,6 +28,48 @@ describe('groupBy engagement', () => {
     ])
   })
 
+  it('renders an empty Engaged lane so it stays a drop target', () => {
+    const rows = buildRows('engagement', [queued], repoMap, null, new Set())
+    expect(headers(rows).map((row) => [row.key, row.count])).toEqual([
+      ['engagement:engaged', 0],
+      ['engagement:queued', 1]
+    ])
+  })
+
+  it('renders both lanes when engagement is a nested level', () => {
+    const rows = buildRows(
+      'repo',
+      [engaged],
+      repoMap,
+      null,
+      new Set(),
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      ['engagement']
+    )
+    const lanes = headers(rows).filter((row) => row.laneGroupBy === 'engagement')
+    expect(lanes.map((row) => [row.laneKey, row.count])).toEqual([
+      ['engagement:engaged', 1],
+      ['engagement:queued', 0]
+    ])
+  })
+
   it('places a folder workspace in its engagement lane', () => {
     // Why a bare group: the engagement lane ignores the project group.
     const projectGroup = {} as ProjectGroup
