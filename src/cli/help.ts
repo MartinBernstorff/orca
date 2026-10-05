@@ -93,6 +93,9 @@ function formatCommandFlagHelp(flag: string, commandPath: string[]): string {
   if (command === 'linear list-issues' && flag === 'cursor') {
     return '--cursor <cursor>      Opaque cursor from a previous list-issues page; issued cursors bind the workspace, raw Linear cursors need --workspace'
   }
+  if (command === 'worktree set' && flag === 'priority') {
+    return '--priority <level>     Workspace priority: urgent, high, medium, low, or none to clear'
+  }
   if (command === 'linear list-issues' && flag === 'priority') {
     return '--priority <0-4>       0=none, 1=urgent, 2=high, 3=medium, 4=low'
   }

@@ -521,6 +521,7 @@ describe('mergeWorktree', () => {
       isUnread: true,
       isPinned: true,
       snoozedUntil: null,
+      priority: null,
       sortOrder: 5,
       lastActivityAt: 1000,
       workspaceStatus: 'in-review',

@@ -5,6 +5,7 @@ import type {
   AgentStatusEntry,
   MigrationUnsupportedPtyEntry
 } from '../../../../shared/agent-status-types'
+import { getWorkspacePriorityRank } from '../../../../shared/worktree/priority'
 import { tabHasLivePty } from '@/lib/tab-has-live-pty'
 import { basename } from '@/lib/path'
 import {
@@ -14,7 +15,7 @@ import {
   type WorktreeAttention
 } from './smart-attention'
 
-export type SortBy = 'name' | 'smart' | 'recent' | 'repo' | 'manual'
+export type SortBy = 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
 
 // Why: a newly-created worktree's lastActivityAt is stamped at the moment
 // createLocalWorktree finishes git + setup-runner prep (often several seconds
@@ -124,6 +125,12 @@ export function buildWorktreeComparator(
         const cmp = ra.localeCompare(rb)
         return cmp !== 0 ? cmp : compareWorktreeSortLabel(a, b)
       }
+      case 'priority':
+        return (
+          getWorkspacePriorityRank(a.priority) - getWorkspacePriorityRank(b.priority) ||
+          effectiveRecentActivity(b, now) - effectiveRecentActivity(a, now) ||
+          compareWorktreeSortLabel(a, b)
+        )
       case 'manual':
         // Why fallback to sortOrder: existing users have a persisted smart-sort
         // snapshot but no manualOrder yet, so Manual starts from a familiar

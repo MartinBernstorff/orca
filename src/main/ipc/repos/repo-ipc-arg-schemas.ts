@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { isTuiAgent } from '../../../shared/tui-agent-config'
 import { TaskSourceContextSchema } from '../../../shared/task-source-context-schema'
 import { WorkspaceLinkedItemSchema } from '../../../shared/workspace-linked-item-schema'
+import { WorkspacePrioritySchema } from '../../../shared/worktree/priority-schema'
 import { isWorkspaceLinkedItemSourceContextMatch } from '../../../shared/workspace-linked-item-source-context'
 import { DiffCommentSchema } from '../../../shared/diff-comment-schema'
 import { normalizeExecutionHostId } from '../../../shared/execution-host'
@@ -153,6 +154,7 @@ export const FolderWorkspaceUpdateArgs = z.object({
       isUnread: z.boolean().optional(),
       isPinned: z.boolean().optional(),
       snoozedUntil: z.number().finite().nullable().optional(),
+      priority: WorkspacePrioritySchema.nullable().optional(),
       sortOrder: z.number().finite().optional(),
       manualOrder: z.number().finite().optional(),
       workspaceStatus: z.string().optional(),

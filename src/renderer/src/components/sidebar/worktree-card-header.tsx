@@ -13,6 +13,7 @@ import type { WorktreeCardPresentation } from './worktree-card-presentation'
 import { WorktreeCardDeleteQuickAction } from './worktree-card-delete-quick-action'
 import { WorktreeCardSshHostControl } from './WorktreeCardSshHostControl'
 import { WorktreeTitleInlineRename } from './WorktreeTitleInlineRename'
+import { WorkspacePriorityIcon, getWorkspacePriorityLane } from './workspace-priority-meta'
 import type { WorktreeCardController } from './use-worktree-card-controller'
 
 // Why: pinned repo icon and compact inline badge share this chip shell so both repo cues read as the same affordance.
@@ -86,6 +87,7 @@ export function WorktreeCardHeader({
     titleRowIndicators,
     titleWrapper
   } = presentation
+  const priorityLane = getWorkspacePriorityLane(worktree)
 
   return (
     <div className="flex min-w-0 items-center justify-between gap-2">
@@ -162,6 +164,10 @@ export function WorktreeCardHeader({
               iconClassName="size-3"
             />
           </RepoIdentityChip>
+        )}
+
+        {priorityLane !== 'none' && (
+          <WorkspacePriorityIcon lane={priorityLane} className="size-3.5" />
         )}
 
         {/* Why: unread alert lives in the left status lane; title-row contrast comes from weight and dimmed read titles. */}

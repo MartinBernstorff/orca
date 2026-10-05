@@ -90,3 +90,29 @@ describe('mergeWorktree snooze projection', () => {
     ).toBeNull()
   })
 })
+
+describe('mergeWorktree priority projection', () => {
+  const meta = {
+    instanceId: '11111111-1111-4111-8111-111111111111',
+    hostId: 'local' as const,
+    displayName: '',
+    comment: '',
+    linkedIssue: null,
+    linkedPR: null,
+    linkedLinearIssue: null,
+    isArchived: false,
+    isUnread: false,
+    isPinned: false,
+    sortOrder: 0,
+    lastActivityAt: 0
+  }
+
+  it('carries a persisted priority onto the listing row', () => {
+    expect(mergeWorktree('repo-1', git, { ...meta, priority: 'high' }).priority).toBe('high')
+  })
+
+  it('projects a missing or unknown priority as an explicit null', () => {
+    expect(mergeWorktree('repo-1', git, undefined).priority).toBeNull()
+    expect(mergeWorktree('repo-1', git, { ...meta, priority: 'p0' as never }).priority).toBeNull()
+  })
+})

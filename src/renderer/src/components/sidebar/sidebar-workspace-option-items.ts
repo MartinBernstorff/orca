@@ -25,6 +25,12 @@ export const GROUP_BY_OPTIONS = [
     }
   },
   {
+    id: 'priority',
+    get label() {
+      return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.priority', 'Priority')
+    }
+  },
+  {
     id: 'repo',
     get label() {
       return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.2170d553cf', 'Project')
@@ -237,6 +243,18 @@ export const SORT_OPTIONS = [
       return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.2170d553cf', 'Project')
     },
     description: null
+  },
+  {
+    id: 'priority',
+    get label() {
+      return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.priority', 'Priority')
+    },
+    get description() {
+      return translate(
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.prioritySortDescription',
+        'Highest priority first, then most recent activity.'
+      )
+    }
   },
   {
     id: 'manual',

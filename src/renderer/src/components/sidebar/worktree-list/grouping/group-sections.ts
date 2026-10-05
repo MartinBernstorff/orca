@@ -6,6 +6,10 @@ import {
   getWorkspaceStatusFromGroupKey,
   getWorkspaceStatusVisualMeta
 } from '../../workspace-status'
+import {
+  getWorkspacePriorityLaneHeaderMeta,
+  getWorkspacePriorityLaneFromKey
+} from '../../workspace-priority-meta'
 import { PROJECT_GROUP_META, PR_GROUP_META } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import type { NoticeHostContext } from './host-labels'
@@ -122,8 +126,10 @@ export function appendOrderedGroups(
               }
             })()
           : (() => {
-              const prGroup = key.replace(/^pr:/, '') as PRGroupKey
-              const meta = PR_GROUP_META[prGroup]
+              const meta =
+                groupBy === 'priority'
+                  ? getWorkspacePriorityLaneHeaderMeta(getWorkspacePriorityLaneFromKey(key))
+                  : PR_GROUP_META[key.replace(/^pr:/, '') as PRGroupKey]
               return {
                 type: 'header' as const,
                 key,

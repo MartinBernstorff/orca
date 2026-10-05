@@ -5,6 +5,10 @@ import {
   getWorkspaceStatus,
   getWorkspaceStatusGroupKey
 } from '../../../../../../shared/workspace-statuses'
+import {
+  getWorkspacePriorityLane,
+  getWorkspacePriorityLaneKey
+} from '../../workspace-priority-meta'
 import { ALL_GROUP_KEY, getPRLaneKey } from './group-keys'
 import type { WorktreeGroupBy } from './row-types'
 
@@ -60,6 +64,8 @@ export function getFolderWorkspaceLaneKey(
       // never resolve a PR. getPRGroupKey returns this same lane for any
       // worktree without one, so the two stay consistent.
       return getPRLaneKey('in-progress')
+    case 'priority':
+      return getWorkspacePriorityLaneKey(getWorkspacePriorityLane(pair.folderWorkspace))
     case 'none':
       return ALL_GROUP_KEY
   }

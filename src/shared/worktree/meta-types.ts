@@ -1,3 +1,4 @@
+import type { WorkspacePriority } from './priority'
 import type { ExecutionHostId } from '../execution-host'
 import type { TaskSourceContext } from '../task-source-context'
 import type { EphemeralVmCheckoutMode } from '../orca-yaml-hook-types'
@@ -51,6 +52,8 @@ export type WorktreeMeta = {
   isPinned: boolean
   /** See {@link Worktree.snoozedUntil}. null clears an existing snooze. */
   snoozedUntil?: number | null
+  /** See {@link Worktree.priority}. null clears an existing priority. */
+  priority?: WorkspacePriority | null
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

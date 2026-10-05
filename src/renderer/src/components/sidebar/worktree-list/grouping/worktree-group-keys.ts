@@ -4,6 +4,10 @@ import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shar
 import { getWorkspaceStatus, getWorkspaceStatusGroupKey } from '../../workspace-status'
 import { cloneDefaultWorkspaceStatuses } from '../../../../../../shared/workspace-statuses'
 import type { AppState } from '../../../../store/types'
+import {
+  getWorkspacePriorityLane,
+  getWorkspacePriorityLaneKey
+} from '../../workspace-priority-meta'
 import { ALL_GROUP_KEY, getPRGroupKey, getProjectGroupHeaderKey } from './group-keys'
 import { buildProjectGroupingIndex, getProjectGroupingForRepo } from './project-grouping'
 import type { ProjectGroupingModel } from './project-grouping'
@@ -23,6 +27,9 @@ export function getGroupKeyForWorktree(
   }
   if (groupBy === 'workspace-status') {
     return getWorkspaceStatusGroupKey(getWorkspaceStatus(worktree, workspaceStatuses))
+  }
+  if (groupBy === 'priority') {
+    return getWorkspacePriorityLaneKey(getWorkspacePriorityLane(worktree))
   }
   if (groupBy === 'repo') {
     return getProjectGroupingForRepo(

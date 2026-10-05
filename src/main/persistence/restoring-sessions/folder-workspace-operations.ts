@@ -9,6 +9,7 @@ import { normalizeWorkspaceLinkedItem } from '../../../shared/workspace-linked-i
 import { isWorkspaceLinkedItemSourceContextMatch } from '../../../shared/workspace-linked-item-source-context'
 import { folderWorkspaceKey } from '../../../shared/workspace-scope'
 import { normalizeSnoozedUntil } from '../../../shared/worktree/snooze'
+import { normalizeWorkspacePriority } from '../../../shared/worktree/priority'
 import { removeWorkspaceSessionOwner } from './session-owner-removal'
 
 export type FolderWorkspaceMutationOperations = {
@@ -120,6 +121,7 @@ export class FolderWorkspacePersistenceOperations {
         | 'isUnread'
         | 'isPinned'
         | 'snoozedUntil'
+        | 'priority'
         | 'sortOrder'
         | 'manualOrder'
         | 'workspaceStatus'
@@ -178,6 +180,9 @@ export class FolderWorkspacePersistenceOperations {
     }
     if (updates.snoozedUntil !== undefined) {
       workspace.snoozedUntil = normalizeSnoozedUntil(updates.snoozedUntil)
+    }
+    if (updates.priority !== undefined) {
+      workspace.priority = normalizeWorkspacePriority(updates.priority)
     }
     if (updates.sortOrder !== undefined && Number.isFinite(updates.sortOrder)) {
       workspace.sortOrder = updates.sortOrder
