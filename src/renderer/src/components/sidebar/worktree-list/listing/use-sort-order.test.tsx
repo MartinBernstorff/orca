@@ -7,7 +7,7 @@ import type { Repo } from '../../../../../../shared/repo-types'
 import type { Worktree } from '../../../../../../shared/worktree/types'
 import { makeRepo, makeWorktree } from '../../../worktree-jump-palette-test-fixtures'
 import type { SortBy } from '../../smart-sort'
-import { useSidebarWorktreeSortOrder } from './use-sort-order'
+import { SORT_SETTLE_MS, useSidebarWorktreeSortOrder } from './use-sort-order'
 
 const initialState = useAppStore.getInitialState()
 const repo = makeRepo()
@@ -71,7 +71,8 @@ describe('useSidebarWorktreeSortOrder freezeOrder', () => {
 
     rerender({ freezeOrder: true })
     act(() => setWorktrees(after))
-    act(() => vi.advanceTimersByTime(10_000))
+    act(() => vi.advanceTimersByTime(SORT_SETTLE_MS))
+    // Re-render so the hook reads the updated worktrees from the store.
     rerender({ freezeOrder: true })
     expect(result.current).toEqual(['a', 'b'])
 
@@ -79,16 +80,24 @@ describe('useSidebarWorktreeSortOrder freezeOrder', () => {
     expect(result.current).toEqual(['b', 'a'])
   })
 
-  it('re-sorts after the settle window when not frozen', () => {
-    const { result, rerender } = renderSortOrder('name', [
-      makeWorktree('a', 'A'),
-      makeWorktree('b', 'B')
-    ])
+  it('slots a workspace added while frozen into its sorted place without reordering the rest', () => {
+    const a = makeWorktree('a', 'A', { lastActivityAt: 3 })
+    const b = makeWorktree('b', 'B', { lastActivityAt: 1 })
+    const { result, rerender } = renderSortOrder('recent', [a, b])
+    rerender({ freezeOrder: true })
 
-    act(() => setWorktrees([makeWorktree('a', 'C'), makeWorktree('b', 'B')]))
-    act(() => vi.advanceTimersByTime(10_000))
+    act(() =>
+      setWorktrees([
+        makeWorktree('a', 'A', { lastActivityAt: 0 }),
+        b,
+        makeWorktree('new', 'New', { lastActivityAt: 2 })
+      ])
+    )
+    rerender({ freezeOrder: true })
+    expect(result.current).toEqual(['new', 'a', 'b'])
+
     rerender({ freezeOrder: false })
-    expect(result.current).toEqual(['b', 'a'])
+    expect(result.current).toEqual(['new', 'b', 'a'])
   })
 
   it('applies manual drops immediately even while frozen', () => {

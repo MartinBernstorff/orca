@@ -13,6 +13,7 @@ import type { VirtualizedScrollAnchor } from '@/hooks/useVirtualizedScrollAnchor
 import { cn } from '@/lib/utils'
 import { FolderPlus, Loader2 } from 'lucide-react'
 import { useSidebarProjectDrop } from './useSidebarProjectDrop'
+import { usePointerOverElement } from './use-pointer-over-element'
 import { useWorkspaceBoardPanel } from './useWorkspaceBoardPanel'
 import { resolveLeftSidebarStyleVariables } from '@/lib/left-sidebar-appearance'
 import { useSystemPrefersDark } from '@/components/terminal-pane/use-system-prefers-dark'
@@ -58,8 +59,6 @@ function Sidebar({
     [settings, systemPrefersDark]
   ) as React.CSSProperties | undefined
   const { nativeDropTarget, dropHandlers, affordance } = useSidebarProjectDrop()
-  // Why: re-sorting under the pointer moves the row the user is about to click.
-  const [pointerOverSidebar, setPointerOverSidebar] = React.useState(false)
   const {
     workspaceBoardOpen,
     workspaceBoardRenderedOpen,
@@ -104,6 +103,7 @@ function Sidebar({
     setWidth: setSidebarWidth,
     onDraftWidthChange: setLiveSidebarWidth
   })
+  const pointerOverSidebar = usePointerOverElement(containerRef)
 
   return (
     <TooltipProvider delayDuration={400}>
@@ -113,8 +113,6 @@ function Sidebar({
         className="relative min-h-0 flex-shrink-0 bg-worktree-sidebar flex flex-col overflow-hidden scrollbar-sleek-parent"
         style={leftSidebarStyle}
         {...dropHandlers}
-        onPointerEnter={() => setPointerOverSidebar(true)}
-        onPointerLeave={() => setPointerOverSidebar(false)}
       >
         {sidebarOpen && (
           <>
