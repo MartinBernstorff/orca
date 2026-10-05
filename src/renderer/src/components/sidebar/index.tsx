@@ -13,6 +13,7 @@ import type { VirtualizedScrollAnchor } from '@/hooks/useVirtualizedScrollAnchor
 import { cn } from '@/lib/utils'
 import { FolderPlus, Loader2 } from 'lucide-react'
 import { useSidebarProjectDrop } from './useSidebarProjectDrop'
+import { usePointerOverElement } from './use-pointer-over-element'
 import { useWorkspaceBoardPanel } from './useWorkspaceBoardPanel'
 import { resolveLeftSidebarStyleVariables } from '@/lib/left-sidebar-appearance'
 import { useSystemPrefersDark } from '@/components/terminal-pane/use-system-prefers-dark'
@@ -102,6 +103,7 @@ function Sidebar({
     setWidth: setSidebarWidth,
     onDraftWidthChange: setLiveSidebarWidth
   })
+  const pointerOverSidebar = usePointerOverElement(containerRef)
 
   return (
     <TooltipProvider delayDuration={400}>
@@ -126,6 +128,7 @@ function Sidebar({
               onWorkspaceBoardDragPreviewStart={previewWorkspaceBoardFromDrag}
               onWorkspaceBoardDragPreviewCommit={solidifyWorkspaceBoardFromDrag}
               onWorkspaceBoardDragPreviewCancel={cancelWorkspaceBoardDragPreview}
+              freezeOrder={pointerOverSidebar}
             />
 
             <div className="relative shrink-0">
