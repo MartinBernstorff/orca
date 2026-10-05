@@ -8,6 +8,7 @@ import { normalizeWorkspaceCreatorProvenance } from './workspace-creator-provena
 import { normalizeSnoozedUntil } from './worktree/snooze'
 import { normalizeWorkspacePriority } from './worktree/priority'
 import { normalizeWorkspaceEngagement } from './worktree/engagement'
+import { normalizeWorkspacePromptTally } from './worktree/prompt-tally'
 
 export function normalizeFolderWorkspaceName(
   name: string | null | undefined,
@@ -88,7 +89,8 @@ export function normalizeFolderWorkspaces(
       isPinned: raw.isPinned === true,
       snoozedUntil: normalizeSnoozedUntil(raw.snoozedUntil),
       priority: normalizeWorkspacePriority(raw.priority),
-      ...normalizeWorkspaceEngagement(raw),
+      ...normalizeWorkspacePromptTally(raw),
+      engagement: normalizeWorkspaceEngagement(raw.engagement),
       sortOrder:
         typeof raw.sortOrder === 'number' && Number.isFinite(raw.sortOrder) ? raw.sortOrder : now,
       ...(typeof raw.manualOrder === 'number' && Number.isFinite(raw.manualOrder)

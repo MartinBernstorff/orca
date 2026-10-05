@@ -4,7 +4,7 @@ import type { WorktreeMeta } from '../../shared/worktree/meta-types'
 import type { Worktree } from '../../shared/worktree/types'
 import { FOLDER_WORKSPACE_INSTANCE_SEPARATOR } from '../../shared/worktree/id'
 import { normalizeWorkspaceCreatorProvenance } from '../../shared/workspace-creator-provenance'
-import { normalizeWorkspaceEngagement } from '../../shared/worktree/engagement'
+import { normalizeWorkspacePromptTally } from '../../shared/worktree/prompt-tally'
 
 export function getRuntimeFolderWorkspaceRootId(repo: Repo): string {
   return `${repo.id}::${repo.path}`
@@ -62,7 +62,8 @@ export function mergeRuntimeFolderWorkspace(
     isPinned: meta.isPinned ?? false,
     ...(meta.snoozedUntil != null ? { snoozedUntil: meta.snoozedUntil } : {}),
     ...(meta.priority != null ? { priority: meta.priority } : {}),
-    ...normalizeWorkspaceEngagement(meta),
+    ...normalizeWorkspacePromptTally(meta),
+    ...(meta.engagement !== undefined ? { engagement: meta.engagement } : {}),
     sortOrder: meta.sortOrder ?? 0,
     ...(meta.manualOrder !== undefined ? { manualOrder: meta.manualOrder } : {}),
     lastActivityAt: meta.lastActivityAt ?? 0,

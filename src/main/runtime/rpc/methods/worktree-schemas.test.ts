@@ -126,3 +126,14 @@ describe('worktree RPC schemas', () => {
     expect(parsed.displayName).toBeUndefined()
   })
 })
+
+describe('WorktreeSet engagement', () => {
+  it('keeps an engagement on worktree.set', () => {
+    expect(
+      WorktreeSet.parse({ worktree: 'id:r1::/repos/wt', engagement: 'engaged' }).engagement
+    ).toBe('engaged')
+    expect(
+      WorktreeSet.safeParse({ worktree: 'id:r1::/repos/wt', engagement: 'busy' }).success
+    ).toBe(false)
+  })
+})

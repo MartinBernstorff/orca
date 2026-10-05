@@ -31,13 +31,12 @@ import { WorktreeOpenInSubMenu } from '@/components/open-in/WorktreeOpenInMenu'
 import { WorktreeDeveloperMenu } from './WorktreeDeveloperMenu'
 import { WorkspaceSleepMenuItems } from './WorkspaceSleepMenuItems'
 import { WorkspaceSnoozeMenuItems } from './WorkspaceSnoozeMenuItems'
-import { WorkspacePriorityMenuItems } from './WorkspacePriorityMenuItems'
+import { WorkspaceGroupingFieldMenuItems } from './WorkspaceGroupingFieldMenuItems'
 import { isWorkspaceSnoozed } from '../../../../shared/worktree/snooze'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import { translate } from '@/i18n/i18n'
 import { useOptionalShortcutLabel } from '@/hooks/useShortcutLabel'
 import type { WorktreeContextMenuModel } from './use-worktree-context-menu-model'
-import { WorktreeStatusMenuItems } from './WorktreeStatusMenuItems'
 import { WorktreeContextMenuOverlays } from './WorktreeContextMenuOverlays'
 import {
   CLOSE_ALL_CONTEXT_MENUS_EVENT,
@@ -51,13 +50,11 @@ import {
 
 export default function WorktreeContextMenuView({ model }: { model: WorktreeContextMenuModel }) {
   const {
-    activeContextWorktrees,
     batchDeleteWorktrees,
     children,
     contentClassName,
     contextDeletePending,
     contextMenuOpenedAtRef,
-    contextWorkspaceStatus,
     deleteLabel,
     deletingContext,
     deletingSubtree,
@@ -65,7 +62,6 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     eligibleParentCount,
     effectiveSelectedWorktrees,
     folderWorkspaceId,
-    handleAssignWorkspaceStatus,
     handleCloseAutoFocus,
     handleCloseTerminals,
     handleCopyPath,
@@ -77,7 +73,6 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     handleRemoveParentLink,
     handleRemoveProjectFromGroup,
     handleRename,
-    handleSetPriority,
     handleSleepSubtree,
     handleSnooze,
     handleTogglePin,
@@ -104,8 +99,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     subtreeSleepableWorktrees,
     suppressOpeningPointerEvent,
     validParentWorktreeId,
-    worktree,
-    workspaceStatuses
+    worktree
   } = model
   const deleteShortcut = useOptionalShortcutLabel('workspace.delete')
   return (
@@ -169,18 +163,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
               {translate('auto.components.sidebar.WorktreeContextMenu.439fa94d53', 'Update')}
             </DropdownMenuItem>
           )}
-          <WorktreeStatusMenuItems
-            contextWorkspaceStatus={contextWorkspaceStatus}
-            deletingContext={deletingContext}
-            isMultiContext={isMultiContext}
-            onAssignWorkspaceStatus={handleAssignWorkspaceStatus}
-            workspaceStatuses={workspaceStatuses}
-          />
-          <WorkspacePriorityMenuItems
-            disabled={deletingContext}
-            worktrees={activeContextWorktrees}
-            onSetPriority={handleSetPriority}
-          />
+          <WorkspaceGroupingFieldMenuItems model={model} />
           <DropdownMenuSeparator />
           {!isMultiContext && (
             <>

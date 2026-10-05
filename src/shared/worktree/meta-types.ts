@@ -1,4 +1,5 @@
 import type { WorkspacePriority } from './priority'
+import type { WorkspaceEngagement } from './engagement'
 import type { ExecutionHostId } from '../execution-host'
 import type { TaskSourceContext } from '../task-source-context'
 import type { EphemeralVmCheckoutMode } from '../orca-yaml-hook-types'
@@ -58,6 +59,8 @@ export type WorktreeMeta = {
   promptCount?: number
   /** See {@link Worktree.lastPromptAt}. */
   lastPromptAt?: number
+  /** See {@link Worktree.engagement}. */
+  engagement?: WorkspaceEngagement
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

@@ -9,6 +9,10 @@ import {
   getWorkspacePriorityLaneHeaderMeta,
   getWorkspacePriorityLaneFromKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagementFromLaneKey,
+  getWorkspaceEngagementLaneHeaderMeta
+} from '../../workspace-engagement-meta'
 import { ALL_GROUP_META, PROJECT_GROUP_META, PR_GROUP_META } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import { getLaneHostWorktreeCounts, getLaneHostWorktreeIds } from './host-labels'
@@ -47,6 +51,8 @@ function getLaneHeaderMeta(
     }
     case 'priority':
       return getWorkspacePriorityLaneHeaderMeta(getWorkspacePriorityLaneFromKey(laneKey))
+    case 'engagement':
+      return getWorkspaceEngagementLaneHeaderMeta(getWorkspaceEngagementFromLaneKey(laneKey))
     case 'pr-status':
       return PR_GROUP_META[laneKey.replace(/^pr:/, '') as PRGroupKey]
   }

@@ -3,7 +3,10 @@ import type { FolderWorkspace } from '../../shared/folder-workspace-types'
 import { getRepoExecutionHostId } from '../../shared/execution-host'
 import { getRepoIdFromWorktreeId } from '../../shared/worktree/id'
 import { parseWorkspaceKey } from '../../shared/workspace-scope'
-import { recordWorkspacePrompt, type WorkspaceEngagement } from '../../shared/worktree/engagement'
+import {
+  recordWorkspacePrompt,
+  type WorkspacePromptTally
+} from '../../shared/worktree/prompt-tally'
 import {
   readWorktreeMetaForHost,
   writeWorktreeMetaForHost,
@@ -20,7 +23,7 @@ export type WorkspacePromptCounterStore = Pick<
   getFolderWorkspace: (id: string) => FolderWorkspace | undefined
   updateFolderWorkspace: (
     id: string,
-    updates: Partial<WorkspaceEngagement>
+    updates: Partial<WorkspacePromptTally>
   ) => FolderWorkspace | null | undefined
 }
 

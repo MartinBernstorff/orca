@@ -11,7 +11,8 @@ const NESTED_GROUP_BY_VALUES: Record<NestedSidebarGroupBy, true> = {
   'workspace-status': true,
   repo: true,
   'pr-status': true,
-  priority: true
+  priority: true,
+  engagement: true
 }
 
 // Why a control char: lane keys embed user-defined status ids and repo ids.

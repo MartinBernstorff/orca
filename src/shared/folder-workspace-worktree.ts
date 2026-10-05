@@ -4,6 +4,7 @@ import { folderWorkspaceKey } from './workspace-scope'
 import { parseExecutionHostId, toSshExecutionHostId } from './execution-host'
 import { normalizeWorkspaceCreatorProvenance } from './workspace-creator-provenance'
 import { normalizeWorkspaceEngagement } from './worktree/engagement'
+import { normalizeWorkspacePromptTally } from './worktree/prompt-tally'
 
 export function folderWorkspaceToWorktree(folderWorkspace: FolderWorkspace): Worktree {
   const linkedTask = folderWorkspace.linkedTask
@@ -36,7 +37,8 @@ export function folderWorkspaceToWorktree(folderWorkspace: FolderWorkspace): Wor
     isPinned: folderWorkspace.isPinned,
     snoozedUntil: folderWorkspace.snoozedUntil ?? null,
     priority: folderWorkspace.priority ?? null,
-    ...normalizeWorkspaceEngagement(folderWorkspace),
+    ...normalizeWorkspacePromptTally(folderWorkspace),
+    engagement: normalizeWorkspaceEngagement(folderWorkspace.engagement),
     sortOrder: folderWorkspace.sortOrder,
     manualOrder: folderWorkspace.manualOrder,
     lastActivityAt: folderWorkspace.lastActivityAt,

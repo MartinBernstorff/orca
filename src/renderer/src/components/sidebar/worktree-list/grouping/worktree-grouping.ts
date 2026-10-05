@@ -19,6 +19,13 @@ import {
   getWorkspacePriorityLaneFromKey,
   getWorkspacePriorityLaneKey
 } from '../../workspace-priority-meta'
+import {
+  getWorkspaceEngagement,
+  getWorkspaceEngagementFromLaneKey,
+  getWorkspaceEngagementLabel,
+  getWorkspaceEngagementLaneKey
+} from '../../workspace-engagement-meta'
+import { WORKSPACE_ENGAGEMENTS } from '../../../../../../shared/worktree/engagement'
 import { PR_GROUP_META, PR_GROUP_ORDER, getPRGroupKey, getPRLaneKey } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import { addRepoIdToGroup, getProjectGroupingForRepo } from './project-grouping'
@@ -50,6 +57,9 @@ function getLaneLabelForKey(
   }
   if (groupBy === 'priority') {
     return getWorkspacePriorityLabel(getWorkspacePriorityLaneFromKey(key))
+  }
+  if (groupBy === 'engagement') {
+    return getWorkspaceEngagementLabel(getWorkspaceEngagementFromLaneKey(key))
   }
   return key
 }
@@ -109,6 +119,10 @@ export function buildOrderedGroups(args: {
       const lane = getWorkspacePriorityLane(w)
       key = getWorkspacePriorityLaneKey(lane)
       label = getWorkspacePriorityLabel(lane)
+    } else if (groupBy === 'engagement') {
+      const engagement = getWorkspaceEngagement(w)
+      key = getWorkspaceEngagementLaneKey(engagement)
+      label = getWorkspaceEngagementLabel(engagement)
     } else {
       const prGroup = getPRGroupKey(w, repoMap, prCache, settings)
       key = getPRLaneKey(prGroup)
@@ -232,6 +246,14 @@ export function buildOrderedGroups(args: {
   } else if (groupBy === 'priority') {
     for (const lane of WORKSPACE_PRIORITY_LANE_ORDER) {
       const key = getWorkspacePriorityLaneKey(lane)
+      const group = grouped.get(key)
+      if (group) {
+        orderedGroups.push([key, group])
+      }
+    }
+  } else if (groupBy === 'engagement') {
+    for (const engagement of WORKSPACE_ENGAGEMENTS) {
+      const key = getWorkspaceEngagementLaneKey(engagement)
       const group = grouped.get(key)
       if (group) {
         orderedGroups.push([key, group])

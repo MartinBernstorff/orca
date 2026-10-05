@@ -444,4 +444,30 @@ describe('orca cli worktree awareness', () => {
       )
     }
   })
+
+  it('passes an engagement through worktree.set', async () => {
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    queueFixtures(
+      callMock,
+      okFixture('req_set_engagement', {
+        worktree: buildWorktree('/tmp/repo/child', 'feature/child')
+      })
+    )
+    await main(
+      [
+        'worktree',
+        'set',
+        '--worktree',
+        'id:repo::/tmp/repo/child',
+        '--engagement',
+        'engaged',
+        '--json'
+      ],
+      '/tmp/repo'
+    )
+    expect(callMock).toHaveBeenLastCalledWith(
+      'worktree.set',
+      expect.objectContaining({ engagement: 'engaged' })
+    )
+  })
 })

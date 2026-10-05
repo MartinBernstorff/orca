@@ -524,6 +524,7 @@ describe('mergeWorktree', () => {
       priority: null,
       promptCount: 0,
       lastPromptAt: 0,
+      engagement: 'queued',
       sortOrder: 5,
       lastActivityAt: 1000,
       workspaceStatus: 'in-review',

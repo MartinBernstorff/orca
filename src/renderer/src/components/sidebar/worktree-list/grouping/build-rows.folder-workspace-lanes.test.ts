@@ -86,6 +86,7 @@ const ALL_GROUP_BY: WorktreeGroupBy[] = [
   'workspace-status',
   'pr-status',
   'priority',
+  'engagement',
   'none'
 ]
 
@@ -181,7 +182,7 @@ describe('membership is decided once, not per mode', () => {
     )
     // Parity with today's behaviour: nothing filters folder workspaces by
     // isArchived, so a mode must not be the thing that hides one.
-    expect(counts).toEqual([1, 1, 1, 1, 1])
+    expect(counts).toEqual([1, 1, 1, 1, 1, 1])
   })
 })
 

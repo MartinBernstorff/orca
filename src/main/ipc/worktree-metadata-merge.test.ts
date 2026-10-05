@@ -91,7 +91,7 @@ describe('mergeWorktree snooze projection', () => {
   })
 })
 
-describe('mergeWorktree priority projection', () => {
+describe('mergeWorktree priority and engagement projection', () => {
   const meta = {
     instanceId: '11111111-1111-4111-8111-111111111111',
     hostId: 'local' as const,
@@ -114,6 +114,19 @@ describe('mergeWorktree priority projection', () => {
   it('projects a missing or unknown priority as an explicit null', () => {
     expect(mergeWorktree('repo-1', git, undefined).priority).toBeNull()
     expect(mergeWorktree('repo-1', git, { ...meta, priority: 'p0' as never }).priority).toBeNull()
+  })
+
+  it('carries a persisted engagement onto the listing row', () => {
+    expect(mergeWorktree('repo-1', git, { ...meta, engagement: 'engaged' }).engagement).toBe(
+      'engaged'
+    )
+  })
+
+  it('projects a missing or unknown engagement as queued', () => {
+    expect(mergeWorktree('repo-1', git, undefined).engagement).toBe('queued')
+    expect(mergeWorktree('repo-1', git, { ...meta, engagement: 'busy' as never }).engagement).toBe(
+      'queued'
+    )
   })
 })
 

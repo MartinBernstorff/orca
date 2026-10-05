@@ -120,7 +120,9 @@ const UiUpdateFields = z
     rightSidebarWidth: z.number().finite().optional(),
     markdownTocPanelWidth: z.number().finite().optional(),
     combinedDiffFileTreeWidth: z.number().finite().optional(),
-    groupBy: z.enum(['none', 'workspace-status', 'repo', 'pr-status', 'priority']).optional(),
+    groupBy: z
+      .enum(['none', 'workspace-status', 'repo', 'pr-status', 'priority', 'engagement'])
+      .optional(),
     // Why filter, not enum: a newer client's extra option drops alone instead of the whole list.
     nestedGroupBy: z
       .array(z.string())
