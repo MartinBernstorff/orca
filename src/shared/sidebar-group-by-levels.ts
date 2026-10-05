@@ -68,6 +68,11 @@ export function getNestedGroupPathKeys(
   return keys
 }
 
+/** The lane keys a group path key is built from, outermost first. */
+export function getGroupKeyPathSegments(key: string): string[] {
+  return key.split(GROUP_PATH_SEPARATOR)
+}
+
 /** 0 for a top-level group key, 1 for a key nested once, and so on. */
 export function getGroupKeyLevel(key: string): number {
   return key.split(GROUP_PATH_SEPARATOR).length - 1

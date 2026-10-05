@@ -1,3 +1,4 @@
+import type { WorkspaceEngagement } from '../../../../shared/worktree/engagement'
 import { buildWorktreeDragPreviewOffsets } from './worktree-drag-preview-offsets'
 import {
   getWorktreeSidebarBoundaryDrop,
@@ -24,6 +25,7 @@ export type WorktreeSidebarDropPreview = {
 export type WorktreeSidebarStatusDropTarget = {
   status: string | null
   isPinDrop: boolean
+  engagement?: WorkspaceEngagement | null
 }
 
 export type WorktreeSidebarTrackedStatusDropTarget = {
@@ -76,7 +78,12 @@ function getWorktreeSidebarDragUnitRects(args: {
 function hasWorktreeSidebarStatusDropTarget(
   target: WorktreeSidebarStatusDropTarget & { lineageParentId?: string | null }
 ): boolean {
-  return target.isPinDrop || target.status !== null || (target.lineageParentId ?? null) !== null
+  return (
+    target.isPinDrop ||
+    target.status !== null ||
+    (target.engagement ?? null) !== null ||
+    (target.lineageParentId ?? null) !== null
+  )
 }
 
 export function resolveWorktreeSidebarStatusDropCommitTarget(args: {

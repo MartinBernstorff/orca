@@ -205,7 +205,8 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     onMoveWorktreesToStatus: props.onMoveWorktreesToStatus,
     onMoveWorktreesToStatusAtIndex: props.onMoveWorktreesToStatusAtIndex,
     onReorderWorktrees: props.onReorderWorktrees,
-    onPinWorktrees: props.onPinWorktrees
+    onPinWorktrees: props.onPinWorktrees,
+    onSetWorktreesEngagement: props.onSetWorktreesEngagement
   })
 
   const { handleWorktreeRowPointerDown, handleWorktreeRowClickCapture } = useWorktreePointerDrag({

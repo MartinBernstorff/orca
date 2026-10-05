@@ -3,6 +3,7 @@ import type {
   WorkspaceStatus,
   WorkspaceStatusDefinition
 } from '../../../../../../shared/worktree/types'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 import type { WorktreeDragGroup } from '../../worktree-manual-order'
 import type { WorktreeDragUnitGroup } from '../../worktree-drag-units'
 import type { WorktreeSidebarDropPreview } from '../../worktree-sidebar-drop-preview'
@@ -48,4 +49,8 @@ export type WorktreeDropCommitContext = {
     dropIndex: number
   }) => void
   onPinWorktrees: (worktreeIds: readonly string[]) => void
+  onSetWorktreesEngagement: (
+    worktreeIds: readonly string[],
+    engagement: WorkspaceEngagement
+  ) => void
 }

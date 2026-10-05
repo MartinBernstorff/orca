@@ -252,12 +252,17 @@ export function buildOrderedGroups(args: {
       }
     }
   } else if (groupBy === 'engagement') {
+    // Why: both lanes always render, even empty or nested, so each header stays a drop target.
     for (const engagement of WORKSPACE_ENGAGEMENTS) {
       const key = getWorkspaceEngagementLaneKey(engagement)
-      const group = grouped.get(key)
-      if (group) {
-        orderedGroups.push([key, group])
-      }
+      orderedGroups.push([
+        key,
+        grouped.get(key) ?? {
+          label: getWorkspaceEngagementLabel(engagement),
+          items: [],
+          repoIds: new Set()
+        }
+      ])
     }
   } else if (groupBy === 'workspace-status') {
     // Why: empty lanes cost a header row each, so they stay opt-in — on, they

@@ -2,7 +2,10 @@ import type {
   WorkspaceStatus,
   WorkspaceStatusDefinition
 } from '../../../../../../shared/worktree/types'
+import { normalizeWorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
+import { getGroupKeyPathSegments } from '../../../../../../shared/sidebar-group-by-levels'
 import { getWorkspaceStatusFromGroupKey } from '../../workspace-status'
+import { getWorkspaceEngagementLaneKey } from '../../workspace-engagement-meta'
 import { getWorktreeLineageDropTargetId } from '../../worktree-lineage-drag-drop'
 import type { WorktreeSidebarStatusDropTarget } from '../../worktree-sidebar-drop-preview'
 import { NO_WORKTREE_SIDEBAR_DROP_TARGET, type WorktreeSidebarLineageDropTarget } from './row-state'
@@ -19,6 +22,15 @@ export function getPointerDropStatusTarget(args: {
   const pinTarget = target.closest<HTMLElement>('[data-workspace-pin-drop-target]')
   if (pinTarget && args.container.contains(pinTarget)) {
     return { status: null, isPinDrop: true, lineageParentId: null }
+  }
+  const engagementTarget = target.closest<HTMLElement>('[data-workspace-engagement-drop-target]')
+  if (engagementTarget && args.container.contains(engagementTarget)) {
+    return {
+      status: null,
+      isPinDrop: false,
+      engagement: normalizeWorkspaceEngagement(engagementTarget.dataset.workspaceEngagement),
+      lineageParentId: null
+    }
   }
   const lineageParentId = getWorktreeLineageDropTargetId({
     container: args.container,
@@ -43,6 +55,12 @@ export function shouldPreferSidebarStatusDropTarget(args: {
 }): boolean {
   if (args.target.isPinDrop) {
     return true
+  }
+  if (args.target.engagement) {
+    // Why: the source lane's own header keeps the reorder path, like a same-status drop.
+    return !getGroupKeyPathSegments(args.sourceGroupKey).includes(
+      getWorkspaceEngagementLaneKey(args.target.engagement)
+    )
   }
   if (!args.target.status) {
     return false

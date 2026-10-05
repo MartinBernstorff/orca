@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react'
 import type React from 'react'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 import type { WorkspaceStatus } from '../../../../../../shared/worktree/types'
 import { clearWorkspaceKanbanSidebarDropTargetVisual } from '../../workspace-kanban-sidebar-drop'
 import { setSidebarPointerDragDocumentStyles } from '../../worktree-sidebar-pointer-drag-dom'
@@ -25,6 +26,7 @@ export function useWorktreeDragRuntime(args: {
 }) {
   const { worktreeDragSessionRef, statusDropAnchorsRef, onWorkspaceBoardDragPreviewCancel } = args
   const [dragOverStatus, setDragOverStatus] = useState<WorkspaceStatus | null>(null)
+  const [dragOverEngagement, setDragOverEngagement] = useState<WorkspaceEngagement | null>(null)
   const [pinDragOver, setPinDragOver] = useState(false)
   const [nativeLineageDropTargetId, setNativeLineageDropTargetId] = useState<string | null>(null)
   const [worktreeDragState, setWorktreeDragState] = useState<WorktreeRowDragState>(
@@ -69,6 +71,7 @@ export function useWorktreeDragRuntime(args: {
     worktreePointerDragRef.current = null
     setSidebarPointerDragDocumentStyles(false)
     setDragOverStatus(null)
+    setDragOverEngagement(null)
     setPinDragOver(false)
     clearWorkspaceKanbanSidebarDropTargetVisual()
     onWorkspaceBoardDragPreviewCancel()
@@ -93,6 +96,8 @@ export function useWorktreeDragRuntime(args: {
     () => ({
       dragOverStatus,
       setDragOverStatus,
+      dragOverEngagement,
+      setDragOverEngagement,
       pinDragOver,
       setPinDragOver,
       nativeLineageDropTargetId,
@@ -114,6 +119,7 @@ export function useWorktreeDragRuntime(args: {
       cancelWorktreeNativeAutoscroll,
       cancelWorktreePointerAutoscroll,
       clearWorktreeDrag,
+      dragOverEngagement,
       dragOverStatus,
       nativeLineageDropTargetId,
       pinDragOver,

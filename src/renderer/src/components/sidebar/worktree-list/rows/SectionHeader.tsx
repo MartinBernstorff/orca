@@ -14,9 +14,12 @@ import type {
   WorkspaceStatus,
   WorkspaceStatusDefinition
 } from '../../../../../../shared/worktree/types'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 import type { GroupHeaderRow, WorktreeGroupBy } from '../grouping/row-types'
 import { PINNED_GROUP_KEY } from '../grouping/group-keys'
 import { getWorkspaceStatusFromGroupKey } from '../../workspace-status'
+import { getWorkspaceEngagementFromLaneKey } from '../../workspace-engagement-meta'
+import { getSectionHeaderDropTarget } from './section-header-drop-target'
 import { getVirtualRowTransform } from '../viewport/virtual-rows'
 import { resolveProjectGroupHeaderColor } from '../../project-header-color'
 import { getRepoHeaderCreateState } from '../../repo-header-create-state'
@@ -50,6 +53,7 @@ export type SectionHeaderRowContext = {
   sshConnectionStates: AppState['sshConnectionStates']
   highlightedRevealRowKey: string | null
   dragOverStatus: WorkspaceStatus | null
+  dragOverEngagement: WorkspaceEngagement | null
   pinDragOver: boolean
   headerDrag: WorktreeSidebarHeaderDrag
   getCachedFolderWorkspacePathStatus: (request: {
@@ -146,6 +150,12 @@ export function renderWorktreeSectionHeaderRow(args: {
       ? getWorkspaceStatusFromGroupKey(headerLaneKey, ctx.workspaceStatuses)
       : null
   const isPinnedHeader = row.key === PINNED_GROUP_KEY
+  const headerDropTarget = getSectionHeaderDropTarget(ctx, {
+    status: headerWorkspaceStatus,
+    engagement:
+      headerGroupBy === 'engagement' ? getWorkspaceEngagementFromLaneKey(headerLaneKey) : null,
+    isPinned: isPinnedHeader
+  })
   const repoHeaderColor = resolveProjectGroupHeaderColor({
     groupBy: headerGroupBy,
     headerKey: headerLaneKey,
@@ -230,9 +240,7 @@ export function renderWorktreeSectionHeaderRow(args: {
             : undefined
         }
         data-project-group-header-drag-handle={isDraggableProjectGroupHeader ? '' : undefined}
-        data-workspace-status-drop-target={headerWorkspaceStatus ? '' : undefined}
-        data-workspace-status={headerWorkspaceStatus ?? undefined}
-        data-workspace-pin-drop-target={isPinnedHeader ? '' : undefined}
+        {...headerDropTarget.props}
         className={cn(
           // Why: no row-level grab — only the title surface below shows the hand;
           // actions use cursor-pointer so … / + never look reorderable.
@@ -242,11 +250,7 @@ export function renderWorktreeSectionHeaderRow(args: {
             'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/50',
           (isDraggingThis || isDraggingThisProjectGroup) &&
             'bg-accent/80 ring-1 ring-ring/40 shadow-md rounded-md scale-[1.01]',
-          headerWorkspaceStatus &&
-            ctx.dragOverStatus === headerWorkspaceStatus &&
-            'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
-          isPinnedHeader &&
-            ctx.pinDragOver &&
+          headerDropTarget.isDragOver &&
             'rounded-md bg-worktree-sidebar-accent ring-1 ring-worktree-sidebar-ring/40',
           row.repo && 'overflow-hidden'
         )}
@@ -257,25 +261,6 @@ export function renderWorktreeSectionHeaderRow(args: {
               ? getProjectGroupHeaderPaddingLeft((row.projectGroupDepth ?? 0) + nestDepth)
               : WORKTREE_SECTION_HEADER_PADDING_LEFT
         }}
-        onDragOver={
-          isPinnedHeader
-            ? ctx.onWorkspacePinDragOver
-            : headerWorkspaceStatus
-              ? (event) => ctx.onWorkspaceStatusDragOver(event, headerWorkspaceStatus)
-              : undefined
-        }
-        onDragLeave={
-          isPinnedHeader
-            ? ctx.onWorkspacePinDragLeave
-            : headerWorkspaceStatus
-              ? ctx.onWorkspaceStatusDragLeave
-              : undefined
-        }
-        onDrop={
-          headerWorkspaceStatus
-            ? (event) => ctx.onWorkspaceStatusDrop(event, headerWorkspaceStatus)
-            : undefined
-        }
         onPointerDown={
           isDraggableRepoHeader && projectIdForHeader
             ? (event) => headerDrag.repoDrag.onHandlePointerDown(event, projectIdForHeader)
