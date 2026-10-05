@@ -6,6 +6,7 @@ import type { AppState } from '../types'
 import { getSetupScriptPromptDismissalKey } from '../../lib/setup-script-prompt'
 import { getRepoHostIdentityForParts } from './repo-host-identity'
 import { createUIStore, makePersistedUI } from './ui-slice-test-harness'
+import { getNestedGroupKey } from '../../../../shared/sidebar-group-by-levels'
 
 const mocks = vi.hoisted(() => ({
   sendNotesToActiveAgentSession: vi.fn(),
@@ -480,6 +481,24 @@ describe('createUISlice hydratePersistedUI', () => {
     expect(store.getState().groupBy).toBe('none')
     expect([...store.getState().collapsedGroups]).toEqual([])
     expect(setUI).toHaveBeenCalledWith({ groupBy: 'none', collapsedGroups: [] })
+  })
+
+  it('keeps shallower collapse state when a nested Group by level changes', () => {
+    vi.stubGlobal('window', { api: { ui: { set: vi.fn(() => Promise.resolve()) } } })
+    const store = createUIStore()
+    const top = 'priority:urgent'
+    const second = getNestedGroupKey(top, 'workspace-status:todo')
+    const third = getNestedGroupKey(second, 'pr:done')
+    store.setState({
+      groupBy: 'priority',
+      nestedGroupBy: ['workspace-status', 'pr-status'],
+      collapsedGroups: new Set([top, second, third])
+    })
+
+    store.getState().setNestedGroupBy(['workspace-status', 'repo'])
+
+    expect(store.getState().nestedGroupBy).toEqual(['workspace-status', 'repo'])
+    expect([...store.getState().collapsedGroups]).toEqual([top, second])
   })
 
   it('hydrates persisted per-worktree dotfile visibility', () => {
