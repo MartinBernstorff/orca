@@ -15,6 +15,7 @@ import {
 } from '../../../../shared/worktree/card-properties'
 import { isPluginPanelTabKey } from '../../../../shared/plugins/plugin-manifest'
 import { ClientUiWorkspaceFilterFields } from './client-ui-workspace-filter-fields'
+import { isNestedSidebarGroupBy } from '../../../../shared/sidebar-group-by-levels'
 import { TaskResumeState } from './task-resume-state-schema'
 import { WorkspaceCleanup } from './workspace-cleanup-ui-schema'
 import { omitUndefinedValues, tolerateUnknownValues } from './ui-update-value-tolerance'
@@ -120,6 +121,11 @@ const UiUpdateFields = z
     markdownTocPanelWidth: z.number().finite().optional(),
     combinedDiffFileTreeWidth: z.number().finite().optional(),
     groupBy: z.enum(['none', 'workspace-status', 'repo', 'pr-status', 'priority']).optional(),
+    // Why filter, not enum: a newer client's extra option must not reject the whole payload.
+    nestedGroupBy: z
+      .array(z.string())
+      .transform((values) => values.filter(isNestedSidebarGroupBy))
+      .optional(),
     showWorkspaceLineage: z.boolean().optional(),
     sortBy: z.enum(['name', 'smart', 'recent', 'repo', 'manual', 'priority']).optional(),
     projectOrderBy: z.enum(['manual', 'recent']).optional(),

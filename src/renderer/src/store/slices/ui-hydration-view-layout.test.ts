@@ -479,7 +479,11 @@ describe('createUISlice hydratePersistedUI', () => {
 
     expect(store.getState().groupBy).toBe('none')
     expect([...store.getState().collapsedGroups]).toEqual([])
-    expect(setUI).toHaveBeenCalledWith({ groupBy: 'none', collapsedGroups: [] })
+    expect(setUI).toHaveBeenCalledWith({
+      groupBy: 'none',
+      nestedGroupBy: [],
+      collapsedGroups: []
+    })
   })
 
   it('hydrates persisted per-worktree dotfile visibility', () => {

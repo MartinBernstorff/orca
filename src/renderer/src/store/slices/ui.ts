@@ -1,6 +1,12 @@
 /* eslint-disable max-lines */
 import type { StateCreator } from 'zustand'
 import type { AppState } from '../types'
+import {
+  getFirstChangedNestedLevel,
+  keepCollapsedGroupsAboveNestedLevel,
+  normalizeNestedGroupBy,
+  type NestedSidebarGroupBy
+} from '../../../../shared/sidebar-group-by-levels'
 import { normalizeRightSidebarRoute } from '../right-sidebar-route'
 import { settleEvictedModalData } from './modal-slot-dismissal'
 import {
@@ -914,6 +920,9 @@ export type UISlice = {
   dismissUsageEmptyState: () => void
   groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority'
   setGroupBy: (g: UISlice['groupBy']) => void
+  /** Group by levels below `groupBy` (second and third). */
+  nestedGroupBy: NestedSidebarGroupBy[]
+  setNestedGroupBy: (levels: readonly NestedSidebarGroupBy[]) => void
   sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
   setSortBy: (s: UISlice['sortBy']) => void
   projectOrderBy: ProjectOrderBy
@@ -2134,8 +2143,23 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
   groupBy: 'repo',
   // Why: group keys are mode-specific, so clear collapsed state on mode switch — stale keys are meaningless and accumulate.
   setGroupBy: (g) => {
-    window.api.ui.set({ groupBy: g, collapsedGroups: [] }).catch(console.error)
-    set({ groupBy: g, collapsedGroups: new Set<string>() })
+    const nestedGroupBy = normalizeNestedGroupBy(g, get().nestedGroupBy)
+    window.api.ui.set({ groupBy: g, nestedGroupBy, collapsedGroups: [] }).catch(console.error)
+    set({ groupBy: g, nestedGroupBy, collapsedGroups: new Set<string>() })
+  },
+
+  nestedGroupBy: [],
+  // Why: only paths at or below the changed level change identity, so shallower collapse state survives.
+  setNestedGroupBy: (levels) => {
+    const { groupBy, nestedGroupBy: previous, collapsedGroups } = get()
+    const nestedGroupBy = normalizeNestedGroupBy(groupBy, levels)
+    const changedLevel = getFirstChangedNestedLevel(previous, nestedGroupBy)
+    if (changedLevel === null) {
+      return
+    }
+    const kept = keepCollapsedGroupsAboveNestedLevel(collapsedGroups, changedLevel)
+    window.api.ui.set({ nestedGroupBy, collapsedGroups: kept }).catch(console.error)
+    set({ nestedGroupBy, collapsedGroups: new Set(kept) })
   },
 
   sortBy: 'recent',
@@ -2644,6 +2668,10 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         rightSidebarTab: rightSidebarRoute.rightSidebarTab,
         rightSidebarExplorerView: rightSidebarRoute.rightSidebarExplorerView,
         groupBy: (ui.groupBy as UISlice['groupBy'] | 'parent') === 'parent' ? 'repo' : ui.groupBy,
+        nestedGroupBy: normalizeNestedGroupBy(
+          (ui.groupBy as UISlice['groupBy'] | 'parent') === 'parent' ? 'repo' : ui.groupBy,
+          ui.nestedGroupBy
+        ),
         sortBy,
         // Why: main-process getUI() already normalized this (defaulting to 'manual'); read it through without migrating.
         projectOrderBy: ui.projectOrderBy,

@@ -5,9 +5,14 @@ import { GROUP_BY_OPTIONS } from './sidebar-workspace-option-items'
 type SidebarGroupByToggleProps = {
   groupBy: WorktreeGroupBy
   setGroupBy: (groupBy: WorktreeGroupBy) => void
+  options?: readonly { id: WorktreeGroupBy; label: string }[]
 }
 
-export function SidebarGroupByToggle({ groupBy, setGroupBy }: SidebarGroupByToggleProps) {
+export function SidebarGroupByToggle({
+  groupBy,
+  setGroupBy,
+  options = GROUP_BY_OPTIONS
+}: SidebarGroupByToggleProps) {
   return (
     <ToggleGroup
       type="single"
@@ -21,7 +26,7 @@ export function SidebarGroupByToggle({ groupBy, setGroupBy }: SidebarGroupByTogg
       size="sm"
       className="h-6 w-full justify-stretch"
     >
-      {GROUP_BY_OPTIONS.map((option) => (
+      {options.map((option) => (
         <ToggleGroupItem
           key={option.id}
           value={option.id}
