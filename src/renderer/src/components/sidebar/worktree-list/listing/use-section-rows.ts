@@ -14,6 +14,7 @@ import { getHostDisplayLabelOverrides } from '../../../../../../shared/host-sett
 import { buildRows } from '../grouping/build-rows'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
 import type { PinnedWorktreeDisplayPolicy, Row, WorktreeGroupBy } from '../grouping/row-types'
+import type { NestedSidebarGroupBy } from '../../../../../../shared/sidebar-group-by-levels'
 import { getLogicalRepoOrderRankById } from '../../project-header-drop'
 import { getEmptyProjectPlaceholderRepoIds } from '../../empty-project-placeholder-repos'
 import { addHostSectionRows } from '../../host-section-rows'
@@ -22,6 +23,7 @@ import { buildSidebarHostOptions } from '../../sidebar-host-options'
 
 type SectionRowsArgs = {
   groupBy: WorktreeGroupBy
+  nestedGroupBy: readonly NestedSidebarGroupBy[]
   projectOrderBy: ProjectOrderBy
   pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy
   defaultHostId: ExecutionHostId
@@ -168,7 +170,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
         hostLabelById,
         defaultHostId,
         args.pinnedDisplayPolicy,
-        args.showEmptyWorkspaceStatuses
+        args.showEmptyWorkspaceStatuses,
+        args.nestedGroupBy
       ),
     [
       args.groupBy,
@@ -192,7 +195,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
       pendingCreations,
       hostLabelById,
       args.pinnedDisplayPolicy,
-      args.showEmptyWorkspaceStatuses
+      args.showEmptyWorkspaceStatuses,
+      args.nestedGroupBy
     ]
   )
   const orderedHostOptions = useMemo(

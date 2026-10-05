@@ -1,6 +1,13 @@
 /* eslint-disable max-lines */
 import type { StateCreator } from 'zustand'
 import type { AppState } from '../types'
+import {
+  getFirstChangedNestedLevel,
+  getCollapsedGroupsAboveNestedLevel,
+  normalizeNestedGroupBy,
+  type NestedSidebarGroupBy,
+  type SidebarGroupBy
+} from '../../../../shared/sidebar-group-by-levels'
 import { normalizeRightSidebarRoute } from '../right-sidebar-route'
 import { settleEvictedModalData } from './modal-slot-dismissal'
 import {
@@ -912,8 +919,11 @@ export type UISlice = {
   dismissUsagePercentageDisplayChangeNotice: () => void
   usageEmptyStateDismissed: boolean
   dismissUsageEmptyState: () => void
-  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority' | 'engagement'
+  groupBy: SidebarGroupBy
   setGroupBy: (g: UISlice['groupBy']) => void
+  /** Group by levels below `groupBy` (second and third). */
+  nestedGroupBy: NestedSidebarGroupBy[]
+  setNestedGroupBy: (levels: readonly NestedSidebarGroupBy[]) => void
   sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
   setSortBy: (s: UISlice['sortBy']) => void
   projectOrderBy: ProjectOrderBy
@@ -1081,6 +1091,11 @@ export type UISlice = {
   setBrowserDefaultZoomLevel: (level: number) => void
   browserKagiSessionLink: string | null
   setBrowserKagiSessionLink: (link: string | null) => void
+}
+
+// Why a call of its own: a strict older host rejects the unknown key, and must not take groupBy/collapsedGroups down with it.
+function persistNestedGroupBy(nestedGroupBy: NestedSidebarGroupBy[]): void {
+  window.api.ui.set({ nestedGroupBy }).catch(console.error)
 }
 
 export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get) => ({
@@ -2134,8 +2149,28 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
   groupBy: 'repo',
   // Why: group keys are mode-specific, so clear collapsed state on mode switch — stale keys are meaningless and accumulate.
   setGroupBy: (g) => {
+    const previousNestedGroupBy = get().nestedGroupBy
+    const nestedGroupBy = normalizeNestedGroupBy(g, previousNestedGroupBy)
     window.api.ui.set({ groupBy: g, collapsedGroups: [] }).catch(console.error)
-    set({ groupBy: g, collapsedGroups: new Set<string>() })
+    if (getFirstChangedNestedLevel(previousNestedGroupBy, nestedGroupBy) !== null) {
+      persistNestedGroupBy(nestedGroupBy)
+    }
+    set({ groupBy: g, nestedGroupBy, collapsedGroups: new Set<string>() })
+  },
+
+  nestedGroupBy: [],
+  // Why: only paths at or below the changed level change identity, so shallower collapse state survives.
+  setNestedGroupBy: (levels) => {
+    const { groupBy, nestedGroupBy: previous, collapsedGroups } = get()
+    const nestedGroupBy = normalizeNestedGroupBy(groupBy, levels)
+    const changedLevel = getFirstChangedNestedLevel(previous, nestedGroupBy)
+    if (changedLevel === null) {
+      return
+    }
+    const kept = getCollapsedGroupsAboveNestedLevel(collapsedGroups, changedLevel)
+    persistNestedGroupBy(nestedGroupBy)
+    window.api.ui.set({ collapsedGroups: kept }).catch(console.error)
+    set({ nestedGroupBy, collapsedGroups: new Set(kept) })
   },
 
   sortBy: 'recent',
@@ -2565,6 +2600,8 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       const validRepoIds = new Set(s.repos.map((repo) => repo.id))
       const validRepoHostIdentities = new Set(s.repos.map(getRepoHostIdentity))
       const persistedFilterRepoIds = sanitizePersistedRepoIds(ui.filterRepoIds)
+      const hydratedGroupBy =
+        (ui.groupBy as UISlice['groupBy'] | 'parent') === 'parent' ? 'repo' : ui.groupBy
       // Why: pre-rename builds used sidekick* keys; read as fallback only so new pet* writes win after upgrade.
       const customPets = Array.isArray(ui.customPets)
         ? ui.customPets
@@ -2643,7 +2680,8 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         rightSidebarOpen: typeof ui.rightSidebarOpen === 'boolean' ? ui.rightSidebarOpen : true,
         rightSidebarTab: rightSidebarRoute.rightSidebarTab,
         rightSidebarExplorerView: rightSidebarRoute.rightSidebarExplorerView,
-        groupBy: (ui.groupBy as UISlice['groupBy'] | 'parent') === 'parent' ? 'repo' : ui.groupBy,
+        groupBy: hydratedGroupBy,
+        nestedGroupBy: normalizeNestedGroupBy(hydratedGroupBy, ui.nestedGroupBy),
         sortBy,
         // Why: main-process getUI() already normalized this (defaulting to 'manual'); read it through without migrating.
         projectOrderBy: ui.projectOrderBy,

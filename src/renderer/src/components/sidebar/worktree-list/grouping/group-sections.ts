@@ -2,26 +2,14 @@ import type { Repo } from '../../../../../../shared/repo-types'
 import type { WorktreeLineage } from '../../../../../../shared/worktree/lineage-types'
 import type { WorkspaceStatusDefinition, Worktree } from '../../../../../../shared/worktree/types'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
-import {
-  getWorkspaceStatusFromGroupKey,
-  getWorkspaceStatusVisualMeta
-} from '../../workspace-status'
-import {
-  getWorkspacePriorityLaneHeaderMeta,
-  getWorkspacePriorityLaneFromKey
-} from '../../workspace-priority-meta'
-import {
-  getWorkspaceEngagementFromLaneKey,
-  getWorkspaceEngagementLaneHeaderMeta
-} from '../../workspace-engagement-meta'
-import { PROJECT_GROUP_META, PR_GROUP_META } from './group-keys'
-import type { PRGroupKey } from './group-keys'
+import type { ProjectOrderBy } from '../../../../../../shared/ui-chrome-types'
+import type { NestedSidebarGroupBy } from '../../../../../../shared/sidebar-group-by-levels'
+import type { AppState } from '../../../../store/types'
+import { PROJECT_GROUP_META } from './group-keys'
 import type { NoticeHostContext } from './host-labels'
-import {
-  getLaneHostWorktreeCounts,
-  getLaneHostWorktreeIds,
-  getMixedHostContextLabels
-} from './host-labels'
+import { getMixedHostContextLabels } from './host-labels'
+import { buildLaneHeaderRow } from './lane-header-row'
+import { appendNestedLanes } from './nested-group-sections'
 import type { OrderedGroupEntry, ProjectGroupingIndex } from './project-grouping'
 import {
   appendWorktreeRows,
@@ -33,6 +21,7 @@ import {
 import type {
   ImportedWorktreesCardCandidate,
   NewExternalWorktreesInboxCandidate,
+  GroupHeaderRow,
   PendingCreationRef,
   Row,
   WorktreeGroupBy
@@ -58,6 +47,12 @@ export type SectionAppendContext = {
   worktreeMap: Map<string, Worktree>
   nestLineage: boolean
   cyclicLineageIds: ReadonlySet<string>
+  /** Group by levels below `groupBy`, already normalized. */
+  nestedGroupBy: readonly NestedSidebarGroupBy[]
+  prCache: Record<string, unknown> | null
+  settings: AppState['settings'] | undefined
+  repoOrder: Map<string, number> | undefined
+  projectOrderBy: ProjectOrderBy
 }
 
 export function appendOrderedGroups(
@@ -87,10 +82,10 @@ export function appendOrderedGroups(
     const isCollapsed = collapsedGroups.has(key)
     const repo = group.repo
     const folderPairs = group.folderWorkspaces ?? []
-    const header =
+    const header: GroupHeaderRow =
       groupBy === 'repo'
         ? {
-            type: 'header' as const,
+            type: 'header',
             key,
             label: group.label,
             count: group.items.length,
@@ -99,65 +94,14 @@ export function appendOrderedGroups(
             repo,
             projectGroupDepth
           }
-        : groupBy === 'workspace-status'
-          ? (() => {
-              const workspaceStatus =
-                getWorkspaceStatusFromGroupKey(key, workspaceStatuses) ??
-                workspaceStatuses[0]?.id ??
-                'in-progress'
-              const definition = workspaceStatuses.find((status) => status.id === workspaceStatus)
-              const meta = getWorkspaceStatusVisualMeta(definition ?? workspaceStatus)
-              return {
-                type: 'header' as const,
-                key,
-                label: definition?.label ?? workspaceStatus,
-                count: group.items.length + folderPairs.length,
-                tone: meta.tone,
-                icon: meta.icon,
-                hostWorktreeCounts: getLaneHostWorktreeCounts(
-                  group.items,
-                  folderPairs,
-                  repoMap,
-                  defaultHostId
-                ),
-                hostWorktreeIds: getLaneHostWorktreeIds(
-                  group.items,
-                  folderPairs,
-                  repoMap,
-                  defaultHostId
-                ),
-                worktreeIds: group.items.map((worktree) => worktree.id)
-              }
-            })()
-          : (() => {
-              const meta =
-                groupBy === 'priority'
-                  ? getWorkspacePriorityLaneHeaderMeta(getWorkspacePriorityLaneFromKey(key))
-                  : groupBy === 'engagement'
-                    ? getWorkspaceEngagementLaneHeaderMeta(getWorkspaceEngagementFromLaneKey(key))
-                    : PR_GROUP_META[key.replace(/^pr:/, '') as PRGroupKey]
-              return {
-                type: 'header' as const,
-                key,
-                label: meta.label,
-                count: group.items.length + folderPairs.length,
-                tone: meta.tone,
-                icon: meta.icon,
-                hostWorktreeCounts: getLaneHostWorktreeCounts(
-                  group.items,
-                  folderPairs,
-                  repoMap,
-                  defaultHostId
-                ),
-                hostWorktreeIds: getLaneHostWorktreeIds(
-                  group.items,
-                  folderPairs,
-                  repoMap,
-                  defaultHostId
-                ),
-                worktreeIds: group.items.map((worktree) => worktree.id)
-              }
-            })()
+        : buildLaneHeaderRow({
+            groupBy,
+            laneKey: key,
+            group,
+            workspaceStatuses,
+            repoMap,
+            defaultHostId
+          })
 
     result.push(header)
     if (!isCollapsed) {
@@ -203,6 +147,16 @@ export function appendOrderedGroups(
         }
       }
       const items = groupBy === 'repo' ? orderMainWorktreeFirst(group.items) : group.items
+      if (ctx.nestedGroupBy.length > 0) {
+        appendNestedLanes(ctx, {
+          parentKey: key,
+          items,
+          folderPairs,
+          levels: ctx.nestedGroupBy,
+          parentGroupDepth: projectGroupDepth
+        })
+        continue
+      }
       const hostContextLabelByRepoId =
         groupBy === 'repo'
           ? getMixedHostContextLabels(group, repoMap, projectIndex, hostLabelById)

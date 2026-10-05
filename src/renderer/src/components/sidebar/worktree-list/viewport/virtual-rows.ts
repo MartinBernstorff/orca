@@ -148,10 +148,10 @@ export function getStickyHeaderIndexes(rows: readonly RenderRow[]): number[] {
   const indexes: number[] = []
   rows.forEach((row, index) => {
     // Why: project groups are the top-level repo sidebar context; nested repo
-    // headers should not replace their containing group as the pinned header.
+    // headers (and nested Group by lanes) should not replace their containing group as the pinned header.
     if (
       row.type === 'host-header' ||
-      (row.type === 'header' && (row.projectGroupDepth ?? 0) === 0)
+      (row.type === 'header' && (row.projectGroupDepth ?? 0) === 0 && !row.nestDepth)
     ) {
       indexes.push(index)
     }

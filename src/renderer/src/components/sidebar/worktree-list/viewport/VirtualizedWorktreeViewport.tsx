@@ -56,6 +56,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
   // Why: callback-ref only mutates scrollRef; state re-runs the scroll-to-top listener attach.
   const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null)
   const settings = useAppStore((s) => s.settings)
+  const nestedGroupBy = useAppStore((s) => s.nestedGroupBy)
   const worktreeVisibilityDefaultsByHost = useAppStore((s) => s.worktreeVisibilityDefaultsByHost)
   const sshConnectionStates = useAppStore((s) => s.sshConnectionStates)
   const newCardStyle = settings?.experimentalNewWorktreeCardStyle === true
@@ -154,6 +155,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     collapsedGroups,
     toggleGroup,
     groupBy,
+    nestedGroupBy,
     pinnedDisplayPolicy,
     defaultHostId: props.defaultHostId,
     prCache: props.prCache,

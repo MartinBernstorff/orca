@@ -4,14 +4,12 @@ import type { ProjectGroup } from '../../../../../../shared/project-group-types'
 import type { Repo } from '../../../../../../shared/repo-types'
 import type { DetectedWorktree, Worktree } from '../../../../../../shared/worktree/types'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
+import type {
+  NestedSidebarGroupBy,
+  SidebarGroupBy
+} from '../../../../../../shared/sidebar-group-by-levels'
 
-export type WorktreeGroupBy =
-  | 'none'
-  | 'workspace-status'
-  | 'repo'
-  | 'pr-status'
-  | 'priority'
-  | 'engagement'
+export type WorktreeGroupBy = SidebarGroupBy
 export type PinnedWorktreeDisplayPolicy = 'single-location' | 'duplicate-in-groups'
 
 export function getPinnedWorktreeDisplayPolicy(
@@ -34,6 +32,11 @@ export type GroupHeaderRow = {
   hostWorktreeCounts?: ReadonlyMap<ExecutionHostId, number>
   hostWorktreeIds?: ReadonlyMap<ExecutionHostId, readonly string[]>
   worktreeIds?: readonly string[]
+  /** Set on headers below the first Group by level: 1 for the second level, 2 for the third. */
+  nestDepth?: number
+  /** Option and own lane key of a nested header, whose `key` is the full group path. */
+  laneGroupBy?: NestedSidebarGroupBy
+  laneKey?: string
 }
 
 export type WorktreeRow = {

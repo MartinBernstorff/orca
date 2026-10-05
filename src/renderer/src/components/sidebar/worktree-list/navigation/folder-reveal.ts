@@ -7,6 +7,11 @@ import { getProjectGroupHeaderKey } from '../grouping/group-keys'
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
 import { getFolderWorkspaceLaneKey } from '../grouping/folder-workspace-lanes'
 import type { WorktreeGroupBy } from '../grouping/row-types'
+import {
+  getNestedGroupPathKeys,
+  normalizeNestedGroupBy,
+  type NestedSidebarGroupBy
+} from '../../../../../../shared/sidebar-group-by-levels'
 import { getFolderWorkspaceHostId } from '../../folder-workspace-host-id'
 
 function findFolderWorkspaceByKey(
@@ -63,6 +68,7 @@ export function getFolderWorkspaceRevealGroupKeys(
   projectGroups: readonly ProjectGroup[],
   options?: {
     groupBy?: WorktreeGroupBy
+    nestedGroupBy?: readonly NestedSidebarGroupBy[]
     workspaceStatuses?: readonly WorkspaceStatusDefinition[]
     defaultHostId?: ExecutionHostId
   }
@@ -91,11 +97,16 @@ export function getFolderWorkspaceRevealGroupKeys(
   // keys come from the same function grouping uses, so the two cannot disagree.
   const owningGroup = groupsById.get(folderWorkspace.projectGroupId)
   if (options?.groupBy && options.groupBy !== 'repo' && owningGroup) {
+    const pair = { folderWorkspace, projectGroup: owningGroup }
+    const statuses = options.workspaceStatuses ?? []
+    const laneKey = getFolderWorkspaceLaneKey(pair, options.groupBy, statuses)
     keys.push(
-      getFolderWorkspaceLaneKey(
-        { folderWorkspace, projectGroup: owningGroup },
-        options.groupBy,
-        options.workspaceStatuses ?? []
+      laneKey,
+      // Why null for repo: project lanes never hold folder workspaces, so the row stays above them.
+      ...getNestedGroupPathKeys(
+        laneKey,
+        normalizeNestedGroupBy(options.groupBy, options.nestedGroupBy),
+        (level) => (level === 'repo' ? null : getFolderWorkspaceLaneKey(pair, level, statuses))
       )
     )
   }

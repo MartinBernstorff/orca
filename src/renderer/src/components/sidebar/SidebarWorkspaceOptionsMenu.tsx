@@ -26,6 +26,7 @@ import { PROJECT_ORDER_OPTIONS, SORT_OPTIONS } from './sidebar-workspace-option-
 import { WorktreeCardDisplayMenuSection } from './WorktreeCardDisplayMenuSection'
 import { translate } from '@/i18n/i18n'
 import { SidebarGroupByToggle } from './SidebarGroupByToggle'
+import { SidebarNestedGroupByToggles } from './SidebarNestedGroupByToggles'
 
 type SidebarWorkspaceOptionsMenuProps = {
   preserveWorkspaceBoardOpen?: boolean
@@ -52,6 +53,8 @@ const SidebarWorkspaceOptionsMenu = React.memo(function SidebarWorkspaceOptionsM
   const setSortBy = useAppStore((s) => s.setSortBy)
   const groupBy = useAppStore((s) => s.groupBy)
   const setGroupBy = useAppStore((s) => s.setGroupBy)
+  const nestedGroupBy = useAppStore((s) => s.nestedGroupBy)
+  const setNestedGroupBy = useAppStore((s) => s.setNestedGroupBy)
   const showEmptyWorkspaceStatuses = useAppStore((s) => s.showEmptyWorkspaceStatuses)
   const setShowEmptyWorkspaceStatuses = useAppStore((s) => s.setShowEmptyWorkspaceStatuses)
   const projectOrderBy = useAppStore((s) => s.projectOrderBy)
@@ -198,6 +201,11 @@ const SidebarWorkspaceOptionsMenu = React.memo(function SidebarWorkspaceOptionsM
         <div className="px-2 pt-0.5 pb-1">
           <SidebarGroupByToggle groupBy={groupBy} setGroupBy={setGroupBy} />
         </div>
+        <SidebarNestedGroupByToggles
+          groupBy={groupBy}
+          nestedGroupBy={nestedGroupBy}
+          setNestedGroupBy={setNestedGroupBy}
+        />
         {/* Why: empty lanes only exist in status grouping, so the switch hides
             in the other modes rather than sitting there as a dead control. */}
         {groupBy === 'workspace-status' && (

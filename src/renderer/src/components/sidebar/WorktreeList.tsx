@@ -73,6 +73,7 @@ const WorktreeList = React.memo(function WorktreeList({
     [activeWorkspaceKey, activeWorktreeId]
   )
   const groupBy = useAppStore((s) => s.groupBy)
+  const nestedGroupBy = useAppStore((s) => s.nestedGroupBy)
   const workspaceStatuses = useAppStore((s) => s.workspaceStatuses)
   const showEmptyWorkspaceStatuses = useAppStore((s) => s.showEmptyWorkspaceStatuses)
   const sortBy = useAppStore((s) => s.sortBy)
@@ -131,6 +132,7 @@ const WorktreeList = React.memo(function WorktreeList({
     collapsedGroups,
     agentSendTargetWorktreeId,
     groupBy,
+    nestedGroupBy,
     pinnedDisplayPolicy,
     visibleWorktrees,
     repoMap,
@@ -160,6 +162,7 @@ const WorktreeList = React.memo(function WorktreeList({
   })
   const rowModel = useSidebarSectionRows({
     groupBy,
+    nestedGroupBy,
     projectOrderBy,
     pinnedDisplayPolicy,
     defaultHostId,

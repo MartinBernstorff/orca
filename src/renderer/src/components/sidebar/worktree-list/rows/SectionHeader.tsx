@@ -87,6 +87,10 @@ export function renderWorktreeSectionHeaderRow(args: {
 }): React.JSX.Element {
   const { ctx, row, vItem, isActiveStickyHeader } = args
   const { headerDrag } = ctx
+  // Why: a nested header's key is its full path; lane identity lives in laneKey/laneGroupBy.
+  const headerGroupBy = row.laneGroupBy ?? ctx.groupBy
+  const headerLaneKey = row.laneKey ?? row.key
+  const nestDepth = row.nestDepth ?? 0
   const isRepoHeader = ctx.groupBy === 'repo' && row.repo !== undefined
   const isProjectGroupHeader = ctx.groupBy === 'repo' && row.projectGroup !== undefined
   const projectIdForHeader = isRepoHeader ? row.repo!.id : undefined
@@ -138,13 +142,13 @@ export function renderWorktreeSectionHeaderRow(args: {
     headerDrag.projectGroupDrag.state.draggingGroupId !== null &&
     headerDrag.projectGroupDrag.state.draggingGroupId === projectGroupIdForHeader
   const headerWorkspaceStatus =
-    ctx.groupBy === 'workspace-status'
-      ? getWorkspaceStatusFromGroupKey(row.key, ctx.workspaceStatuses)
+    headerGroupBy === 'workspace-status'
+      ? getWorkspaceStatusFromGroupKey(headerLaneKey, ctx.workspaceStatuses)
       : null
   const isPinnedHeader = row.key === PINNED_GROUP_KEY
   const repoHeaderColor = resolveProjectGroupHeaderColor({
-    groupBy: ctx.groupBy,
-    headerKey: row.key,
+    groupBy: headerGroupBy,
+    headerKey: headerLaneKey,
     badgeColor: row.repo?.badgeColor
   })
   const createState = row.repo
@@ -249,8 +253,8 @@ export function renderWorktreeSectionHeaderRow(args: {
         style={{
           // Why: non-project headers like "All" are flat-list labels; don't reserve project hierarchy indent.
           paddingLeft:
-            isRepoHeader || isProjectGroupHeader
-              ? getProjectGroupHeaderPaddingLeft(row.projectGroupDepth ?? 0)
+            isRepoHeader || isProjectGroupHeader || nestDepth > 0
+              ? getProjectGroupHeaderPaddingLeft((row.projectGroupDepth ?? 0) + nestDepth)
               : WORKTREE_SECTION_HEADER_PADDING_LEFT
         }}
         onDragOver={
@@ -334,7 +338,7 @@ export function renderWorktreeSectionHeaderRow(args: {
                 className={cn(
                   'min-w-0 truncate text-[13px] leading-none',
                   // Why: bold status lane labels read like unhandled-reply workspace rows.
-                  ctx.groupBy === 'workspace-status' ? 'font-medium' : 'font-semibold'
+                  headerGroupBy === 'workspace-status' ? 'font-medium' : 'font-semibold'
                 )}
               >
                 {row.label}
