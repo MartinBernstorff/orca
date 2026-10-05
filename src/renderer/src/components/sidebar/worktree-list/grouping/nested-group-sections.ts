@@ -71,7 +71,8 @@ export function appendNestedLanes(
       laneKey,
       laneGroupBy: groupBy,
       nestDepth,
-      projectGroupDepth: args.parentGroupDepth
+      // Why: SectionHeader pads by projectGroupDepth + nestDepth, so pass the base depth to land on groupDepth.
+      projectGroupDepth: groupDepth - nestDepth
     })
     if (collapsedGroups.has(key)) {
       continue

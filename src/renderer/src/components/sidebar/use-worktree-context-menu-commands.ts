@@ -75,7 +75,8 @@ export function useWorktreeContextMenuCommands(args: {
         args.activeContextWorktrees.map((worktree) =>
           args.updateWorktreeMeta(
             worktree.id,
-            { priority },
+            // Why: setting a real priority marks the workspace Engaged; clearing it leaves engagement unchanged.
+            priority !== null ? { priority, engagement: 'engaged' } : { priority },
             { executionHostId: worktree.hostId ?? 'local' }
           )
         )

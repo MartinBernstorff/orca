@@ -66,7 +66,11 @@ export function shouldPreferSidebarStatusDropTarget(args: {
   if (!args.target.status) {
     return false
   }
-  const sourceStatus = getWorkspaceStatusFromGroupKey(args.sourceGroupKey, args.workspaceStatuses)
+  // Why: under nested Group by the source key is a path; status may sit at any level.
+  const sourceStatus =
+    getGroupKeyPathSegments(args.sourceGroupKey)
+      .map((segment) => getWorkspaceStatusFromGroupKey(segment, args.workspaceStatuses))
+      .find((status) => status !== null) ?? null
   // Why: overlapping edge zones — the section under the pointer must win so guide and drop agree.
   return sourceStatus !== null && args.target.status !== sourceStatus
 }

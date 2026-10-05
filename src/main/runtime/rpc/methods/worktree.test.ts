@@ -751,6 +751,23 @@ describe('worktree RPC methods', () => {
     )
   })
 
+  it('sets priority through worktree.set without writing Engagement', async () => {
+    const runtime = {
+      getRuntimeId: () => 'test-runtime',
+      dedupeWorktreeCreate: passthroughDedupe,
+      updateManagedWorktreeMeta: vi.fn().mockResolvedValue({ id: 'wt-1' })
+    } as unknown as OrcaRuntimeService
+    const dispatcher = new RpcDispatcher({ runtime, methods: WORKTREE_METHODS })
+
+    await dispatcher.dispatch(
+      makeRequest('worktree.set', { worktree: 'id:wt-1', priority: 'high' })
+    )
+
+    const updates = vi.mocked(runtime.updateManagedWorktreeMeta).mock.calls[0]?.[1]
+    expect(updates).toMatchObject({ priority: 'high' })
+    expect(updates?.engagement).toBeUndefined()
+  })
+
   it('forwards push target clears through worktree.set', async () => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',
