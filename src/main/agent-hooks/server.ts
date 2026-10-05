@@ -1369,7 +1369,6 @@ export class AgentHookServer {
       return
     }
     this.promptSentDedupeByPaneKey.set(payload.paneKey, next)
-    const agentKind = next.agentKind
     for (const listener of this.promptSubmittedListeners) {
       try {
         listener({
@@ -1385,7 +1384,7 @@ export class AgentHookServer {
     try {
       // Why: hooks prove a turn was submitted but not which UI launched the terminal; keep attribution low-cardinality.
       track('agent_prompt_sent', {
-        agent_kind: agentKind,
+        agent_kind: next.agentKind,
         launch_source: 'unknown',
         request_kind: 'followup',
         ...getCohortAtEmit()

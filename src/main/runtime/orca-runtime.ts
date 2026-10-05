@@ -34702,7 +34702,7 @@ export class OrcaRuntimeService {
     this.notifyWorktreesChanged(repoId)
   }
 
-  /** Re-list after a main-authored metadata write (e.g. prompt counts); unlike a rename, no Git rescan is needed. */
+  /** Re-list after a main-authored metadata write (e.g. prompt counts) so renderers and paired clients pick it up. */
   notifyWorktreeMetaChanged(repoId: string): void {
     this.invalidateResolvedWorktreeCache()
     this.notifyWorktreesChanged(repoId)
