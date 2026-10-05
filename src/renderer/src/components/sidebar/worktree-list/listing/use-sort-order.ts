@@ -14,9 +14,10 @@ import {
   type WorktreeAttention
 } from '../../smart-attention'
 import { useReusedArrayIdentity } from './use-reused-array-identity'
+import { useFrozenSortOrder } from './frozen-sort-order'
 
 // Debounce re-sort after a sortEpoch bump so background score changes don't jar row positions.
-const SORT_SETTLE_MS = 3_000
+export const SORT_SETTLE_MS = 3_000
 
 function trackSmartClassDistribution(attention: ReadonlyMap<string, WorktreeAttention>): void {
   let class1 = 0
@@ -76,8 +77,10 @@ export function useSidebarWorktreeSortOrder(args: {
   allWorktrees: readonly Worktree[]
   repoMap: Map<string, Repo>
   sortBy: SortBy
+  /** Pointer is over the sidebar: keep the rendered order; pending re-sorts apply once false. */
+  freezeOrder?: boolean
 }): string[] {
-  const { allWorktrees, repoMap, sortBy } = args
+  const { allWorktrees, repoMap, sortBy, freezeOrder = false } = args
   // Non-archived count — detects structural changes (add/remove) so the debounce below can apply immediately.
   const worktreeCount = useMemo(() => {
     let count = 0
@@ -148,7 +151,9 @@ export function useSidebarWorktreeSortOrder(args: {
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedSortEpoch, repoMap, sortBy])
   // Why: stable ID order prevents rank-only refreshes from echoing an unchanged snapshot.
-  const sortedIds = useReusedArrayIdentity(recomputedSort.sortedIds)
+  const recomputedIds = useReusedArrayIdentity(recomputedSort.sortedIds)
+  // Why exempt manual: its re-sorts are the user's own drops, which must land immediately.
+  const sortedIds = useFrozenSortOrder(recomputedIds, sortBy, freezeOrder && sortBy !== 'manual')
 
   // Why after commit: a discarded render must not latch Smart onto a live signal that never committed.
   useEffect(() => {
