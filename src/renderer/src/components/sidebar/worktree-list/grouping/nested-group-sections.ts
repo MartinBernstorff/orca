@@ -71,7 +71,7 @@ export function appendNestedLanes(
       laneKey,
       laneGroupBy: groupBy,
       nestDepth,
-      projectGroupDepth: args.parentGroupDepth
+      projectGroupDepth: groupDepth
     })
     if (collapsedGroups.has(key)) {
       continue
