@@ -442,6 +442,8 @@ describe('orca cli worktree awareness', () => {
         'worktree.set',
         expect.objectContaining({ priority })
       )
+      // Why: only the renderer marks a workspace Engaged when priority is set.
+      expect(callMock.mock.lastCall?.[1].engagement).toBeUndefined()
     }
   })
 
