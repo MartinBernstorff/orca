@@ -66,7 +66,12 @@ export function shouldPreferSidebarStatusDropTarget(args: {
   if (!args.target.status) {
     return false
   }
-  const sourceStatus = getWorkspaceStatusFromGroupKey(args.sourceGroupKey, args.workspaceStatuses)
+  // Why: under nested grouping, sourceGroupKey is the full path (e.g. status:in-progress␟priority:high),
+  // so we must extract just the status segment with getGroupKeyPathSegments, as engagement does above.
+  const segments = getGroupKeyPathSegments(args.sourceGroupKey)
+  const sourceStatus = segments
+    .map((seg) => getWorkspaceStatusFromGroupKey(seg, args.workspaceStatuses))
+    .find((status) => status !== null)
   // Why: overlapping edge zones — the section under the pointer must win so guide and drop agree.
   return sourceStatus !== null && args.target.status !== sourceStatus
 }
