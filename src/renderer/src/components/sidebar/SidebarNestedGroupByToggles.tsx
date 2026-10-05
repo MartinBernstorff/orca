@@ -1,13 +1,18 @@
 import type React from 'react'
 import { DropdownMenuLabel } from '@/components/ui/dropdown-menu'
 import { translate } from '@/i18n/i18n'
-import type { NestedSidebarGroupBy } from '../../../../shared/sidebar-group-by-levels'
+import {
+  MAX_GROUP_BY_LEVELS,
+  type NestedSidebarGroupBy
+} from '../../../../shared/sidebar-group-by-levels'
 import type { WorktreeGroupBy } from './worktree-list/grouping/row-types'
 import { GROUP_BY_OPTIONS } from './sidebar-workspace-option-items'
 import { SidebarGroupByToggle } from './SidebarGroupByToggle'
 
-// One entry per level below Group by (MAX_GROUP_BY_LEVELS - 1).
-const NESTED_LEVEL_IDS = ['second-level', 'third-level'] as const
+const NESTED_LEVEL_IDS = Array.from(
+  { length: MAX_GROUP_BY_LEVELS - 1 },
+  (_, offset) => `group-by-level-${offset + 2}`
+)
 
 type SidebarNestedGroupByTogglesProps = {
   groupBy: WorktreeGroupBy

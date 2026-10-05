@@ -134,6 +134,26 @@ describe('nested group by', () => {
     expect(itemSummary(rows).map(([id]) => id)).toEqual([lowReview.id])
   })
 
+  it('hides the third level under a collapsed second-level lane only', () => {
+    const urgentReviewKey = getNestedGroupKey(URGENT, REVIEW)
+    const rows = rowsFor(
+      'priority',
+      ['workspace-status', 'pr-status'],
+      [urgentReview, lowReview],
+      new Set([urgentReviewKey])
+    )
+    const lowReviewKey = getNestedGroupKey(LOW, REVIEW)
+
+    expect(headerSummary(rows).map(([key]) => key)).toEqual([
+      URGENT,
+      urgentReviewKey,
+      LOW,
+      lowReviewKey,
+      getNestedGroupKey(lowReviewKey, PR_IN_PROGRESS)
+    ])
+    expect(itemSummary(rows).map(([id]) => id)).toEqual([lowReview.id])
+  })
+
   it('collapses one nested lane without touching the same lane under another parent', () => {
     const rows = rowsFor(
       'priority',

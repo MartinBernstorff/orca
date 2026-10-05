@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   getFirstChangedNestedLevel,
   getNestedGroupKey,
-  keepCollapsedGroupsAboveNestedLevel,
+  getCollapsedGroupsAboveNestedLevel,
   normalizeNestedGroupBy
 } from './sidebar-group-by-levels'
 
@@ -26,18 +26,18 @@ describe('normalizeNestedGroupBy', () => {
   })
 })
 
-describe('keepCollapsedGroupsAboveNestedLevel', () => {
+describe('getCollapsedGroupsAboveNestedLevel', () => {
   const top = 'priority:urgent'
   const second = getNestedGroupKey(top, 'workspace-status:todo')
   const third = getNestedGroupKey(second, 'pr:done')
 
   it('keeps shallower collapse state when a deeper level changes', () => {
-    expect(keepCollapsedGroupsAboveNestedLevel([top, second, third, 'lineage:wt'], 1)).toEqual([
+    expect(getCollapsedGroupsAboveNestedLevel([top, second, third, 'lineage:wt'], 1)).toEqual([
       top,
       second,
       'lineage:wt'
     ])
-    expect(keepCollapsedGroupsAboveNestedLevel([top, second, third], 0)).toEqual([top])
+    expect(getCollapsedGroupsAboveNestedLevel([top, second, third], 0)).toEqual([top])
   })
 
   it('finds the first changed nested level', () => {

@@ -91,7 +91,7 @@ export function getFirstChangedNestedLevel(
  * the second Group by level). Shallower paths keep their identity, so only
  * paths at or below the changed level are dropped.
  */
-export function keepCollapsedGroupsAboveNestedLevel(
+export function getCollapsedGroupsAboveNestedLevel(
   collapsedGroups: Iterable<string>,
   changedNestedLevel: number
 ): string[] {
