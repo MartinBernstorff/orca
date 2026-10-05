@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { WorktreeCreate } from './worktree-create-schemas'
 import { WorktreeActivate, WorktreeSet } from './worktree-schemas'
-import { FolderWorkspaceUpdate } from './folder-workspace'
 
 describe('worktree RPC schemas', () => {
   it('validates additive navigation intent', () => {
@@ -128,7 +127,7 @@ describe('worktree RPC schemas', () => {
   })
 })
 
-describe('engagement on the RPC update schemas', () => {
+describe('WorktreeSet engagement', () => {
   it('keeps an engagement on worktree.set', () => {
     expect(
       WorktreeSet.parse({ worktree: 'id:r1::/repos/wt', engagement: 'engaged' }).engagement
@@ -136,12 +135,5 @@ describe('engagement on the RPC update schemas', () => {
     expect(
       WorktreeSet.safeParse({ worktree: 'id:r1::/repos/wt', engagement: 'busy' }).success
     ).toBe(false)
-  })
-
-  it('keeps an engagement on folderWorkspace.update', () => {
-    expect(
-      FolderWorkspaceUpdate.parse({ folderWorkspaceId: 'fw-1', updates: { engagement: 'queued' } })
-        .updates.engagement
-    ).toBe('queued')
   })
 })

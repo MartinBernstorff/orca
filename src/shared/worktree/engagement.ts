@@ -5,5 +5,7 @@ export type WorkspaceEngagement = (typeof WORKSPACE_ENGAGEMENTS)[number]
 
 /** Absent or unknown reads as Queued, the default for new workspaces. */
 export function normalizeWorkspaceEngagement(value: unknown): WorkspaceEngagement {
-  return value === 'engaged' ? 'engaged' : 'queued'
+  return WORKSPACE_ENGAGEMENTS.includes(value as WorkspaceEngagement)
+    ? (value as WorkspaceEngagement)
+    : 'queued'
 }

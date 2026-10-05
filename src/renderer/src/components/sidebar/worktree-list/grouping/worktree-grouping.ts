@@ -20,12 +20,12 @@ import {
   getWorkspacePriorityLaneKey
 } from '../../workspace-priority-meta'
 import {
-  WORKSPACE_ENGAGEMENT_LANE_ORDER,
   getWorkspaceEngagement,
   getWorkspaceEngagementFromLaneKey,
   getWorkspaceEngagementLabel,
   getWorkspaceEngagementLaneKey
 } from '../../workspace-engagement-meta'
+import { WORKSPACE_ENGAGEMENTS } from '../../../../../../shared/worktree/engagement'
 import { PR_GROUP_META, PR_GROUP_ORDER, getPRGroupKey, getPRLaneKey } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import { addRepoIdToGroup, getProjectGroupingForRepo } from './project-grouping'
@@ -252,7 +252,7 @@ export function buildOrderedGroups(args: {
       }
     }
   } else if (groupBy === 'engagement') {
-    for (const engagement of WORKSPACE_ENGAGEMENT_LANE_ORDER) {
+    for (const engagement of WORKSPACE_ENGAGEMENTS) {
       const key = getWorkspaceEngagementLaneKey(engagement)
       const group = grouped.get(key)
       if (group) {

@@ -9,10 +9,12 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { translate } from '@/i18n/i18n'
 import type { Worktree } from '../../../../shared/worktree/types'
-import type { WorkspaceEngagement } from '../../../../shared/worktree/engagement'
+import {
+  WORKSPACE_ENGAGEMENTS,
+  type WorkspaceEngagement
+} from '../../../../shared/worktree/engagement'
 import {
   WORKSPACE_ENGAGEMENT_ICONS,
-  WORKSPACE_ENGAGEMENT_LANE_ORDER,
   getWorkspaceEngagement,
   getWorkspaceEngagementLabel
 } from './workspace-engagement-meta'
@@ -38,7 +40,7 @@ export function WorkspaceEngagementMenuItems({
       </DropdownMenuSubTrigger>
       <DropdownMenuSubContent className="w-44">
         <DropdownMenuRadioGroup value={value}>
-          {WORKSPACE_ENGAGEMENT_LANE_ORDER.map((option) => {
+          {WORKSPACE_ENGAGEMENTS.map((option) => {
             const Icon = WORKSPACE_ENGAGEMENT_ICONS[option]
             return (
               <DropdownMenuRadioItem
