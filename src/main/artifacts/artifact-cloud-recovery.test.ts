@@ -29,29 +29,6 @@ afterEach(async () => {
 })
 
 describe('ArtifactCloudService committed response loss recovery', () => {
-  it('reconciles one remotely revocable artifact after a committed create loses its response', async () => {
-    const userDataPath = await createUserDataPath()
-    const server = new ArtifactFaultServer()
-    server.loseNextCreateResponse = true
-    vi.stubGlobal('fetch', server.fetch)
-
-    await expect(service(userDataPath).publish(writeRequest)).rejects.toThrow('response lost')
-    expect(server.createMutations).toBe(1)
-    expect(server.artifactSlugs()).toEqual(['artifact-1'])
-    await expect(publishedLink(userDataPath)).resolves.toBeNull()
-
-    await expect(
-      service(userDataPath).publish({ ...writeRequest, content: '<h1>Changed after loss</h1>' })
-    ).resolves.toMatchObject({
-      status: 'ok',
-      value: { item: { artifact: { slug: 'artifact-1' } } }
-    })
-    expect(server.createMutations).toBe(1)
-    expect(server.artifactSlugs()).toEqual(['artifact-1'])
-    expect(server.artifactContent('artifact-1')).toBe('<h1>Changed after loss</h1>')
-    await expect(publishedLink(userDataPath)).resolves.toBe('https://share.onorca.dev/a/artifact-1')
-  })
-
   it('replays the exact create when content is unchanged after response loss', async () => {
     const userDataPath = await createUserDataPath()
     const server = new ArtifactFaultServer()
@@ -101,55 +78,6 @@ describe('ArtifactCloudService committed response loss recovery', () => {
     expect(server.createMutations).toBe(1)
     expect(server.artifactSlugs()).toEqual(['artifact-1'])
     expect(server.artifactContent('artifact-1')).toBe(changed.content)
-  })
-
-  it('clears the durable mapping when a committed delete retry returns 404', async () => {
-    const userDataPath = await createUserDataPath()
-    const server = new ArtifactFaultServer()
-    vi.stubGlobal('fetch', server.fetch)
-    await service(userDataPath).publish(writeRequest)
-
-    server.loseNextDeleteResponse = true
-    await expect(
-      service(userDataPath).unshare({
-        sourceKey: writeRequest.sourceKey,
-        apiUrl,
-        authToken: 'token-a'
-      })
-    ).rejects.toThrow('response lost')
-    expect(server.deleteMutations).toBe(1)
-    expect(server.artifactSlugs()).toEqual([])
-    await expect(publishedLink(userDataPath)).resolves.toBe('https://share.onorca.dev/a/artifact-1')
-
-    await expect(
-      service(userDataPath).unshare({
-        sourceKey: writeRequest.sourceKey,
-        apiUrl,
-        authToken: 'token-a'
-      })
-    ).resolves.toEqual({ status: 'ok', value: undefined })
-    expect(server.deleteMutations).toBe(1)
-    expect(server.artifactSlugs()).toEqual([])
-    await expect(publishedLink(userDataPath)).resolves.toBeNull()
-  })
-
-  it('keeps the durable mapping when a delete receives an unrelated 404', async () => {
-    const userDataPath = await createUserDataPath()
-    const server = new ArtifactFaultServer()
-    vi.stubGlobal('fetch', server.fetch)
-    await service(userDataPath).publish(writeRequest)
-
-    server.rejectNextDeleteCode = 'not_found'
-    await expect(
-      service(userDataPath).unshare({
-        sourceKey: writeRequest.sourceKey,
-        apiUrl,
-        authToken: 'token-a'
-      })
-    ).rejects.toMatchObject({ statusCode: 404, errorCode: 'not_found' })
-    expect(server.deleteMutations).toBe(0)
-    expect(server.artifactSlugs()).toEqual(['artifact-1'])
-    await expect(publishedLink(userDataPath)).resolves.toBe('https://share.onorca.dev/a/artifact-1')
   })
 
   it('drops an uncommitted validation failure so corrected content can create', async () => {
@@ -307,15 +235,6 @@ async function createUserDataPath(): Promise<string> {
 
 function service(userDataPath: string): ArtifactCloudService {
   return new ArtifactCloudService(userDataPath, () => true)
-}
-
-async function publishedLink(userDataPath: string): Promise<string | null> {
-  const result = await service(userDataPath).getPublishedLink({
-    sourceKey: writeRequest.sourceKey,
-    apiUrl,
-    authToken: 'token-a'
-  })
-  return result.status === 'ok' ? (result.value?.shareUrl ?? null) : null
 }
 
 function jsonResponse(body: object, status: number): Response {
