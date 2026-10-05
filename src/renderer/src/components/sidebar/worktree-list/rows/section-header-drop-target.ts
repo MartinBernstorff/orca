@@ -10,6 +10,8 @@ type SectionHeaderDropContext = {
   onWorkspaceStatusDragLeave: (event: React.DragEvent) => void
   onWorkspacePinDragOver: (event: React.DragEvent) => void
   onWorkspacePinDragLeave: (event: React.DragEvent) => void
+  onWorkspaceEngagementDragOver: (event: React.DragEvent, engagement: WorkspaceEngagement) => void
+  onWorkspaceEngagementDragLeave: (event: React.DragEvent) => void
   onWorkspaceStatusDrop: (event: React.DragEvent, status: WorkspaceStatus) => void
 }
 
@@ -33,19 +35,23 @@ export function getSectionHeaderDropTarget(
       'data-workspace-status-drop-target': status ? '' : undefined,
       'data-workspace-status': status ?? undefined,
       'data-workspace-pin-drop-target': isPinned ? '' : undefined,
-      // Why: engagement drops commit through the pointer-drag path only, so no native handlers.
       'data-workspace-engagement-drop-target': engagement ? '' : undefined,
       'data-workspace-engagement': engagement ?? undefined,
       onDragOver: isPinned
         ? ctx.onWorkspacePinDragOver
-        : status
-          ? (event: React.DragEvent) => ctx.onWorkspaceStatusDragOver(event, status)
-          : undefined,
+        : engagement
+          ? (event: React.DragEvent) => ctx.onWorkspaceEngagementDragOver(event, engagement)
+          : status
+            ? (event: React.DragEvent) => ctx.onWorkspaceStatusDragOver(event, status)
+            : undefined,
       onDragLeave: isPinned
         ? ctx.onWorkspacePinDragLeave
-        : status
-          ? ctx.onWorkspaceStatusDragLeave
-          : undefined,
+        : engagement
+          ? ctx.onWorkspaceEngagementDragLeave
+          : status
+            ? ctx.onWorkspaceStatusDragLeave
+            : undefined,
+      // Why: native engagement drops commit from the document capture listener, like pin drops.
       onDrop: status
         ? (event: React.DragEvent) => ctx.onWorkspaceStatusDrop(event, status)
         : undefined

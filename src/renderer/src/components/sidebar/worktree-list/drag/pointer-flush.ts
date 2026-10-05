@@ -64,7 +64,7 @@ function showStatusHoverWithoutInsertionLine(
     return
   }
   args.setDragOverStatus(target.status)
-  args.setDragOverEngagement(target.engagement ?? null)
+  args.setDragOverEngagement(target.engagement)
   args.setPinDragOver(target.isPinDrop)
   args.setWorktreeDragState((prev) =>
     clearWorktreeDropPreview(prev, { pointerY: drag.currentY, matchPointerY: true })

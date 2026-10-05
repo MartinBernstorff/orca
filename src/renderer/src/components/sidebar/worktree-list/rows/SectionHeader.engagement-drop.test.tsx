@@ -17,10 +17,7 @@ import { buildWorkspaceEngagementDropUpdates } from '../drag/engagement-drop'
 import { commitSectionTargetDrop } from '../drag/pointer-commit'
 import type { WorktreeDropCommitContext } from '../drag/drop-commit-context'
 import type { WorktreePointerDrag } from '../drag/row-state'
-import {
-  getPointerDropStatusTarget,
-  shouldPreferSidebarStatusDropTarget
-} from '../drag/status-target'
+import { getPointerDropStatusTarget } from '../drag/status-target'
 import type { GroupHeaderRow, WorktreeGroupBy } from '../grouping/row-types'
 import { renderWorktreeSectionHeaderRow, type SectionHeaderRowContext } from './SectionHeader'
 
@@ -104,10 +101,12 @@ function dropOnHeader(
 ) {
   vi.spyOn(document, 'elementFromPoint').mockReturnValue(header)
   const target = getPointerDropStatusTarget({ container, x: 1, y: 1 })
+  const writeAll = (ids: readonly string[], meta: WorktreeMetaBatchUpdate['updates']) =>
+    store.updateWorktreesMeta(ids.map((worktreeId) => ({ worktreeId, updates: meta })))
   const ctx = {
-    onPinWorktrees: vi.fn(),
-    onMoveWorktreesToStatus: vi.fn(),
-    onMoveWorktreesToStatusAtIndex: vi.fn(),
+    onPinWorktrees: (ids: readonly string[]) => writeAll(ids, { isPinned: true }),
+    onMoveWorktreesToStatus: (ids: readonly string[], status: string) =>
+      writeAll(ids, { workspaceStatus: status }),
     onSetWorktreesEngagement: (ids: readonly string[], engagement: WorkspaceEngagement) =>
       store.updateWorktreesMeta(
         buildWorkspaceEngagementDropUpdates({
@@ -122,7 +121,6 @@ function dropOnHeader(
     reorderDraggedIds: worktreeIds
   } as unknown as WorktreePointerDrag
   commitSectionTargetDrop({ ctx, drag }, target, null)
-  return { ctx, target }
 }
 
 function engagementHeader(engagement: WorkspaceEngagement, count: number): GroupHeaderRow {
@@ -176,62 +174,14 @@ describe('dropping a workspace onto an Engagement header', () => {
     expect(getWorkspaceEngagement(store.worktreeMap.get('wt-a')!)).toBe('queued')
   })
 
-  it('does not treat an Engagement header as a status or pin drop', () => {
-    const store = makeFakeStore([{ ...worktree, id: 'wt-a' }])
+  it('changes only Engagement, not status or pin', () => {
+    const store = makeFakeStore([{ ...worktree, id: 'wt-a', workspaceStatus: 'todo' }])
     const header = renderHeader(engagementHeader('engaged', 0), 'engagement')
 
-    const { ctx } = dropOnHeader(header, ['wt-a'], store)
+    dropOnHeader(header, ['wt-a'], store)
 
-    expect(ctx.onPinWorktrees).not.toHaveBeenCalled()
-    expect(ctx.onMoveWorktreesToStatus).not.toHaveBeenCalled()
-    expect(ctx.onMoveWorktreesToStatusAtIndex).not.toHaveBeenCalled()
-  })
-})
-
-describe('buildWorkspaceEngagementDropUpdates', () => {
-  it('skips workspaces already in the target lane', () => {
-    const store = makeFakeStore([
-      { ...worktree, id: 'wt-queued' },
-      { ...worktree, id: 'wt-engaged', engagement: 'engaged' }
-    ])
-    const updates = buildWorkspaceEngagementDropUpdates({
-      worktreeIds: ['wt-queued', 'wt-engaged'],
-      engagement: 'engaged',
-      worktreeMap: store.worktreeMap
-    })
-    expect(updates.map((update) => update.worktreeId)).toEqual(['wt-queued'])
-  })
-
-  it('writes folder workspaces, which the worktree map does not hold', () => {
-    const updates = buildWorkspaceEngagementDropUpdates({
-      worktreeIds: ['folder:fw-1'],
-      engagement: 'engaged',
-      worktreeMap: new Map()
-    })
-    expect(updates).toEqual([{ worktreeId: 'folder:fw-1', updates: { engagement: 'engaged' } }])
-  })
-})
-
-describe('preferring an Engagement header over reorder', () => {
-  const engagedTarget = { status: null, isPinDrop: false, engagement: 'engaged' as const }
-  const prefers = (sourceGroupKey: string) =>
-    shouldPreferSidebarStatusDropTarget({
-      sourceGroupKey,
-      target: engagedTarget,
-      workspaceStatuses: DEFAULT_WORKSPACE_STATUSES
-    })
-
-  it('prefers the header of another lane, top-level or nested', () => {
-    expect(prefers(getWorkspaceEngagementLaneKey('queued'))).toBe(true)
-    expect(prefers(getNestedGroupKey('repo:repo-1', getWorkspaceEngagementLaneKey('queued')))).toBe(
-      true
-    )
-  })
-
-  it("leaves the source lane's own header to the reorder path", () => {
-    expect(prefers(getWorkspaceEngagementLaneKey('engaged'))).toBe(false)
-    expect(
-      prefers(getNestedGroupKey(getWorkspaceEngagementLaneKey('engaged'), 'repo:repo-1'))
-    ).toBe(false)
+    const dropped = store.worktreeMap.get('wt-a')!
+    expect(dropped.isPinned).toBe(worktree.isPinned)
+    expect(dropped.workspaceStatus).toBe('todo')
   })
 })

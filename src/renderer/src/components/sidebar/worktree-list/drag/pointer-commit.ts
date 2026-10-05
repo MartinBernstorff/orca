@@ -23,7 +23,6 @@ type PointerDropCommitArgs = {
   onDropWorktreesOnWorkspaceBoard: (args: WorktreeStatusDropAtIndexArgs) => void
 }
 
-// Commit a drop on a status, pin, or engagement section.
 export function commitSectionTargetDrop(
   args: Pick<PointerDropCommitArgs, 'drag' | 'ctx'>,
   target: WorktreeSidebarStatusDropTarget & { lineageParentId?: string | null },

@@ -69,6 +69,8 @@ export type SectionHeaderRowContext = {
   onWorkspaceStatusDragLeave: (event: React.DragEvent) => void
   onWorkspacePinDragOver: (event: React.DragEvent) => void
   onWorkspacePinDragLeave: (event: React.DragEvent) => void
+  onWorkspaceEngagementDragOver: (event: React.DragEvent, engagement: WorkspaceEngagement) => void
+  onWorkspaceEngagementDragLeave: (event: React.DragEvent) => void
   onWorkspaceStatusDrop: (event: React.DragEvent, status: WorkspaceStatus) => void
 }
 

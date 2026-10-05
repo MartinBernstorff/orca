@@ -25,7 +25,7 @@ export type WorktreeSidebarDropPreview = {
 export type WorktreeSidebarStatusDropTarget = {
   status: string | null
   isPinDrop: boolean
-  engagement?: WorkspaceEngagement | null
+  engagement: WorkspaceEngagement | null
 }
 
 export type WorktreeSidebarTrackedStatusDropTarget = {
@@ -81,7 +81,7 @@ function hasWorktreeSidebarStatusDropTarget(
   return (
     target.isPinDrop ||
     target.status !== null ||
-    (target.engagement ?? null) !== null ||
+    target.engagement !== null ||
     (target.lineageParentId ?? null) !== null
   )
 }

@@ -1,29 +1,41 @@
 import { useEffect } from 'react'
 import type React from 'react'
+import {
+  normalizeWorkspaceEngagement,
+  type WorkspaceEngagement
+} from '../../../../shared/worktree/engagement'
 import type { WorkspaceStatus } from '../../../../shared/worktree/types'
 import { hasWorkspaceDragData, readWorkspaceDragDataIds } from './workspace-status'
 
 const WORKSPACE_STATUS_DROP_TARGET = '[data-workspace-status-drop-target]'
 const WORKSPACE_PIN_DROP_TARGET = '[data-workspace-pin-drop-target]'
+const WORKSPACE_ENGAGEMENT_DROP_TARGET = '[data-workspace-engagement-drop-target]'
 
 type MoveWorktreeToStatus = (worktreeId: string, status: WorkspaceStatus) => void
 type MoveWorktreesToStatus = (worktreeIds: readonly string[], status: WorkspaceStatus) => void
 type PinWorktree = (worktreeId: string) => void
 type PinWorktrees = (worktreeIds: readonly string[]) => void
+type SetWorktreesEngagement = (
+  worktreeIds: readonly string[],
+  engagement: WorkspaceEngagement
+) => void
 
 type WorkspaceStatusDocumentDropOptions = {
   onMoveWorktreesToStatus?: MoveWorktreesToStatus
   onPinWorktrees?: PinWorktrees
+  onSetWorktreesEngagement?: SetWorktreesEngagement
 }
 
 export function commitWorkspaceStatusDocumentDrop(params: {
   worktreeIds: readonly string[]
   status: WorkspaceStatus | null
   isPinDrop: boolean
+  engagement?: WorkspaceEngagement | null
   onMoveWorktreeToStatus: MoveWorktreeToStatus
   onMoveWorktreesToStatus?: MoveWorktreesToStatus
   onPinWorktree: PinWorktree
   onPinWorktrees?: PinWorktrees
+  onSetWorktreesEngagement?: SetWorktreesEngagement
 }): void {
   const {
     worktreeIds,
@@ -32,7 +44,9 @@ export function commitWorkspaceStatusDocumentDrop(params: {
     onMoveWorktreeToStatus,
     onMoveWorktreesToStatus,
     onPinWorktree,
-    onPinWorktrees
+    onPinWorktrees,
+    engagement,
+    onSetWorktreesEngagement
   } = params
 
   if (isPinDrop) {
@@ -43,6 +57,11 @@ export function commitWorkspaceStatusDocumentDrop(params: {
     for (const worktreeId of worktreeIds) {
       onPinWorktree(worktreeId)
     }
+    return
+  }
+
+  if (engagement) {
+    onSetWorktreesEngagement?.(worktreeIds, engagement)
     return
   }
 
@@ -68,7 +87,7 @@ export function useWorkspaceStatusDocumentDrop<T extends HTMLElement>(
   enabled = true,
   options?: WorkspaceStatusDocumentDropOptions
 ): void {
-  const { onMoveWorktreesToStatus, onPinWorktrees } = options ?? {}
+  const { onMoveWorktreesToStatus, onPinWorktrees, onSetWorktreesEngagement } = options ?? {}
 
   useEffect(() => {
     if (!enabled) {
@@ -90,13 +109,12 @@ export function useWorkspaceStatusDocumentDrop<T extends HTMLElement>(
       }
 
       const pinTarget = target.closest<HTMLElement>(WORKSPACE_PIN_DROP_TARGET)
+      const engagementTarget = target.closest<HTMLElement>(WORKSPACE_ENGAGEMENT_DROP_TARGET)
       const statusTarget = target.closest<HTMLElement>(WORKSPACE_STATUS_DROP_TARGET)
       const dropTarget =
-        pinTarget && container.contains(pinTarget)
-          ? pinTarget
-          : statusTarget && container.contains(statusTarget)
-            ? statusTarget
-            : null
+        [pinTarget, engagementTarget, statusTarget].find(
+          (candidate) => candidate && container.contains(candidate)
+        ) ?? null
       if (!dropTarget) {
         return
       }
@@ -114,10 +132,15 @@ export function useWorkspaceStatusDocumentDrop<T extends HTMLElement>(
         worktreeIds,
         status: dropTarget.dataset.workspaceStatus ?? null,
         isPinDrop: dropTarget === pinTarget,
+        engagement:
+          dropTarget === engagementTarget
+            ? normalizeWorkspaceEngagement(dropTarget.dataset.workspaceEngagement)
+            : null,
         onMoveWorktreeToStatus,
         onMoveWorktreesToStatus,
         onPinWorktree,
-        onPinWorktrees
+        onPinWorktrees,
+        onSetWorktreesEngagement
       })
     }
 
@@ -138,6 +161,7 @@ export function useWorkspaceStatusDocumentDrop<T extends HTMLElement>(
     onMoveWorktreeToStatus,
     onMoveWorktreesToStatus,
     onPinWorktree,
-    onPinWorktrees
+    onPinWorktrees,
+    onSetWorktreesEngagement
   ])
 }

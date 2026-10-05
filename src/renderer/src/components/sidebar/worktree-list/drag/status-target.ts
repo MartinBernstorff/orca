@@ -21,7 +21,7 @@ export function getPointerDropStatusTarget(args: {
   }
   const pinTarget = target.closest<HTMLElement>('[data-workspace-pin-drop-target]')
   if (pinTarget && args.container.contains(pinTarget)) {
-    return { status: null, isPinDrop: true, lineageParentId: null }
+    return { status: null, isPinDrop: true, engagement: null, lineageParentId: null }
   }
   const engagementTarget = target.closest<HTMLElement>('[data-workspace-engagement-drop-target]')
   if (engagementTarget && args.container.contains(engagementTarget)) {
@@ -44,6 +44,7 @@ export function getPointerDropStatusTarget(args: {
         ? ((statusTarget.dataset.workspaceStatus as WorkspaceStatus | undefined) ?? null)
         : null,
     isPinDrop: false,
+    engagement: null,
     lineageParentId
   }
 }

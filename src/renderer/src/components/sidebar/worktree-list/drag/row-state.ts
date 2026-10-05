@@ -56,6 +56,7 @@ export type WorktreeSidebarLineageDropTarget = WorktreeSidebarStatusDropTarget &
 export const NO_WORKTREE_SIDEBAR_DROP_TARGET: WorktreeSidebarLineageDropTarget = {
   status: null,
   isPinDrop: false,
+  engagement: null,
   lineageParentId: null
 }
 
