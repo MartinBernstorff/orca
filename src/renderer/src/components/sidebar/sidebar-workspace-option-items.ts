@@ -216,17 +216,17 @@ export const SORT_OPTIONS = [
     description: null
   },
   {
-    id: 'smart',
+    id: 'engagement',
     get label() {
       return translate(
-        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.503462f2b4',
-        'Agent Activity'
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.engagement',
+        'Engagement'
       )
     },
     get description() {
       return translate(
-        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.b759bb87ee',
-        'Agents that need attention, then most recent activity.'
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.engagementSortDescription',
+        'Most prompts submitted first, then the most recent prompt.'
       )
     }
   },

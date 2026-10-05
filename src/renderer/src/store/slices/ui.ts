@@ -914,7 +914,7 @@ export type UISlice = {
   dismissUsageEmptyState: () => void
   groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority'
   setGroupBy: (g: UISlice['groupBy']) => void
-  sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
+  sortBy: 'name' | 'engagement' | 'recent' | 'repo' | 'manual' | 'priority'
   setSortBy: (s: UISlice['sortBy']) => void
   projectOrderBy: ProjectOrderBy
   setProjectOrderBy: (p: ProjectOrderBy) => void
@@ -2572,8 +2572,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
           ? ui.customSidekicks
           : []
       const petId = ui.petId ?? ui.sidekickId
-      // Migration: one-shot old-'recent'→'smart' runs in main (_sortBySmartMigrated), not here, so a deliberate 'recent' choice survives restart.
-      const sortBy = ui.sortBy
+      // Migration: one-shot old-'recent'→'engagement' runs in main (_sortBySmartMigrated), not here, so a deliberate 'recent' choice survives restart.
+      // Why map 'smart': an older paired host still publishes the retired Agent Activity sort.
+      const sortBy = (ui.sortBy as string) === 'smart' ? 'engagement' : ui.sortBy
       const migratedStatusBarItems = migrateStatusBarItems(ui.statusBarItems)
       const statusBarItemsWithPorts =
         ui._portsStatusBarDefaultAdded || migratedStatusBarItems.includes('ports')

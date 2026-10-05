@@ -34702,6 +34702,12 @@ export class OrcaRuntimeService {
     this.notifyWorktreesChanged(repoId)
   }
 
+  /** Re-list after a main-authored metadata write (e.g. prompt counts); unlike a rename, no Git rescan is needed. */
+  notifyWorktreeMetaChanged(repoId: string): void {
+    this.invalidateResolvedWorktreeCache()
+    this.notifyWorktreesChanged(repoId)
+  }
+
   /** Like {@link notifyBranchRenamed} but carries old->new worktree id so the renderer re-keys instead of treating the id change as a deletion. */
   notifyWorktreeFolderRenamed(repoId: string, oldWorktreeId: string, newWorktreeId: string): void {
     this.clientSessionTabSelections.migrateWorktree(oldWorktreeId, newWorktreeId)

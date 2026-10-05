@@ -62,7 +62,7 @@ describe('Store', () => {
   afterEach(() => {
     rmSync(testState.dir, { recursive: true, force: true })
   })
-  it('preserves persisted smart sort value', async () => {
+  it('migrates a saved Agent Activity (smart) sort to engagement', async () => {
     writeDataFile({
       schemaVersion: 1,
       repos: [],
@@ -74,10 +74,25 @@ describe('Store', () => {
     })
 
     const store = await createStore()
-    expect(store.getUI().sortBy).toBe('smart')
+    expect(store.getUI().sortBy).toBe('engagement')
   })
 
-  it('migrates legacy recent sort to smart on first load', async () => {
+  it('preserves a persisted engagement sort', async () => {
+    writeDataFile({
+      schemaVersion: 1,
+      repos: [],
+      worktreeMeta: {},
+      settings: {},
+      ui: { sortBy: 'engagement', _sortBySmartMigrated: true },
+      githubCache: { pr: {}, issue: {} },
+      workspaceSession: {}
+    })
+
+    const store = await createStore()
+    expect(store.getUI().sortBy).toBe('engagement')
+  })
+
+  it('migrates legacy recent sort to engagement on first load', async () => {
     writeDataFile({
       schemaVersion: 1,
       repos: [],
@@ -89,7 +104,7 @@ describe('Store', () => {
     })
 
     const store = await createStore()
-    expect(store.getUI().sortBy).toBe('smart')
+    expect(store.getUI().sortBy).toBe('engagement')
     expect(store.getUI()._sortBySmartMigrated).toBe(true)
   })
 
@@ -109,7 +124,7 @@ describe('Store', () => {
   })
 
   it('uses recent as the default sort for a fresh install (no persisted sortBy)', async () => {
-    // Why: the legacy-recent→smart migration must gate on the raw persisted value, not the normalized default, or fresh installs get mis-migrated to 'smart'.
+    // Why: the legacy-recent→smart migration must gate on the raw persisted value, not the normalized default, or fresh installs get mis-migrated to 'engagement'.
     writeDataFile({
       schemaVersion: 1,
       repos: [],

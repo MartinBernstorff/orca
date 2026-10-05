@@ -10,6 +10,7 @@ import { isWorkspaceLinkedItemSourceContextMatch } from '../../../shared/workspa
 import { folderWorkspaceKey } from '../../../shared/workspace-scope'
 import { normalizeSnoozedUntil } from '../../../shared/worktree/snooze'
 import { normalizeWorkspacePriority } from '../../../shared/worktree/priority'
+import { normalizeWorkspaceEngagement } from '../../../shared/worktree/engagement'
 import { removeWorkspaceSessionOwner } from './session-owner-removal'
 
 export type FolderWorkspaceMutationOperations = {
@@ -122,6 +123,8 @@ export class FolderWorkspacePersistenceOperations {
         | 'isPinned'
         | 'snoozedUntil'
         | 'priority'
+        | 'promptCount'
+        | 'lastPromptAt'
         | 'sortOrder'
         | 'manualOrder'
         | 'workspaceStatus'
@@ -183,6 +186,11 @@ export class FolderWorkspacePersistenceOperations {
     }
     if (updates.priority !== undefined) {
       workspace.priority = normalizeWorkspacePriority(updates.priority)
+    }
+    if (updates.promptCount !== undefined || updates.lastPromptAt !== undefined) {
+      const engagement = normalizeWorkspaceEngagement({ ...workspace, ...updates })
+      workspace.promptCount = engagement.promptCount
+      workspace.lastPromptAt = engagement.lastPromptAt
     }
     if (updates.sortOrder !== undefined && Number.isFinite(updates.sortOrder)) {
       workspace.sortOrder = updates.sortOrder

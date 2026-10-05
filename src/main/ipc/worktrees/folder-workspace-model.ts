@@ -4,6 +4,7 @@ import { DEFAULT_WORKSPACE_STATUS_ID } from '../../../shared/workspace-statuses'
 import { FOLDER_WORKSPACE_INSTANCE_SEPARATOR } from '../../../shared/worktree/id'
 import type { WorktreeMeta } from '../../../shared/worktree/meta-types'
 import type { Worktree } from '../../../shared/worktree/types'
+import { normalizeWorkspaceEngagement } from '../../../shared/worktree/engagement'
 
 export function getFolderWorkspaceRootId(repo: Repo): string {
   return `${repo.id}::${repo.path}`
@@ -59,6 +60,7 @@ export function mergeFolderWorkspace(repo: Repo, worktreeId: string, meta: Workt
     isUnread: meta.isUnread ?? false,
     isPinned: meta.isPinned ?? false,
     ...(meta.priority != null ? { priority: meta.priority } : {}),
+    ...normalizeWorkspaceEngagement(meta),
     sortOrder: meta.sortOrder ?? 0,
     ...(meta.manualOrder !== undefined ? { manualOrder: meta.manualOrder } : {}),
     lastActivityAt: meta.lastActivityAt ?? 0,

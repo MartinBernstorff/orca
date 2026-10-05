@@ -39,8 +39,12 @@ export function normalizeShowDotfilesByWorktree(value: unknown): Record<string, 
 }
 
 export function normalizeSortBy(sortBy: unknown): PersistedState['ui']['sortBy'] {
+  // Why: Engagement replaced the Agent Activity ('smart') sort; carry its users over.
+  if (sortBy === 'smart') {
+    return 'engagement'
+  }
   if (
-    sortBy === 'smart' ||
+    sortBy === 'engagement' ||
     sortBy === 'recent' ||
     sortBy === 'repo' ||
     sortBy === 'name' ||

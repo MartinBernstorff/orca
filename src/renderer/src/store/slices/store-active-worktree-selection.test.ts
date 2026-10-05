@@ -103,7 +103,7 @@ describe('setActiveWorktree', () => {
     })
   })
 
-  it('does not change smart-sort rank after selection when a background event bumps sortEpoch', () => {
+  it('does not change recent-sort rank after selection when a background event bumps sortEpoch', () => {
     const store = createTestStore()
     const focusedId = 'repo1::/path/focused'
     const backgroundId = 'repo1::/path/background'
@@ -137,7 +137,7 @@ describe('setActiveWorktree', () => {
 
     const worktrees = [...store.getState().worktreesByRepo.repo1]
     const repoMap = new Map(store.getState().repos.map((repo) => [repo.id, repo]))
-    worktrees.sort(buildWorktreeComparator('smart', repoMap, now, new Map()))
+    worktrees.sort(buildWorktreeComparator('recent', repoMap, now))
 
     expect(worktrees.map((worktree) => worktree.id)).toEqual([backgroundId, focusedId])
   })

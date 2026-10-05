@@ -121,7 +121,10 @@ const UiUpdateFields = z
     combinedDiffFileTreeWidth: z.number().finite().optional(),
     groupBy: z.enum(['none', 'workspace-status', 'repo', 'pr-status', 'priority']).optional(),
     showWorkspaceLineage: z.boolean().optional(),
-    sortBy: z.enum(['name', 'smart', 'recent', 'repo', 'manual', 'priority']).optional(),
+    // Why keep 'smart': older paired clients still send it; normalizeSortBy maps it to 'engagement'.
+    sortBy: z
+      .enum(['name', 'engagement', 'smart', 'recent', 'repo', 'manual', 'priority'])
+      .optional(),
     projectOrderBy: z.enum(['manual', 'recent']).optional(),
     showActiveOnly: z.boolean().optional(),
     hideSleepingWorkspaces: z.boolean().optional(),
