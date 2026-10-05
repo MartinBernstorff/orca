@@ -37,8 +37,8 @@ export type PersistedUIState = {
   rightSidebarWidth: number
   markdownTocPanelWidth?: number
   combinedDiffFileTreeWidth?: number
-  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status'
-  sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual'
+  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority'
+  sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
   /** Project header ordering in `groupBy: 'repo'`, independent of `sortBy`: 'manual' uses persisted order + header drag, 'recent' by latest visible activity. */
   projectOrderBy: ProjectOrderBy
   /** Deprecated; the Active only filter is retired and ignored on hydration. */

@@ -31,6 +31,7 @@ import { WorktreeOpenInSubMenu } from '@/components/open-in/WorktreeOpenInMenu'
 import { WorktreeDeveloperMenu } from './WorktreeDeveloperMenu'
 import { WorkspaceSleepMenuItems } from './WorkspaceSleepMenuItems'
 import { WorkspaceSnoozeMenuItems } from './WorkspaceSnoozeMenuItems'
+import { WorkspacePriorityMenuItems } from './WorkspacePriorityMenuItems'
 import { isWorkspaceSnoozed } from '../../../../shared/worktree/snooze'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import { translate } from '@/i18n/i18n'
@@ -50,6 +51,7 @@ import {
 
 export default function WorktreeContextMenuView({ model }: { model: WorktreeContextMenuModel }) {
   const {
+    activeContextWorktrees,
     batchDeleteWorktrees,
     children,
     contentClassName,
@@ -75,6 +77,7 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
     handleRemoveParentLink,
     handleRemoveProjectFromGroup,
     handleRename,
+    handleSetPriority,
     handleSleepSubtree,
     handleSnooze,
     handleTogglePin,
@@ -172,6 +175,11 @@ export default function WorktreeContextMenuView({ model }: { model: WorktreeCont
             isMultiContext={isMultiContext}
             onAssignWorkspaceStatus={handleAssignWorkspaceStatus}
             workspaceStatuses={workspaceStatuses}
+          />
+          <WorkspacePriorityMenuItems
+            disabled={deletingContext}
+            worktrees={activeContextWorktrees}
+            onSetPriority={handleSetPriority}
           />
           <DropdownMenuSeparator />
           {!isMultiContext && (

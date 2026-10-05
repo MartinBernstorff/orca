@@ -421,4 +421,27 @@ describe('orca cli worktree awareness', () => {
       expect.objectContaining({ workspaceStatus: 'Human review' })
     )
   })
+
+  it('passes a priority and its clear through worktree.set', async () => {
+    vi.spyOn(console, 'log').mockImplementation(() => {})
+    for (const [flag, priority] of [
+      ['high', 'high'],
+      ['none', null]
+    ] as const) {
+      queueFixtures(
+        callMock,
+        okFixture('req_set_priority', {
+          worktree: buildWorktree('/tmp/repo/child', 'feature/child')
+        })
+      )
+      await main(
+        ['worktree', 'set', '--worktree', 'id:repo::/tmp/repo/child', '--priority', flag, '--json'],
+        '/tmp/repo'
+      )
+      expect(callMock).toHaveBeenLastCalledWith(
+        'worktree.set',
+        expect.objectContaining({ priority })
+      )
+    }
+  })
 })

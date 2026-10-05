@@ -912,9 +912,9 @@ export type UISlice = {
   dismissUsagePercentageDisplayChangeNotice: () => void
   usageEmptyStateDismissed: boolean
   dismissUsageEmptyState: () => void
-  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status'
+  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority'
   setGroupBy: (g: UISlice['groupBy']) => void
-  sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual'
+  sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'
   setSortBy: (s: UISlice['sortBy']) => void
   projectOrderBy: ProjectOrderBy
   setProjectOrderBy: (p: ProjectOrderBy) => void

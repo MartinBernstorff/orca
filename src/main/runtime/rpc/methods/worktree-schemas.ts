@@ -11,6 +11,7 @@ import {
 } from '../schemas'
 import { TaskSourceContextSchema } from '../../../../shared/task-source-context-schema'
 import { WorkspaceLinkedItemSchema } from '../../../../shared/workspace-linked-item-schema'
+import { WorkspacePrioritySchema } from '../../../../shared/worktree/priority-schema'
 import { isWorkspaceLinkedItemSourceContextMatch } from '../../../../shared/workspace-linked-item-source-context'
 import { normalizeExecutionHostId } from '../../../../shared/execution-host'
 
@@ -133,6 +134,7 @@ export const WorktreeSet = WorktreeSelector.extend({
   isUnread: OptionalBoolean,
   isPinned: OptionalBoolean,
   snoozedUntil: OptionalFiniteNumber.nullable(),
+  priority: WorkspacePrioritySchema.nullable().optional(),
   sortOrder: OptionalFiniteNumber,
   manualOrder: OptionalFiniteNumber,
   lastActivityAt: OptionalFiniteNumber,

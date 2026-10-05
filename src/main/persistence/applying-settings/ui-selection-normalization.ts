@@ -7,7 +7,8 @@ export function normalizeGroupBy(groupBy: unknown): PersistedState['ui']['groupB
     groupBy === 'none' ||
     groupBy === 'workspace-status' ||
     groupBy === 'repo' ||
-    groupBy === 'pr-status'
+    groupBy === 'pr-status' ||
+    groupBy === 'priority'
   ) {
     return groupBy
   }
@@ -43,7 +44,8 @@ export function normalizeSortBy(sortBy: unknown): PersistedState['ui']['sortBy']
     sortBy === 'recent' ||
     sortBy === 'repo' ||
     sortBy === 'name' ||
-    sortBy === 'manual'
+    sortBy === 'manual' ||
+    sortBy === 'priority'
   ) {
     return sortBy
   }

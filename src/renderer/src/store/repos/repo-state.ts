@@ -71,6 +71,7 @@ export type FolderWorkspaceUpdates = Partial<
     | 'isUnread'
     | 'isPinned'
     | 'snoozedUntil'
+    | 'priority'
     | 'sortOrder'
     | 'manualOrder'
     | 'workspaceStatus'

@@ -28,3 +28,22 @@ describe('FolderWorkspaceUpdateArgs snooze field', () => {
     ).toBe(false)
   })
 })
+
+describe('FolderWorkspaceUpdateArgs priority field', () => {
+  it('keeps a priority and its clear', () => {
+    const parse = (priority: unknown) =>
+      FolderWorkspaceUpdateArgs.parse({ folderWorkspaceId: 'fw-1', updates: { priority } }).updates
+        .priority
+    expect(parse('urgent')).toBe('urgent')
+    expect(parse(null)).toBeNull()
+  })
+
+  it('rejects an unknown priority', () => {
+    expect(
+      FolderWorkspaceUpdateArgs.safeParse({
+        folderWorkspaceId: 'fw-1',
+        updates: { priority: 'p0' }
+      }).success
+    ).toBe(false)
+  })
+})

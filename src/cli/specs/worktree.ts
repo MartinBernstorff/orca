@@ -82,7 +82,7 @@ export const WORKTREE_COMMAND_SPECS: CommandSpec[] = [
     path: ['worktree', 'set'],
     summary: 'Update Orca metadata for a worktree',
     usage:
-      'orca worktree set --worktree <selector> [--display-name <name>] [--issue <number|null>] [--linear-issue <identifier-or-url|null>] [--comment <text>] [--workspace-status <column>] [--parent-worktree <selector>|--no-parent] [--json]',
+      'orca worktree set --worktree <selector> [--display-name <name>] [--issue <number|null>] [--linear-issue <identifier-or-url|null>] [--comment <text>] [--workspace-status <column>] [--priority <urgent|high|medium|low|none>] [--parent-worktree <selector>|--no-parent] [--json]',
     allowedFlags: [
       ...GLOBAL_FLAGS,
       'worktree',
@@ -91,16 +91,19 @@ export const WORKTREE_COMMAND_SPECS: CommandSpec[] = [
       'linear-issue',
       'comment',
       'workspace-status',
+      'priority',
       'parent-worktree',
       'no-parent'
     ],
     notes: [
       'Pass the board column name, e.g. --workspace-status "Human review"; its configured id also works. An unknown value is rejected with the available columns listed.',
-      'Pass --linear-issue null to clear the Linear issue link.'
+      'Pass --linear-issue null to clear the Linear issue link.',
+      'Pass --priority none to clear the priority.'
     ],
     examples: [
       'orca worktree set --worktree active --linear-issue STA-335 --json',
-      'orca worktree set --worktree active --linear-issue null --json'
+      'orca worktree set --worktree active --linear-issue null --json',
+      'orca worktree set --worktree active --priority high --json'
     ]
   },
   {

@@ -6,6 +6,7 @@ import type { DiffComment, MobileDiffReviewState } from '../diff-comment-types'
 import type { EphemeralVmCheckoutMode } from '../orca-yaml-hook-types'
 import type { BuiltInWorktreeVisibilitySourceId } from '../repo-types'
 import type { WorktreeIdentity } from './identity'
+import type { WorkspacePriority } from './priority'
 
 export type WorkspaceLinkedItem = {
   provider: 'github' | 'gitlab' | 'linear' | 'jira'
@@ -104,6 +105,8 @@ export type Worktree = {
   /** Epoch ms the workspace stops being hidden from the sidebar. Absent or in
    *  the past means not snoozed; nothing rewrites it on expiry. */
   snoozedUntil?: number | null
+  /** User-set priority. Absent or null means no priority. */
+  priority?: WorkspacePriority | null
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */
   manualOrder?: number

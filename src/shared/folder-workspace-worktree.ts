@@ -34,6 +34,7 @@ export function folderWorkspaceToWorktree(folderWorkspace: FolderWorkspace): Wor
     isUnread: folderWorkspace.isUnread,
     isPinned: folderWorkspace.isPinned,
     snoozedUntil: folderWorkspace.snoozedUntil ?? null,
+    priority: folderWorkspace.priority ?? null,
     sortOrder: folderWorkspace.sortOrder,
     manualOrder: folderWorkspace.manualOrder,
     lastActivityAt: folderWorkspace.lastActivityAt,

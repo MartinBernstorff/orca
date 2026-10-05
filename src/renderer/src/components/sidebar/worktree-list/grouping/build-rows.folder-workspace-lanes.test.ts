@@ -81,10 +81,16 @@ function folderRows(rows: Row[]): Extract<Row, { type: 'folder-workspace' }>[] {
   )
 }
 
-const ALL_GROUP_BY: WorktreeGroupBy[] = ['repo', 'workspace-status', 'pr-status', 'none']
+const ALL_GROUP_BY: WorktreeGroupBy[] = [
+  'repo',
+  'workspace-status',
+  'pr-status',
+  'priority',
+  'none'
+]
 
 describe('folder workspaces render under every Group by mode', () => {
-  // The three non-repo arms are the acceptance evidence; the repo arm is a
+  // The non-repo arms are the acceptance evidence; the repo arm is a
   // deliberate no-regression guard that also passed before the fix.
   for (const groupBy of ALL_GROUP_BY) {
     it(`emits the folder-workspace row when groupBy is ${groupBy}`, () => {
@@ -175,7 +181,7 @@ describe('membership is decided once, not per mode', () => {
     )
     // Parity with today's behaviour: nothing filters folder workspaces by
     // isArchived, so a mode must not be the thing that hides one.
-    expect(counts).toEqual([1, 1, 1, 1])
+    expect(counts).toEqual([1, 1, 1, 1, 1])
   })
 })
 
