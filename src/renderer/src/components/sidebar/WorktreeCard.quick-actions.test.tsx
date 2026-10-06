@@ -417,6 +417,29 @@ describe('WorktreeCard quick actions', () => {
     expect(markup).not.toContain('data-worktree-card-meta-row=""')
   })
 
+  it('shows open as a quick action for any workspace', () => {
+    const markup = renderToStaticMarkup(
+      <WorktreeCard
+        worktree={makeWorktree({ engagement: 'engaged' })}
+        repo={makeRepo()}
+        isActive={false}
+      />
+    )
+
+    expect(markup).toContain('aria-label="Open workspace"')
+  })
+
+  it('places open before engage', () => {
+    const markup = renderToStaticMarkup(
+      <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
+    )
+
+    expect(markup.indexOf('aria-label="Open workspace"')).toBeGreaterThan(-1)
+    expect(markup.indexOf('aria-label="Open workspace"')).toBeLessThan(
+      markup.indexOf('aria-label="Engage workspace"')
+    )
+  })
+
   it('shows engage as a quick action for a queued workspace', () => {
     const markup = renderToStaticMarkup(
       <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />

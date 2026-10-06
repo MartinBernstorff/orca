@@ -3,6 +3,8 @@ import React, { useCallback } from 'react'
 import { folderWorkspaceKey } from '../../../../shared/workspace-scope'
 import { translate } from '@/i18n/i18n'
 import { useAppStore } from '@/store'
+import { openWorktreeInLastUsedApp } from '@/components/open-in/open-worktree-in-last-used-app'
+import { getConnectionIdFromState } from '@/lib/connection-owner-resolution'
 import { runWorktreeDelete } from './delete-worktree-flow'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import type { ResolvedWorktreeCardProps } from './worktree-card-model'
@@ -97,6 +99,17 @@ export function useWorktreeCardWorkspaceActions({
     },
     [updateWorktreeMeta, worktree.hostId, worktree.id]
   )
+  const handleOpenQuickAction = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+      void openWorktreeInLastUsedApp({
+        worktreePath: worktree.path,
+        connectionId: getConnectionIdFromState(useAppStore.getState(), worktree.id)
+      })
+    },
+    [worktree.id, worktree.path]
+  )
   const handleOpenRenameErrorDialog = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
@@ -183,6 +196,7 @@ export function useWorktreeCardWorkspaceActions({
   return {
     handleWorkspaceQuickAction,
     handleEngageQuickAction,
+    handleOpenQuickAction,
     handleOpenRenameErrorDialog,
     unreadTooltip,
     lineageChildAriaLabel,

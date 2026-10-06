@@ -92,6 +92,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     })
   const showEngageQuickAction =
     !props.affiliateListMode && !linked.isDeleting && getWorkspaceEngagement(worktree) === 'queued'
+  const showOpenQuickAction = !props.affiliateListMode && !linked.isDeleting
   const workspaceActions = useWorktreeCardWorkspaceActions({
     worktree,
     lineageChildCount: props.lineageChildCount,
@@ -160,6 +161,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     ...activation,
     showDeleteQuickAction,
     showEngageQuickAction,
+    showOpenQuickAction,
     ...workspaceActions,
     ...secondary
   }

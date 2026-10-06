@@ -5422,7 +5422,9 @@
           "ef18787206": "Queued for deletion",
           "deleteQuickAction": "Delete",
           "engageQuickActionLabel": "Engage workspace",
-          "engageQuickAction": "Engage"
+          "engageQuickAction": "Engage",
+          "openQuickActionLabel": "Open workspace",
+          "openQuickAction": "Open"
         },
         "WorktreeCardAgents": {
           "1b0a156717": "Agents"

@@ -54,7 +54,8 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
     handleUnlinkReview,
     detailsHoverControl,
     showDeleteQuickAction,
-    showEngageQuickAction
+    showEngageQuickAction,
+    showOpenQuickAction
   } = card
 
   // Why: pinned trees mix repos, so the repo icon shows regardless of groupBy's hideRepoBadge.
@@ -204,7 +205,7 @@ export function buildWorktreeCardPresentation(card: WorktreeCardController) {
   })
   // Why: linked refs own a row below the title so the workspace name keeps the full title width.
   const showLinkedRefsRow = linkedRefs.length > 0
-  const showQuickActions = showDeleteQuickAction || showEngageQuickAction
+  const showQuickActions = showDeleteQuickAction || showEngageQuickAction || showOpenQuickAction
   const showRefsRowQuickActions = showQuickActions && showLinkedRefsRow
   // Why: without refs there is no second row to sit next to, so quick actions stay in the title row
   // rather than opening a blank line on every card.

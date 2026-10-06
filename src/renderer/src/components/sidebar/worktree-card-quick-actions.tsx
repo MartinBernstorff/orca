@@ -11,7 +11,7 @@ const QUICK_ACTION_CLASS = cn(
   'group-hover/worktree-card:opacity-100 group-focus-within/worktree-card:opacity-100 focus-visible:opacity-100'
 )
 
-/** Hover-revealed Engage/Delete affordances, shared by the linked refs row and the title row fallback. */
+/** Hover-revealed Open/Engage/Delete affordances, shared by the linked refs row and the title row fallback. */
 export function WorktreeCardQuickActions({
   card
 }: {
@@ -21,12 +21,32 @@ export function WorktreeCardQuickActions({
     stopQuickActionPointerPropagation,
     handleWorkspaceQuickAction,
     handleEngageQuickAction,
+    handleOpenQuickAction,
     showEngageQuickAction,
+    showOpenQuickAction,
     showDeleteQuickAction
   } = card
 
   return (
     <div className="ml-auto flex shrink-0 items-center">
+      {showOpenQuickAction && (
+        <button
+          type="button"
+          data-workspace-board-preserve-open=""
+          onPointerDown={stopQuickActionPointerPropagation}
+          onClick={handleOpenQuickAction}
+          className={cn(
+            QUICK_ACTION_CLASS,
+            'text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground'
+          )}
+          aria-label={translate(
+            'auto.components.sidebar.WorktreeCard.openQuickActionLabel',
+            'Open workspace'
+          )}
+        >
+          {translate('auto.components.sidebar.WorktreeCard.openQuickAction', 'Open')}
+        </button>
+      )}
       {showEngageQuickAction && (
         <button
           type="button"
