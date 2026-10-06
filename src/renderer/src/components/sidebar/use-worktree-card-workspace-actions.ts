@@ -29,6 +29,7 @@ export function useWorktreeCardWorkspaceActions({
   deleteFolderWorkspace,
   setActiveWorktree,
   setShowRenameErrorDialog,
+  updateWorktreeMeta,
   isDeleting,
   showDeleteQuickAction
 }: Pick<
@@ -43,7 +44,13 @@ export function useWorktreeCardWorkspaceActions({
   | 'onCardDragEnd'
   | 'onContextMenuSelect'
 > &
-  Pick<Foundation, 'deleteFolderWorkspace' | 'setActiveWorktree' | 'setShowRenameErrorDialog'> &
+  Pick<
+    Foundation,
+    | 'deleteFolderWorkspace'
+    | 'setActiveWorktree'
+    | 'setShowRenameErrorDialog'
+    | 'updateWorktreeMeta'
+  > &
   Pick<LinkedDetails, 'isDeleting'> &
   Pick<ReviewDetails, 'folderWorkspaceId'> & {
     showDeleteQuickAction: boolean
@@ -77,6 +84,18 @@ export function useWorktreeCardWorkspaceActions({
       worktree.hostId,
       worktree.id
     ]
+  )
+  const handleEngageQuickAction = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault()
+      event.stopPropagation()
+      void updateWorktreeMeta(
+        worktree.id,
+        { engagement: 'engaged' },
+        { executionHostId: worktree.hostId ?? 'local' }
+      )
+    },
+    [updateWorktreeMeta, worktree.hostId, worktree.id]
   )
   const handleOpenRenameErrorDialog = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -163,6 +182,7 @@ export function useWorktreeCardWorkspaceActions({
 
   return {
     handleWorkspaceQuickAction,
+    handleEngageQuickAction,
     handleOpenRenameErrorDialog,
     unreadTooltip,
     lineageChildAriaLabel,

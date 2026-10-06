@@ -18,7 +18,7 @@ function renderRow(openUrl: ReturnType<typeof vi.fn>): { cardClick: ReturnType<t
       { key: 'linear', label: 'GUP-12', url: 'https://linear.app/acme/issue/GUP-12' },
       { key: 'review', label: '#4242', url: null }
     ],
-    showRefsRowDeleteQuickAction: false
+    showRefsRowQuickActions: false
   } as unknown as WorktreeCardPresentation
 
   render(

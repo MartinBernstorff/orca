@@ -417,6 +417,26 @@ describe('WorktreeCard quick actions', () => {
     expect(markup).not.toContain('data-worktree-card-meta-row=""')
   })
 
+  it('shows engage as a quick action for a queued workspace', () => {
+    const markup = renderToStaticMarkup(
+      <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
+    )
+
+    expect(markup).toContain('aria-label="Engage workspace"')
+  })
+
+  it('does not show engage for an engaged workspace', () => {
+    const markup = renderToStaticMarkup(
+      <WorktreeCard
+        worktree={makeWorktree({ engagement: 'engaged' })}
+        repo={makeRepo()}
+        isActive={false}
+      />
+    )
+
+    expect(markup).not.toContain('aria-label="Engage workspace"')
+  })
+
   it('hides delete by default for an inactive workspace', () => {
     const markup = renderToStaticMarkup(
       <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />

@@ -5420,7 +5420,9 @@
           "branchIdentity": "Branch",
           "branchFolderPathIdentity": "Branch or folder path",
           "ef18787206": "Queued for deletion",
-          "deleteQuickAction": "Delete"
+          "deleteQuickAction": "Delete",
+          "engageQuickActionLabel": "Engage workspace",
+          "engageQuickAction": "Engage"
         },
         "WorktreeCardAgents": {
           "1b0a156717": "Agents"
