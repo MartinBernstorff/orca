@@ -1,4 +1,5 @@
 import { canShowWorkspaceDeleteQuickAction } from './workspace-delete-quick-action'
+import { getWorkspaceEngagement } from './workspace-engagement-meta'
 import { useWorktreeCardDetailsHoverControl } from './worktree-card-details-hover-state'
 import type { ResolvedWorktreeCardProps } from './worktree-card-model'
 import { useWorktreeCardActivationActions } from './use-worktree-card-activation-actions'
@@ -89,6 +90,8 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
       isDeleting: linked.isDeleting,
       isMainWorktree: worktree.isMainWorktree
     })
+  const showEngageQuickAction =
+    !props.affiliateListMode && !linked.isDeleting && getWorkspaceEngagement(worktree) === 'queued'
   const workspaceActions = useWorktreeCardWorkspaceActions({
     worktree,
     lineageChildCount: props.lineageChildCount,
@@ -103,6 +106,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     deleteFolderWorkspace: foundation.deleteFolderWorkspace,
     setActiveWorktree: foundation.setActiveWorktree,
     setShowRenameErrorDialog: foundation.setShowRenameErrorDialog,
+    updateWorktreeMeta: foundation.updateWorktreeMeta,
     isDeleting: linked.isDeleting,
     showDeleteQuickAction
   })
@@ -155,6 +159,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     shouldRefreshHostedReview,
     ...activation,
     showDeleteQuickAction,
+    showEngageQuickAction,
     ...workspaceActions,
     ...secondary
   }

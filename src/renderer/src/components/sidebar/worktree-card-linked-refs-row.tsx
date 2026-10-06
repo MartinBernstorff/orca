@@ -2,7 +2,7 @@ import React from 'react'
 
 import { cn } from '@/lib/utils'
 import type { WorktreeCardPresentation } from './worktree-card-presentation'
-import { WorktreeCardDeleteQuickAction } from './worktree-card-delete-quick-action'
+import { WorktreeCardQuickActions } from './worktree-card-quick-actions'
 import type { WorktreeCardLinkedRef } from './worktree-card-linked-refs'
 import { WORKTREE_CARD_ROW_CHIP_CLASS } from './worktree-card-row-chip'
 import type { WorktreeCardController } from './use-worktree-card-controller'
@@ -57,7 +57,7 @@ export function WorktreeCardLinkedRefsRow({
   card: WorktreeCardController
   presentation: WorktreeCardPresentation
 }): React.JSX.Element {
-  const { linkedRefs, showRefsRowDeleteQuickAction } = presentation
+  const { linkedRefs, showRefsRowQuickActions } = presentation
 
   return (
     <div
@@ -68,7 +68,7 @@ export function WorktreeCardLinkedRefsRow({
         <LinkedRefChip key={linkedRef.key} linkedRef={linkedRef} card={card} />
       ))}
 
-      {showRefsRowDeleteQuickAction && <WorktreeCardDeleteQuickAction card={card} />}
+      {showRefsRowQuickActions && <WorktreeCardQuickActions card={card} />}
     </div>
   )
 }

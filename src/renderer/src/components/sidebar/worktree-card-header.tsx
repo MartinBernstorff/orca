@@ -10,7 +10,7 @@ import type { Repo } from '../../../../shared/repo-types'
 import { resolveRepoHeaderColor } from './project-header-color'
 import { formatSparseDirectoryPreview, shouldBeginWorktreeRename } from './worktree-card-model'
 import type { WorktreeCardPresentation } from './worktree-card-presentation'
-import { WorktreeCardDeleteQuickAction } from './worktree-card-delete-quick-action'
+import { WorktreeCardQuickActions } from './worktree-card-quick-actions'
 import { WorktreeCardSshHostControl } from './WorktreeCardSshHostControl'
 import { WorktreeTitleInlineRename } from './WorktreeTitleInlineRename'
 import { WorkspacePriorityIcon, getWorkspacePriorityLane } from './workspace-priority-meta'
@@ -82,7 +82,7 @@ export function WorktreeCardHeader({
     showPinnedRepoIcon,
     showInlineRepoBadge,
     showTitleRowPrimary,
-    showHeaderDeleteQuickAction,
+    showHeaderQuickActions,
     showTitleRowIndicators,
     titleRowIndicators,
     titleWrapper
@@ -268,7 +268,7 @@ export function WorktreeCardHeader({
         {showTitleRowIndicators && titleRowIndicators}
       </div>
 
-      {(showTitleRowPrimary || showHeaderDeleteQuickAction) && (
+      {(showTitleRowPrimary || showHeaderQuickActions) && (
         <div className="ml-auto flex shrink-0 items-center justify-center gap-1 pr-1.5">
           {showTitleRowPrimary && (
             <Tooltip>
@@ -292,7 +292,7 @@ export function WorktreeCardHeader({
             </Tooltip>
           )}
 
-          {showHeaderDeleteQuickAction && <WorktreeCardDeleteQuickAction card={card} />}
+          {showHeaderQuickActions && <WorktreeCardQuickActions card={card} />}
         </div>
       )}
     </div>
