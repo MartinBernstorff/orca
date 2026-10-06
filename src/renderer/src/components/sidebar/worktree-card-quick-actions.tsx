@@ -14,9 +14,11 @@ const NEUTRAL_TONE_CLASS =
   'text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground'
 const DESTRUCTIVE_TONE_CLASS =
   'text-muted-foreground hover:bg-destructive/10 hover:text-destructive focus-visible:bg-destructive/10 focus-visible:text-destructive'
-// Why: Open shows on every card, so it must not reserve title width while hidden.
-const COLLAPSED_UNTIL_HOVER_CLASS =
-  'hidden group-hover/worktree-card:inline-flex group-focus-within/worktree-card:inline-flex'
+// Why: Open shows on every card, so it must not reserve title width while hidden; discrete display transition keeps the fade.
+const COLLAPSED_UNTIL_HOVER_CLASS = cn(
+  'hidden group-hover/worktree-card:inline-flex group-focus-within/worktree-card:inline-flex',
+  'transition-[opacity,display] transition-discrete starting:opacity-0'
+)
 
 function QuickActionButton({
   card,
@@ -45,7 +47,7 @@ function QuickActionButton({
   )
 }
 
-/** Hover-revealed Open/Engage/Delete affordances, shared by the linked refs row and the title row fallback. */
+/** Hover-revealed Engage/Open/Delete affordances, shared by the linked refs row and the title row fallback. */
 export function WorktreeCardQuickActions({
   card
 }: {
@@ -62,18 +64,6 @@ export function WorktreeCardQuickActions({
 
   return (
     <div className="ml-auto flex shrink-0 items-center">
-      {showOpenQuickAction && (
-        <QuickActionButton
-          card={card}
-          onClick={handleOpenQuickAction}
-          className={cn(NEUTRAL_TONE_CLASS, COLLAPSED_UNTIL_HOVER_CLASS)}
-          ariaLabel={translate(
-            'auto.components.sidebar.WorktreeCard.openQuickActionLabel',
-            'Open workspace'
-          )}
-          label={translate('auto.components.sidebar.WorktreeCard.openQuickAction', 'Open')}
-        />
-      )}
       {showEngageQuickAction && (
         <QuickActionButton
           card={card}
@@ -84,6 +74,18 @@ export function WorktreeCardQuickActions({
             'Engage workspace'
           )}
           label={translate('auto.components.sidebar.WorktreeCard.engageQuickAction', 'Engage')}
+        />
+      )}
+      {showOpenQuickAction && (
+        <QuickActionButton
+          card={card}
+          onClick={handleOpenQuickAction}
+          className={cn(NEUTRAL_TONE_CLASS, COLLAPSED_UNTIL_HOVER_CLASS)}
+          ariaLabel={translate(
+            'auto.components.sidebar.WorktreeCard.openQuickActionLabel',
+            'Open workspace'
+          )}
+          label={translate('auto.components.sidebar.WorktreeCard.openQuickAction', 'Open')}
         />
       )}
       {showDeleteQuickAction && (

@@ -429,14 +429,14 @@ describe('WorktreeCard quick actions', () => {
     expect(markup).toContain('aria-label="Open workspace"')
   })
 
-  it('places open before engage', () => {
+  it('places engage before open so open keeps a constant position', () => {
     const markup = renderToStaticMarkup(
       <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
     )
 
-    expect(markup.indexOf('aria-label="Open workspace"')).toBeGreaterThan(-1)
-    expect(markup.indexOf('aria-label="Open workspace"')).toBeLessThan(
-      markup.indexOf('aria-label="Engage workspace"')
+    expect(markup.indexOf('aria-label="Engage workspace"')).toBeGreaterThan(-1)
+    expect(markup.indexOf('aria-label="Engage workspace"')).toBeLessThan(
+      markup.indexOf('aria-label="Open workspace"')
     )
   })
 
