@@ -56,6 +56,7 @@ describe('useWorktreeCardWorkspaceActions', () => {
       { executionHostId: 'ssh:box' }
     )
   })
+
   it('opens the workspace in the last used app on its own connection', () => {
     const worktree = { id: 'repo-1::/repo/wt', path: '/repo/wt' } as unknown as Worktree
     const { result } = renderWorkspaceActions(worktree)
