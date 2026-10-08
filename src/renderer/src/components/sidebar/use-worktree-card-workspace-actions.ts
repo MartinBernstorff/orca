@@ -9,6 +9,7 @@ import { runWorktreeDelete } from './delete-worktree-flow'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import type { ResolvedWorktreeCardProps } from './worktree-card-model'
 import { writeWorkspaceDragData } from './workspace-status'
+import { getWorkspaceEngagement } from './workspace-engagement-meta'
 import type { useWorktreeCardFoundation } from './use-worktree-card-foundation'
 import type { useWorktreeCardLinkedDetails } from './use-worktree-card-linked-details'
 import type { useWorktreeCardReviewDetails } from './use-worktree-card-review-details'
@@ -87,28 +88,36 @@ export function useWorktreeCardWorkspaceActions({
       worktree.id
     ]
   )
+  const isEngaged = getWorkspaceEngagement(worktree) === 'engaged'
+  const engageWorkspace = useCallback(() => {
+    if (isEngaged) {
+      return
+    }
+    void updateWorktreeMeta(
+      worktree.id,
+      { engagement: 'engaged' },
+      { executionHostId: worktree.hostId ?? 'local' }
+    )
+  }, [isEngaged, updateWorktreeMeta, worktree.hostId, worktree.id])
   const handleEngageQuickAction = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       event.stopPropagation()
-      void updateWorktreeMeta(
-        worktree.id,
-        { engagement: 'engaged' },
-        { executionHostId: worktree.hostId ?? 'local' }
-      )
+      engageWorkspace()
     },
-    [updateWorktreeMeta, worktree.hostId, worktree.id]
+    [engageWorkspace]
   )
   const handleOpenQuickAction = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       event.preventDefault()
       event.stopPropagation()
+      engageWorkspace()
       void openWorktreeInLastUsedApp({
         worktreePath: worktree.path,
         connectionId: getConnectionIdFromState(useAppStore.getState(), worktree.id)
       })
     },
-    [worktree.id, worktree.path]
+    [engageWorkspace, worktree.id, worktree.path]
   )
   const handleOpenRenameErrorDialog = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
