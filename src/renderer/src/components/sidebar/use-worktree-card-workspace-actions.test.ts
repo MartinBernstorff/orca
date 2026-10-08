@@ -57,9 +57,15 @@ describe('useWorktreeCardWorkspaceActions', () => {
     )
   })
 
-  it('opens the workspace in the last used app on its own connection', () => {
-    const worktree = { id: 'repo-1::/repo/wt', path: '/repo/wt' } as unknown as Worktree
-    const { result } = renderWorkspaceActions(worktree)
+  it('opens the workspace in the last used app on its own connection and engages it', () => {
+    const updateWorktreeMeta = vi.fn().mockResolvedValue(undefined)
+    const worktree = {
+      id: 'repo-1::/repo/wt',
+      path: '/repo/wt',
+      hostId: 'ssh:box',
+      engagement: 'queued'
+    } as unknown as Worktree
+    const { result } = renderWorkspaceActions(worktree, updateWorktreeMeta)
 
     const event = makeClickEvent()
     result.current.handleOpenQuickAction(event)
@@ -69,5 +75,24 @@ describe('useWorktreeCardWorkspaceActions', () => {
       worktreePath: '/repo/wt',
       connectionId: 'conn-for:repo-1::/repo/wt'
     })
+    expect(updateWorktreeMeta).toHaveBeenCalledWith(
+      'repo-1::/repo/wt',
+      { engagement: 'engaged' },
+      { executionHostId: 'ssh:box' }
+    )
+  })
+
+  it('does not rewrite engagement when opening an already engaged workspace', () => {
+    const updateWorktreeMeta = vi.fn().mockResolvedValue(undefined)
+    const worktree = {
+      id: 'repo-1::/repo/wt',
+      path: '/repo/wt',
+      engagement: 'engaged'
+    } as unknown as Worktree
+    const { result } = renderWorkspaceActions(worktree, updateWorktreeMeta)
+
+    result.current.handleOpenQuickAction(makeClickEvent())
+
+    expect(updateWorktreeMeta).not.toHaveBeenCalled()
   })
 })
