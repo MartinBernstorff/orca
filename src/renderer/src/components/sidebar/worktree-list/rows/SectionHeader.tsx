@@ -153,10 +153,14 @@ export function renderWorktreeSectionHeaderRow(args: {
       : null
   const isPinnedHeader = row.key === PINNED_GROUP_KEY
   const isAgentStateHeader = headerGroupBy === 'agent-state'
+  const headerEngagement =
+    headerGroupBy === 'engagement' ? getWorkspaceEngagementFromLaneKey(headerLaneKey) : null
+  const showHeaderCount =
+    (headerWorkspaceStatus !== null || isAgentStateHeader || headerEngagement !== null) &&
+    row.count > 0
   const headerDropTarget = getSectionHeaderDropTarget(ctx, {
     status: headerWorkspaceStatus,
-    engagement:
-      headerGroupBy === 'engagement' ? getWorkspaceEngagementFromLaneKey(headerLaneKey) : null,
+    engagement: headerEngagement,
     isPinned: isPinnedHeader
   })
   const repoHeaderColor = resolveProjectGroupHeaderColor({
@@ -338,7 +342,7 @@ export function renderWorktreeSectionHeaderRow(args: {
           </div>
         </div>
 
-        {(headerWorkspaceStatus !== null || isAgentStateHeader) && row.count > 0 ? (
+        {showHeaderCount ? (
           <span
             className="shrink-0 text-[11px] font-medium leading-none tabular-nums text-muted-foreground/60"
             data-worktree-section-header-count=""
