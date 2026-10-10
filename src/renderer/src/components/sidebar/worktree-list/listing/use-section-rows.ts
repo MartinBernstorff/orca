@@ -20,6 +20,7 @@ import { getEmptyProjectPlaceholderRepoIds } from '../../empty-project-placehold
 import { addHostSectionRows } from '../../host-section-rows'
 import { orderHostSectionOptions } from '../../host-section-order'
 import { buildSidebarHostOptions } from '../../sidebar-host-options'
+import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
 type SectionRowsArgs = {
   groupBy: WorktreeGroupBy
@@ -33,6 +34,7 @@ type SectionRowsArgs = {
   worktreeMap: Map<string, Worktree>
   worktreeLineageById: Record<string, WorktreeLineage>
   prCache: AppState['prCache'] | null
+  agentStates: WorkspaceAgentStates
   settings: AppState['settings']
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
   showEmptyWorkspaceStatuses: boolean
@@ -171,7 +173,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
         defaultHostId,
         args.pinnedDisplayPolicy,
         args.showEmptyWorkspaceStatuses,
-        args.nestedGroupBy
+        args.nestedGroupBy,
+        args.agentStates
       ),
     [
       args.groupBy,
@@ -196,7 +199,8 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
       hostLabelById,
       args.pinnedDisplayPolicy,
       args.showEmptyWorkspaceStatuses,
-      args.nestedGroupBy
+      args.nestedGroupBy,
+      args.agentStates
     ]
   )
   const orderedHostOptions = useMemo(

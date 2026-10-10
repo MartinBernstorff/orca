@@ -10,6 +10,8 @@ import {
   isFreshNonDoneAgentStatus,
   type AgentStatusEntry
 } from '../../../../shared/agent-status-types'
+import { suppressesAgentCompletionAttention } from '../../../../shared/workspace-agent-state'
+import { selectWorkspaceAgentState } from '@/components/sidebar/worktree-agent-activity-summary'
 import { isSupersededAgentCompletionSnapshot } from './agent-completion-snapshot-staleness'
 import type {
   AgentCompletionDispatchMeta,
@@ -140,6 +142,9 @@ export function dispatchTerminalNotification(
   }
 
   if (event.source === 'agent-task-complete') {
+    if (suppressesAgentCompletionAttention(selectWorkspaceAgentState(state, worktreeId))) {
+      return
+    }
     const terminalAttentionEnabled = state.settings?.experimentalTerminalAttention === true
     let tabId: string | null = null
     if (event.paneKey) {

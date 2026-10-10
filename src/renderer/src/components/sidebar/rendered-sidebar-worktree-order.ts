@@ -20,6 +20,7 @@ import {
   filterProjectGroupsForVisibleHosts,
   getVisibleSidebarHostIdSet
 } from './worktree-list/listing/host-filtering'
+import { selectSidebarAgentStates } from './worktree-list/listing/agent-state-inputs'
 
 const EMPTY_REPO_ID_SET: ReadonlySet<string> = Object.freeze(new Set<string>())
 const EMPTY_IMPORTED_BY_REPO = Object.freeze(new Map()) as never
@@ -84,7 +85,8 @@ export function computeRenderedSidebarWorktrees(
     defaultHostId,
     pinnedDisplayPolicy,
     state.showEmptyWorkspaceStatuses,
-    state.nestedGroupBy
+    state.nestedGroupBy,
+    selectSidebarAgentStates(state, state.groupBy, state.nestedGroupBy)
   )
 
   // Why lazy: with no host filter, addHostSectionRows is a pass-through, so skip building the whole host registry on a keystroke.

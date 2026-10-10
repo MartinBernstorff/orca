@@ -53,7 +53,8 @@ export function appendNestedLanes(
     projectOrderBy: ctx.projectOrderBy,
     folderWorkspaces: [...args.folderPairs],
     // Why: an empty lane per parent multiplies header noise; empty lanes stay top-level only.
-    showEmptyWorkspaceStatuses: false
+    showEmptyWorkspaceStatuses: false,
+    agentStates: ctx.agentStates
   })
   for (const [laneKey, lane] of lanes) {
     const key = getNestedGroupKey(args.parentKey, laneKey)

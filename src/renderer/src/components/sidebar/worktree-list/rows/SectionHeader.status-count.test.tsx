@@ -5,6 +5,7 @@ import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DEFAULT_WORKSPACE_STATUSES } from '../../../../../../shared/workspace-status-defaults'
 import { getWorkspaceStatusGroupKey } from '../../../../../../shared/workspace-statuses'
+import { getNestedGroupKey } from '../../../../../../shared/sidebar-group-by-levels'
 import type { GroupHeaderRow, WorktreeGroupBy } from '../grouping/row-types'
 import { PROJECT_GROUP_META } from '../grouping/group-keys'
 import { renderWorktreeSectionHeaderRow, type SectionHeaderRowContext } from './SectionHeader'
@@ -123,5 +124,38 @@ describe('status section header count', () => {
       'repo'
     )
     expect(countText()).toBeNull()
+  })
+})
+
+describe('agent-state section header count', () => {
+  it('renders the count on a top-level agent-state header', () => {
+    render(
+      {
+        type: 'header',
+        key: 'agent-state:working',
+        label: 'Working',
+        count: 2,
+        tone: 'text-foreground'
+      },
+      'agent-state'
+    )
+    expect(countText()).toBe('2')
+  })
+
+  it('renders the count on a nested agent-state header', () => {
+    render(
+      {
+        type: 'header',
+        key: getNestedGroupKey('repo:one', 'agent-state:polling'),
+        label: 'Polling',
+        count: 1,
+        tone: 'text-yellow-500',
+        laneKey: 'agent-state:polling',
+        laneGroupBy: 'agent-state',
+        nestDepth: 1
+      },
+      'repo'
+    )
+    expect(countText()).toBe('1')
   })
 })

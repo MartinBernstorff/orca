@@ -19,6 +19,7 @@ import { isPinnedSectionWorktree } from '../../pinned-section-worktrees'
 import { getWorktreeLineageAncestors } from '../../worktree-lineage-projection'
 import { getFolderWorkspaceRevealGroupKeys } from './folder-reveal'
 import { getPinnedWorktreeRevealCollapsedGroupKeys } from './reveal-ancestors'
+import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
 export const MAX_REVEAL_RETRIES = 8
 
@@ -43,6 +44,7 @@ export type PendingSidebarRevealArgs = {
   pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy
   defaultHostId: ExecutionHostId
   prCache: AppState['prCache'] | null
+  agentStates?: WorkspaceAgentStates
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
   settings: AppState['settings']
   projectGroups: readonly ProjectGroup[]
@@ -67,7 +69,8 @@ export function expandGroupsForWorktreeReveal(
       groupBy: args.groupBy,
       nestedGroupBy: args.nestedGroupBy,
       workspaceStatuses: args.workspaceStatuses,
-      defaultHostId: args.defaultHostId
+      defaultHostId: args.defaultHostId,
+      agentStates: args.agentStates
     }
   )
   if (folderGroupKeys.length > 0) {
@@ -139,7 +142,8 @@ export function expandGroupsForWorktreeReveal(
           args.settings,
           args.projectGroups,
           args.projectGrouping,
-          args.nestedGroupBy
+          args.nestedGroupBy,
+          args.agentStates
         )
   for (const groupKey of groupKeys) {
     if (args.collapsedGroups.has(groupKey)) {

@@ -14,6 +14,7 @@ import type { FolderWorkspace } from '../../../../../../shared/folder-workspace-
 import type { ExecutionHostId } from '../../../../../../shared/execution-host'
 import { isPinnedSectionWorktree } from '../../pinned-section-worktrees'
 import { getWorktreeLineageAncestors } from '../../worktree-lineage-projection'
+import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
 // While the agent send picker targets a workspace, force open every section that hides it.
 export function useEffectiveCollapsedGroups(args: {
@@ -27,6 +28,7 @@ export function useEffectiveCollapsedGroups(args: {
   worktreeMap: Map<string, Worktree>
   worktreeLineageById: Record<string, WorktreeLineage>
   prCache: AppState['prCache'] | null
+  agentStates: WorkspaceAgentStates
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
   settings: AppState['settings']
   projectGroups: readonly ProjectGroup[]
@@ -45,6 +47,7 @@ export function useEffectiveCollapsedGroups(args: {
     worktreeMap,
     worktreeLineageById,
     prCache,
+    agentStates,
     workspaceStatuses,
     settings,
     projectGroups,
@@ -64,7 +67,7 @@ export function useEffectiveCollapsedGroups(args: {
         agentSendTargetWorktreeId,
         folderWorkspaces,
         projectGroups,
-        { groupBy, nestedGroupBy, workspaceStatuses, defaultHostId }
+        { groupBy, nestedGroupBy, workspaceStatuses, defaultHostId, agentStates }
       )
       if (folderKeys.length === 0) {
         return collapsedGroups
@@ -91,7 +94,8 @@ export function useEffectiveCollapsedGroups(args: {
         settings,
         projectGroups,
         projectGrouping,
-        nestedGroupBy
+        nestedGroupBy,
+        agentStates
       )) {
         next.delete(groupKey)
       }
@@ -113,6 +117,7 @@ export function useEffectiveCollapsedGroups(args: {
     pinnedDisplayPolicy,
     visibleWorktrees,
     prCache,
+    agentStates,
     projectGroups,
     projectGrouping,
     repoMap,

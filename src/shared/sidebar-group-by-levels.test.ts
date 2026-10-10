@@ -3,8 +3,18 @@ import {
   getFirstChangedNestedLevel,
   getNestedGroupKey,
   getCollapsedGroupsAboveNestedLevel,
+  isSidebarGroupBy,
   normalizeNestedGroupBy
 } from './sidebar-group-by-levels'
+
+describe('isSidebarGroupBy', () => {
+  it('accepts every option and rejects values from other builds', () => {
+    expect(isSidebarGroupBy('none')).toBe(true)
+    expect(isSidebarGroupBy('agent-state')).toBe(true)
+    expect(isSidebarGroupBy('future-option')).toBe(false)
+    expect(isSidebarGroupBy(undefined)).toBe(false)
+  })
+})
 
 describe('normalizeNestedGroupBy', () => {
   it('drops unknown values, repeats of any level above, and levels past the third', () => {

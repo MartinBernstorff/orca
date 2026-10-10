@@ -686,7 +686,8 @@ describe('client UI RPC methods', () => {
     ['worktree card property', { worktreeCardProperties: ['status', 'pr-status'] }],
     ['feature interaction id', { featureInteractions: { unknown: { firstInteractedAt: 100 } } }],
     ['feature tip id', { featureTipsSeenIds: ['voice-dictation', 'unknown-tip'] }],
-    ['right sidebar tab', { rightSidebarTab: 'not-a-tab' }]
+    ['right sidebar tab', { rightSidebarTab: 'not-a-tab' }],
+    ['group by option from a newer client', { groupBy: 'future-option' }]
   ])('drops an unknown %s instead of rejecting the batch around it', async (_label, drifted) => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',
@@ -702,6 +703,23 @@ describe('client UI RPC methods', () => {
     expect(runtime.updateUIState).toHaveBeenCalledWith({
       sidebarWidth: 280,
       filterRepoIds: ['repo-1']
+    })
+  })
+
+  it('accepts Agent state as a top-level and nested Group by', async () => {
+    const runtime = {
+      getRuntimeId: () => 'test-runtime',
+      updateUIState: vi.fn(() => getDefaultUIState())
+    } as unknown as OrcaRuntimeService
+    const dispatcher = new RpcDispatcher({ runtime, methods: CLIENT_UI_METHODS })
+
+    await dispatcher.dispatch(
+      makeRequest('ui.set', { groupBy: 'agent-state', nestedGroupBy: ['agent-state', 'repo'] })
+    )
+
+    expect(runtime.updateUIState).toHaveBeenCalledWith({
+      groupBy: 'agent-state',
+      nestedGroupBy: ['agent-state', 'repo']
     })
   })
 

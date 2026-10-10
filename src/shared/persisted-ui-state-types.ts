@@ -37,7 +37,14 @@ export type PersistedUIState = {
   rightSidebarWidth: number
   markdownTocPanelWidth?: number
   combinedDiffFileTreeWidth?: number
-  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority' | 'engagement'
+  groupBy:
+    | 'none'
+    | 'workspace-status'
+    | 'repo'
+    | 'pr-status'
+    | 'priority'
+    | 'engagement'
+    | 'agent-state'
   /** Group by levels below `groupBy`; absent on profiles written before nested grouping. */
   nestedGroupBy?: Exclude<PersistedUIState['groupBy'], 'none'>[]
   sortBy: 'name' | 'smart' | 'recent' | 'repo' | 'manual' | 'priority'

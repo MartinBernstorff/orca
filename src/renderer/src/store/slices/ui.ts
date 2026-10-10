@@ -4,6 +4,7 @@ import type { AppState } from '../types'
 import {
   getFirstChangedNestedLevel,
   getCollapsedGroupsAboveNestedLevel,
+  isSidebarGroupBy,
   normalizeNestedGroupBy,
   type NestedSidebarGroupBy,
   type SidebarGroupBy
@@ -2600,8 +2601,8 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       const validRepoIds = new Set(s.repos.map((repo) => repo.id))
       const validRepoHostIdentities = new Set(s.repos.map(getRepoHostIdentity))
       const persistedFilterRepoIds = sanitizePersistedRepoIds(ui.filterRepoIds)
-      const hydratedGroupBy =
-        (ui.groupBy as UISlice['groupBy'] | 'parent') === 'parent' ? 'repo' : ui.groupBy
+      // Why: a newer paired peer can persist an option this build does not know; fall back to Project.
+      const hydratedGroupBy: UISlice['groupBy'] = isSidebarGroupBy(ui.groupBy) ? ui.groupBy : 'repo'
       // Why: pre-rename builds used sidekick* keys; read as fallback only so new pet* writes win after upgrade.
       const customPets = Array.isArray(ui.customPets)
         ? ui.customPets

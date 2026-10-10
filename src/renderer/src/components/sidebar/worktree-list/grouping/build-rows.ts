@@ -46,6 +46,7 @@ import type {
 } from './row-types'
 import { getRenderedNaturalAnchorRepoIds, withRepoSectionDisplayLabels } from './section-order'
 import { buildOrderedGroups } from './worktree-grouping'
+import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
 export function buildRows(
   groupBy: WorktreeGroupBy,
@@ -74,7 +75,8 @@ export function buildRows(
   defaultHostId: ExecutionHostId = LOCAL_EXECUTION_HOST_ID,
   pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy = getPinnedWorktreeDisplayPolicy(settings),
   showEmptyWorkspaceStatuses = false,
-  nestedGroupBy: readonly NestedSidebarGroupBy[] = []
+  nestedGroupBy: readonly NestedSidebarGroupBy[] = [],
+  agentStates?: WorkspaceAgentStates
 ): Row[] {
   const result: Row[] = []
   const projectIndex = buildProjectGroupingIndex(projectGrouping)
@@ -134,7 +136,8 @@ export function buildRows(
     collapsedGroups,
     workspaceStatuses,
     settings,
-    projectGrouping
+    projectGrouping,
+    agentStates
   })
   emitPinnedGroup(
     pinnedSectionWorktrees,
@@ -210,7 +213,8 @@ export function buildRows(
     repoOrder,
     projectOrderBy,
     folderWorkspaces: renderableFolderWorkspaces,
-    showEmptyWorkspaceStatuses
+    showEmptyWorkspaceStatuses,
+    agentStates
   })
 
   const sectionContext: SectionAppendContext = {
@@ -235,7 +239,8 @@ export function buildRows(
     prCache,
     settings,
     repoOrder,
-    projectOrderBy
+    projectOrderBy,
+    agentStates
   }
 
   if (groupBy !== 'repo' || projectGroups.length === 0) {

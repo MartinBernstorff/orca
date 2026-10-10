@@ -1,7 +1,14 @@
 export function shouldShowProjectOrderManualDefaultNotice(args: {
   persistedUIReady: boolean
   projectOrderManualDefaultNoticeDismissed: boolean
-  groupBy: 'none' | 'workspace-status' | 'repo' | 'pr-status' | 'priority' | 'engagement'
+  groupBy:
+    | 'none'
+    | 'workspace-status'
+    | 'repo'
+    | 'pr-status'
+    | 'priority'
+    | 'engagement'
+    | 'agent-state'
   projectOrderBy: 'manual' | 'recent'
   repoCount: number
 }): boolean {

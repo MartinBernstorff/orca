@@ -166,6 +166,7 @@ export function usePendingSidebarReveal(args: PendingSidebarRevealArgs): void {
     args.folderWorkspaces,
     args.repoMap,
     args.prCache,
+    args.agentStates,
     args.worktreeLineageById,
     args.worktreeMap,
     renderRows,

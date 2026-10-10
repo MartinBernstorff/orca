@@ -152,6 +152,7 @@ export function renderWorktreeSectionHeaderRow(args: {
       ? getWorkspaceStatusFromGroupKey(headerLaneKey, ctx.workspaceStatuses)
       : null
   const isPinnedHeader = row.key === PINNED_GROUP_KEY
+  const isAgentStateHeader = headerGroupBy === 'agent-state'
   const headerDropTarget = getSectionHeaderDropTarget(ctx, {
     status: headerWorkspaceStatus,
     engagement:
@@ -191,7 +192,8 @@ export function renderWorktreeSectionHeaderRow(args: {
   // Why: status lanes keep the chevron while empty so collapsing an empty lane stays possible.
   const showHeaderCollapseAffordance =
     headerWorkspaceStatus !== null ||
-    (row.count > 0 && (isRepoHeader || isProjectGroupHeader || isPinnedHeader))
+    (row.count > 0 &&
+      (isRepoHeader || isProjectGroupHeader || isPinnedHeader || isAgentStateHeader))
   return (
     <div
       key={vItem.key}
@@ -336,7 +338,7 @@ export function renderWorktreeSectionHeaderRow(args: {
           </div>
         </div>
 
-        {headerWorkspaceStatus !== null && row.count > 0 ? (
+        {(headerWorkspaceStatus !== null || isAgentStateHeader) && row.count > 0 ? (
           <span
             className="shrink-0 text-[11px] font-medium leading-none tabular-nums text-muted-foreground/60"
             data-worktree-section-header-count=""

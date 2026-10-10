@@ -11,6 +11,12 @@ import {
   type AgentStatusEntry,
   type AgentStatusOrchestrationContext
 } from '../../../../shared/agent-status-types'
+import {
+  IDLE_WORKSPACE_AGENT_STATE,
+  getPaneAgentState,
+  mostUrgentAgentState,
+  type WorkspaceAgentState
+} from '../../../../shared/workspace-agent-state'
 
 export type WorktreeAgentActivitySummary = {
   hasPermission: boolean
@@ -20,6 +26,8 @@ export type WorktreeAgentActivitySummary = {
   hasInterrupted: boolean
   hasLiveDone: boolean
   hasRetainedDone: boolean
+  /** Most urgent state across fresh hook panes; null when none is fresh. */
+  agentState: WorkspaceAgentState | null
   agentStatusPaneIdsByTabId: Record<string, ReadonlySet<string>>
 }
 
@@ -32,6 +40,7 @@ const EMPTY_SUMMARY: WorktreeAgentActivitySummary = {
   hasInterrupted: false,
   hasLiveDone: false,
   hasRetainedDone: false,
+  agentState: null,
   agentStatusPaneIdsByTabId: EMPTY_AGENT_STATUS_PANE_IDS_BY_TAB_ID
 }
 
@@ -64,6 +73,44 @@ export function selectWorktreeAgentActivitySummary(
   worktreeId: string
 ): WorktreeAgentActivitySummary {
   return getWorktreeAgentActivitySummaries(state).get(worktreeId) ?? EMPTY_SUMMARY
+}
+
+export function selectWorkspaceAgentState(
+  state: AgentActivityInput,
+  worktreeId: string
+): WorkspaceAgentState {
+  return (
+    selectWorktreeAgentActivitySummary(state, worktreeId).agentState ?? IDLE_WORKSPACE_AGENT_STATE
+  )
+}
+
+const EMPTY_AGENT_STATES: ReadonlyMap<string, WorkspaceAgentState> = new Map()
+let agentStatesCache: {
+  summaries: Map<string, WorktreeAgentActivitySummary>
+  states: ReadonlyMap<string, WorkspaceAgentState>
+} | null = null
+
+/** Agent state of every workspace with a fresh hook pane; absent ids are idle. Identity-stable
+ *  while no workspace changes state, so grouping only rebuilds on a real transition. */
+export function selectWorkspaceAgentStates(
+  state: AgentActivityInput
+): ReadonlyMap<string, WorkspaceAgentState> {
+  const summaries = getWorktreeAgentActivitySummaries(state)
+  if (agentStatesCache?.summaries === summaries) {
+    return agentStatesCache.states
+  }
+  const next = new Map<string, WorkspaceAgentState>()
+  for (const [worktreeId, summary] of summaries) {
+    if (summary.agentState !== null) {
+      next.set(worktreeId, summary.agentState)
+    }
+  }
+  const previous = agentStatesCache?.states ?? EMPTY_AGENT_STATES
+  const unchanged =
+    previous.size === next.size &&
+    [...next].every(([worktreeId, agentState]) => previous.get(worktreeId) === agentState)
+  agentStatesCache = { summaries, states: unchanged ? previous : next }
+  return agentStatesCache.states
 }
 
 function getWorktreeAgentActivitySummaries(
@@ -186,6 +233,7 @@ function summariesEqual(
     previous.hasInterrupted === next.hasInterrupted &&
     previous.hasLiveDone === next.hasLiveDone &&
     previous.hasRetainedDone === next.hasRetainedDone &&
+    previous.agentState === next.agentState &&
     agentStatusPaneIdsByTabIdEqual(
       previous.agentStatusPaneIdsByTabId,
       next.agentStatusPaneIdsByTabId
@@ -223,6 +271,7 @@ function applyLiveAgentState(
   summary: WorktreeAgentActivitySummary,
   entry: Pick<AgentStatusEntry, 'state' | 'workingMode' | 'interrupted'>
 ): void {
+  summary.agentState = mostUrgentAgentState(summary.agentState, getPaneAgentState(entry))
   if (entry.state === 'blocked' || entry.state === 'waiting') {
     summary.hasPermission = true
   } else if (entry.interrupted === true) {

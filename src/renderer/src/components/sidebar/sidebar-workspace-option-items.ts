@@ -40,6 +40,15 @@ export const GROUP_BY_OPTIONS = [
     }
   },
   {
+    id: 'agent-state',
+    get label() {
+      return translate(
+        'auto.components.sidebar.SidebarWorkspaceOptionsMenu.agentState',
+        'Agent state'
+      )
+    }
+  },
+  {
     id: 'repo',
     get label() {
       return translate('auto.components.sidebar.SidebarWorkspaceOptionsMenu.2170d553cf', 'Project')

@@ -27,6 +27,7 @@ import type {
   WorktreeGroupBy
 } from './row-types'
 import { orderMainWorktreeFirst } from './section-order'
+import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
 /** Everything section emission reads that stays fixed for one buildRows call. */
 export type SectionAppendContext = {
@@ -53,6 +54,7 @@ export type SectionAppendContext = {
   settings: AppState['settings'] | undefined
   repoOrder: Map<string, number> | undefined
   projectOrderBy: ProjectOrderBy
+  agentStates: WorkspaceAgentStates | undefined
 }
 
 export function appendOrderedGroups(
