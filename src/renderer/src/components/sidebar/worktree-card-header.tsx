@@ -14,6 +14,7 @@ import { WorktreeCardQuickActions } from './worktree-card-quick-actions'
 import { WorktreeCardSshHostControl } from './WorktreeCardSshHostControl'
 import { WorktreeTitleInlineRename } from './WorktreeTitleInlineRename'
 import { WorkspacePriorityIcon, getWorkspacePriorityLane } from './workspace-priority-meta'
+import { WorktreeCardWorkspaceStatusIcon } from './worktree-card-workspace-status-icon'
 import type { WorktreeCardController } from './use-worktree-card-controller'
 
 // Why: pinned repo icon and compact inline badge share this chip shell so both repo cues read as the same affordance.
@@ -76,7 +77,9 @@ export function WorktreeCardHeader({
     setRenamingWorktreeId,
     titleRenaming,
     handleOpenRenameErrorDialog,
-    isFolder
+    isFolder,
+    showWorkspaceStatus,
+    showPriority
   } = card
   const {
     showPinnedRepoIcon,
@@ -166,7 +169,9 @@ export function WorktreeCardHeader({
           </RepoIdentityChip>
         )}
 
-        {priorityLane !== 'none' && (
+        {showWorkspaceStatus && <WorktreeCardWorkspaceStatusIcon worktree={worktree} />}
+
+        {showPriority && priorityLane !== 'none' && (
           <WorkspacePriorityIcon lane={priorityLane} className="size-3.5" />
         )}
 

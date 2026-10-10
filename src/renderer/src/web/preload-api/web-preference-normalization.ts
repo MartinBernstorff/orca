@@ -5,6 +5,7 @@ import {
   normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../../shared/constants'
+import { normalizeWorktreeCardGroupingFields } from '../../../../shared/worktree/card-grouping-fields'
 import { normalizeContextualTourIds } from '../../../../shared/contextual-tours'
 import type { ContextualTourId } from '../../../../shared/contextual-tours'
 import { normalizeFeatureInteractions } from '../../../../shared/feature-interactions'
@@ -47,6 +48,9 @@ export function mergeWebUIState(
     ),
     worktreeCardInteractions: normalizeWorktreeCardInteractions(
       safeUpdates.worktreeCardInteractions ?? base.worktreeCardInteractions
+    ),
+    worktreeCardGroupingFields: normalizeWorktreeCardGroupingFields(
+      safeUpdates.worktreeCardGroupingFields ?? base.worktreeCardGroupingFields
     ),
     _worktreeCardModeDefaulted:
       safeUpdates._worktreeCardModeDefaulted ?? base._worktreeCardModeDefaulted,

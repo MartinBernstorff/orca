@@ -34,6 +34,7 @@ import type {
   WorkspaceHostOrder,
   WorkspaceHostScope,
   WorktreeCardMode,
+  WorktreeCardGroupingField,
   WorktreeCardInteraction,
   WorktreeCardProperty
 } from '../../../../shared/ui-chrome-types'
@@ -94,6 +95,10 @@ import {
   normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../../shared/constants'
+import {
+  DEFAULT_WORKTREE_CARD_GROUPING_FIELDS,
+  normalizeWorktreeCardGroupingFields
+} from '../../../../shared/worktree/card-grouping-fields'
 import {
   DEFAULT_BROWSER_PAGE_ZOOM_LEVEL,
   normalizeBrowserPageZoomLevel
@@ -641,7 +646,11 @@ export type UISlice = {
   closeAgentSendPopoverTargetMode: (id?: string, instanceId?: string) => void
   sendPromptToSidebarAgentTarget: (paneKey: string) => Promise<boolean>
   /** Bumped to ask the active worktree's Source Control notes send menu to open (keyboard shortcut). `issuedAt` bounds staleness so a request the menu never consumed can't reopen it much later. */
-  diffNotesSendMenuOpenRequest: { worktreeId: string; nonce: number; issuedAt: number } | null
+  diffNotesSendMenuOpenRequest: {
+    worktreeId: string
+    nonce: number
+    issuedAt: number
+  } | null
   /** Reveal Source Control and request its notes send menu open; returns false (no-op) when the active worktree has no unsent notes. */
   openDiffNotesSendMenuForActiveWorktree: () => boolean
   consumeDiffNotesSendMenuOpenRequest: (worktreeId: string) => void
@@ -739,7 +748,11 @@ export type UISlice = {
   }
   taskResumeState: TaskResumeState | undefined
   setTaskResumeState: (updates: Partial<TaskResumeState>) => void
-  taskListPosition: { contextKey: string; page: number; scrollTop: number } | null
+  taskListPosition: {
+    contextKey: string
+    page: number
+    scrollTop: number
+  } | null
   setTaskListPosition: (position: UISlice['taskListPosition']) => void
   githubTaskDrawerWorkItem: GitHubWorkItem | null
   setGithubTaskDrawerWorkItem: (item: GitHubWorkItem | null) => void
@@ -794,7 +807,11 @@ export type UISlice = {
     hostId?: ExecutionHostId
   } | null
   setPendingAutomationRunNavigation: (
-    navigation: { automationId: string; runId: string | null; hostId?: ExecutionHostId } | null
+    navigation: {
+      automationId: string
+      runId: string | null
+      hostId?: ExecutionHostId
+    } | null
   ) => void
   openAutomationsPage: () => void
   closeAutomationsPage: () => void
@@ -971,6 +988,8 @@ export type UISlice = {
   setWorktreeCardProperties: (properties: readonly WorktreeCardProperty[]) => void
   worktreeCardInteractions: WorktreeCardInteraction[]
   setWorktreeCardInteractions: (interactions: readonly WorktreeCardInteraction[]) => void
+  worktreeCardGroupingFields: WorktreeCardGroupingField[]
+  setWorktreeCardGroupingFields: (fields: readonly WorktreeCardGroupingField[]) => void
   agentActivityDisplayMode: AgentActivityDisplayMode
   setAgentActivityDisplayMode: (mode: AgentActivityDisplayMode) => void
   workspaceStatuses: WorkspaceStatusDefinition[]
@@ -1132,7 +1151,10 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       targets.some((target) => target.status === 'eligible') &&
       (previousMode?.id !== args.id || previousMode.worktreeId !== args.worktreeId)
     ) {
-      get().revealWorktreeInSidebar(args.worktreeId, { behavior: 'auto', highlight: true })
+      get().revealWorktreeInSidebar(args.worktreeId, {
+        behavior: 'auto',
+        highlight: true
+      })
     }
   },
   diffNotesSendMenuOpenRequest: null,
@@ -1152,7 +1174,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
     get().setRightSidebarTab('source-control')
     get().setRightSidebarOpen(true)
     const nonce = (get().diffNotesSendMenuOpenRequest?.nonce ?? 0) + 1
-    set({ diffNotesSendMenuOpenRequest: { worktreeId, nonce, issuedAt: Date.now() } })
+    set({
+      diffNotesSendMenuOpenRequest: { worktreeId, nonce, issuedAt: Date.now() }
+    })
     return true
   },
   consumeDiffNotesSendMenuOpenRequest: (worktreeId) =>
@@ -1222,7 +1246,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
     }
 
     if (result.status !== 'sent') {
-      const message = activeAgentNotesSendFailureMessage(result.status, { explicitTarget: true })
+      const message = activeAgentNotesSendFailureMessage(result.status, {
+        explicitTarget: true
+      })
       set((s) =>
         s.agentSendPopoverTargetMode?.id === mode.id &&
         s.agentSendPopoverTargetMode.instanceId === mode.instanceId
@@ -1260,7 +1286,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       request_kind: 'followup'
     })
     toast.success(
-      translate('auto.store.slices.ui.66e3bd7ce6', 'Sent to {{value0}}', { value0: label })
+      translate('auto.store.slices.ui.66e3bd7ce6', 'Sent to {{value0}}', {
+        value0: label
+      })
     )
     get().closeAgentSendPopoverTargetMode(mode.id, mode.instanceId)
     return true
@@ -1845,7 +1873,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         const { [id]: _consumed, ...remainingNavigationSnapshot } =
           s.contextualTourNavigationInteractionSnapshot
         void _consumed
-        return { contextualTourNavigationInteractionSnapshot: remainingNavigationSnapshot }
+        return {
+          contextualTourNavigationInteractionSnapshot: remainingNavigationSnapshot
+        }
       }
       const navigationSnapshot = s.contextualTourNavigationInteractionSnapshot[id]
       const { [id]: _consumed, ...remainingNavigationSnapshot } =
@@ -1903,7 +1933,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         s.activeContextualTourId === 'browser' &&
         s.activeContextualTourStepIndex + 1 < tour.steps.length
       ) {
-        return { activeContextualTourStepIndex: s.activeContextualTourStepIndex + 1 }
+        return {
+          activeContextualTourStepIndex: s.activeContextualTourStepIndex + 1
+        }
       }
       return s
     }),
@@ -2313,9 +2345,15 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
   },
   setWorktreeCardProperties: (properties) => {
     const normalized = normalizeWorktreeCardProperties(properties)
-    set({ worktreeCardProperties: normalized, _worktreeCardModeDefaulted: false })
+    set({
+      worktreeCardProperties: normalized,
+      _worktreeCardModeDefaulted: false
+    })
     window.api.ui
-      .set({ worktreeCardProperties: normalized, _worktreeCardModeDefaulted: false })
+      .set({
+        worktreeCardProperties: normalized,
+        _worktreeCardModeDefaulted: false
+      })
       .catch(console.error)
   },
   worktreeCardInteractions: [...DEFAULT_WORKTREE_CARD_INTERACTIONS],
@@ -2323,6 +2361,12 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
     const normalized = normalizeWorktreeCardInteractions(interactions)
     set({ worktreeCardInteractions: normalized })
     window.api.ui.set({ worktreeCardInteractions: normalized }).catch(console.error)
+  },
+  worktreeCardGroupingFields: [...DEFAULT_WORKTREE_CARD_GROUPING_FIELDS],
+  setWorktreeCardGroupingFields: (fields) => {
+    const normalized = normalizeWorktreeCardGroupingFields(fields)
+    set({ worktreeCardGroupingFields: normalized })
+    window.api.ui.set({ worktreeCardGroupingFields: normalized }).catch(console.error)
   },
   agentActivityDisplayMode: DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE,
   setAgentActivityDisplayMode: (mode) => {
@@ -2417,7 +2461,10 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       }
       return {
         workspacePortScan: scan,
-        workspacePortScansByKey: { ...state.workspacePortScansByKey, [scan.key]: scan.result }
+        workspacePortScansByKey: {
+          ...state.workspacePortScansByKey,
+          [scan.key]: scan.result
+        }
       }
     }),
   // Why: target changes rebuild the aggregate without republishing or clearing per-host scans.
@@ -2441,7 +2488,10 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       ) {
         return state
       }
-      return { workspacePortScansByKey: scansByKey, workspacePortScan: projection }
+      return {
+        workspacePortScansByKey: scansByKey,
+        workspacePortScan: projection
+      }
     }),
   setWorkspacePortScanForKey: (key, result) =>
     set((state) => {
@@ -2584,7 +2634,12 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       return {
         persistedUIWriteInFlightCounts: counts,
         ...(foldable
-          ? { persistedUIWriteBaseline: { ...s.persistedUIWriteBaseline!, ...flushed } }
+          ? {
+              persistedUIWriteBaseline: {
+                ...s.persistedUIWriteBaseline!,
+                ...flushed
+              }
+            }
           : {})
       }
     }),
@@ -2719,6 +2774,9 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
         worktreeCardProperties: normalizeWorktreeCardProperties(ui.worktreeCardProperties),
         _worktreeCardModeDefaulted: ui._worktreeCardModeDefaulted === true,
         worktreeCardInteractions: normalizeWorktreeCardInteractions(ui.worktreeCardInteractions),
+        worktreeCardGroupingFields: normalizeWorktreeCardGroupingFields(
+          ui.worktreeCardGroupingFields
+        ),
         agentActivityDisplayMode: normalizeAgentActivityDisplayMode(ui.agentActivityDisplayMode),
         workspaceStatuses: normalizeWorkspaceStatuses(ui.workspaceStatuses),
         workspaceBoardOpacity: clampWorkspaceBoardOpacity(ui.workspaceBoardOpacity),

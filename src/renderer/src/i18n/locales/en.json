@@ -5344,6 +5344,7 @@
           "cli": "Orca CLI",
           "interactionsSection": "Interactions",
           "interactionDelete": "Delete button",
+          "workspaceStatusField": "Workspace status",
           "thenBy": "Then by",
           "showEmptyStatuses": "Show empty statuses",
           "showEmptyStatusesAria": "Show statuses with no workspaces",

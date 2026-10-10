@@ -2,6 +2,7 @@ import { canShowWorkspaceDeleteQuickAction } from './workspace-delete-quick-acti
 import { getWorkspaceEngagement } from './workspace-engagement-meta'
 import { useWorktreeCardDetailsHoverControl } from './worktree-card-details-hover-state'
 import type { ResolvedWorktreeCardProps } from './worktree-card-model'
+import { resolveWorktreeCardGroupingFieldVisibility } from './worktree-card-grouping-field-visibility'
 import { useWorktreeCardActivationActions } from './use-worktree-card-activation-actions'
 import { useWorktreeCardFoundation } from './use-worktree-card-foundation'
 import { useWorktreeCardLifecycleEffects } from './use-worktree-card-lifecycle-effects'
@@ -40,6 +41,12 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
   const showCli = foundation.cardProps.includes('cli')
   const showComment = foundation.cardProps.includes('comment')
   const showPorts = foundation.cardProps.includes('ports')
+  const groupingFieldVisibility = resolveWorktreeCardGroupingFieldVisibility({
+    enabledFields: foundation.cardGroupingFields,
+    groupedFields: props.groupedFields,
+    inPinnedSection: props.inPinnedSection,
+    newCardStyle: foundation.newCardStyle
+  })
   const shouldRefreshHostedReview = showPR
   const detailsHoverControl = useWorktreeCardDetailsHoverControl()
   const hoverDetailsOpen = detailsHoverControl.hoverOpen
@@ -157,6 +164,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     showCli,
     showComment,
     showPorts,
+    ...groupingFieldVisibility,
     shouldRefreshHostedReview,
     ...activation,
     showDeleteQuickAction,

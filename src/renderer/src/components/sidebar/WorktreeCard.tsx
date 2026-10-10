@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { WorktreeCardSurface } from './worktree-card-surface'
-import type { WorktreeCardProps } from './worktree-card-model'
+import { EMPTY_GROUPED_FIELDS, type WorktreeCardProps } from './worktree-card-model'
 import { useWorktreeCardController } from './use-worktree-card-controller'
 
 export { shouldBeginWorktreeRename } from './worktree-card-model'
@@ -26,6 +26,7 @@ const WorktreeCard = React.memo(function WorktreeCard({
   onCardDragEnd,
   nativeDragEnabled = true,
   hideRepoBadge,
+  groupedFields = EMPTY_GROUPED_FIELDS,
   hostContextLabel,
   inPinnedSection = false,
   activationRowKey,
@@ -60,6 +61,7 @@ const WorktreeCard = React.memo(function WorktreeCard({
     onCardDragEnd,
     nativeDragEnabled,
     hideRepoBadge,
+    groupedFields,
     hostContextLabel,
     inPinnedSection,
     activationRowKey,

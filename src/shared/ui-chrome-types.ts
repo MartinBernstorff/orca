@@ -48,6 +48,9 @@ export type WorktreeCardProperty =
 /** Opt-in hover affordances on workspace cards (see DEFAULT_WORKTREE_CARD_INTERACTIONS). */
 export type WorktreeCardInteraction = 'delete'
 
+/** Workspace fields the sidebar can group by, shown as title-row icons on new-style cards. */
+export type WorktreeCardGroupingField = 'workspace-status' | 'priority'
+
 export type WorktreeCardMode = 'Default' | 'Compact'
 
 export type AgentActivityDisplayMode = 'compact' | 'full'
