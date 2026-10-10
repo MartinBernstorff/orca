@@ -13,6 +13,12 @@ import {
   getWorkspaceEngagement,
   getWorkspaceEngagementLaneKey
 } from '../../workspace-engagement-meta'
+import {
+  getWorkspaceAgentState,
+  getWorkspaceAgentStateLaneKey,
+  type WorkspaceAgentStates
+} from '../../workspace-agent-state-meta'
+import { folderWorkspaceKey } from '../../../../../../shared/workspace-scope'
 import { ALL_GROUP_KEY, getPRLaneKey } from './group-keys'
 import type { WorktreeGroupBy } from './row-types'
 
@@ -58,7 +64,8 @@ export function getRenderableFolderWorkspaces(
 export function getFolderWorkspaceLaneKey(
   pair: RenderableFolderWorkspace,
   groupBy: Exclude<WorktreeGroupBy, 'repo'>,
-  workspaceStatuses: readonly WorkspaceStatusDefinition[]
+  workspaceStatuses: readonly WorkspaceStatusDefinition[],
+  agentStates?: WorkspaceAgentStates
 ): string {
   switch (groupBy) {
     case 'workspace-status':
@@ -72,6 +79,10 @@ export function getFolderWorkspaceLaneKey(
       return getWorkspacePriorityLaneKey(getWorkspacePriorityLane(pair.folderWorkspace))
     case 'engagement':
       return getWorkspaceEngagementLaneKey(getWorkspaceEngagement(pair.folderWorkspace))
+    case 'agent-state':
+      return getWorkspaceAgentStateLaneKey(
+        getWorkspaceAgentState(agentStates, folderWorkspaceKey(pair.folderWorkspace.id))
+      )
     case 'none':
       return ALL_GROUP_KEY
   }

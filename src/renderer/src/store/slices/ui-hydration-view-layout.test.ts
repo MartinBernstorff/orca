@@ -501,6 +501,30 @@ describe('createUISlice hydratePersistedUI', () => {
     expect([...store.getState().collapsedGroups]).toEqual([top, second])
   })
 
+  it('falls back to Project when a newer peer persisted an unknown Group by', () => {
+    const store = createUIStore()
+
+    store
+      .getState()
+      .hydratePersistedUI(
+        makePersistedUI({ groupBy: 'future-option' as never, nestedGroupBy: ['priority'] })
+      )
+
+    expect(store.getState().groupBy).toBe('repo')
+    expect(store.getState().nestedGroupBy).toEqual(['priority'])
+  })
+
+  it('hydrates Agent state grouping', () => {
+    const store = createUIStore()
+
+    store
+      .getState()
+      .hydratePersistedUI(makePersistedUI({ groupBy: 'agent-state', nestedGroupBy: ['repo'] }))
+
+    expect(store.getState().groupBy).toBe('agent-state')
+    expect(store.getState().nestedGroupBy).toEqual(['repo'])
+  })
+
   it('hydrates persisted per-worktree dotfile visibility', () => {
     const store = createUIStore()
 

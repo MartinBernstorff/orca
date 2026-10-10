@@ -12,6 +12,11 @@ import {
   getWorkspaceEngagement,
   getWorkspaceEngagementLaneKey
 } from '../../workspace-engagement-meta'
+import {
+  getWorkspaceAgentState,
+  getWorkspaceAgentStateLaneKey,
+  type WorkspaceAgentStates
+} from '../../workspace-agent-state-meta'
 import { ALL_GROUP_KEY, getPRGroupKey, getProjectGroupHeaderKey } from './group-keys'
 import { buildProjectGroupingIndex, getProjectGroupingForRepo } from './project-grouping'
 import type { ProjectGroupingModel } from './project-grouping'
@@ -29,7 +34,8 @@ export function getGroupKeyForWorktree(
   prCache: Record<string, unknown> | null,
   workspaceStatuses: readonly WorkspaceStatusDefinition[] = cloneDefaultWorkspaceStatuses(),
   settings?: AppState['settings'],
-  projectGrouping?: ProjectGroupingModel
+  projectGrouping?: ProjectGroupingModel,
+  agentStates?: WorkspaceAgentStates
 ): string | null {
   if (groupBy === 'none') {
     return ALL_GROUP_KEY
@@ -42,6 +48,9 @@ export function getGroupKeyForWorktree(
   }
   if (groupBy === 'engagement') {
     return getWorkspaceEngagementLaneKey(getWorkspaceEngagement(worktree))
+  }
+  if (groupBy === 'agent-state') {
+    return getWorkspaceAgentStateLaneKey(getWorkspaceAgentState(agentStates, worktree.id))
   }
   if (groupBy === 'repo') {
     return getProjectGroupingForRepo(
@@ -62,7 +71,8 @@ export function getGroupKeysForWorktree(
   settings?: AppState['settings'],
   projectGroups: readonly ProjectGroup[] = [],
   projectGrouping?: ProjectGroupingModel,
-  nestedGroupBy: readonly NestedSidebarGroupBy[] = []
+  nestedGroupBy: readonly NestedSidebarGroupBy[] = [],
+  agentStates?: WorkspaceAgentStates
 ): string[] {
   const groupKey = getGroupKeyForWorktree(
     groupBy,
@@ -71,7 +81,8 @@ export function getGroupKeysForWorktree(
     prCache,
     workspaceStatuses,
     settings,
-    projectGrouping
+    projectGrouping,
+    agentStates
   )
   if (!groupKey) {
     return []
@@ -87,7 +98,8 @@ export function getGroupKeysForWorktree(
         prCache,
         workspaceStatuses,
         settings,
-        projectGrouping
+        projectGrouping,
+        agentStates
       )
   )
   if (groupBy !== 'repo') {

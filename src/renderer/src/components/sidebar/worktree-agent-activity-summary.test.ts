@@ -4,6 +4,7 @@ import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
 import { makePaneKey } from '../../../../shared/stable-pane-id'
 import type { TerminalTab } from '../../../../shared/terminal-tab-types'
 import {
+  selectWorkspaceAgentStates,
   selectWorktreeAgentActivitySummary,
   type AgentActivityInput
 } from './worktree-agent-activity-summary'
@@ -439,5 +440,59 @@ describe('selectWorktreeAgentActivitySummary', () => {
 
     const summary = selectWorktreeAgentActivitySummary(state, 'repo::/wt-1')
     expect(summary.agentStatusPaneIdsByTabId['tab-parent']).toEqual(new Set([LEAF_ID]))
+  })
+})
+
+describe('selectWorkspaceAgentStates', () => {
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  function makeState(epoch: number, entries: AgentStatusEntry[]): AgentActivityInput {
+    return {
+      tabsByWorktree: {
+        'repo::/wt-1': [makeTab('tab-1', 'repo::/wt-1')],
+        'repo::/wt-2': [makeTab('tab-2', 'repo::/wt-2')]
+      },
+      agentStatusEpoch: epoch,
+      agentStatusByPaneKey: Object.fromEntries(entries.map((entry) => [entry.paneKey, entry])),
+      migrationUnsupportedByPtyId: {},
+      retainedAgentsByPaneKey: {}
+    }
+  }
+
+  it('derives each workspace from its fresh hook panes, most urgent first', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(2_000)
+    const working = makePaneKey('tab-1', LEAF_ID)
+    const done = makePaneKey('tab-1', '22222222-2222-4222-8222-222222222222')
+    const polling = makePaneKey('tab-2', LEAF_ID)
+    const states = selectWorkspaceAgentStates(
+      makeState(101, [
+        makeAgentStatusEntry({ paneKey: working, state: 'working' }),
+        makeAgentStatusEntry({ paneKey: done, state: 'done' }),
+        makeAgentStatusEntry({ paneKey: polling, state: 'working', workingMode: 'monitoring' })
+      ])
+    )
+    expect(Object.fromEntries(states)).toEqual({
+      'repo::/wt-1': 'needs-you',
+      'repo::/wt-2': 'polling'
+    })
+  })
+
+  it('keeps the map identity when an epoch bump changes no workspace state', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(2_000)
+    const paneKey = makePaneKey('tab-1', LEAF_ID)
+    const first = selectWorkspaceAgentStates(
+      makeState(102, [makeAgentStatusEntry({ paneKey, state: 'working' })])
+    )
+    const second = selectWorkspaceAgentStates(
+      makeState(103, [makeAgentStatusEntry({ paneKey, state: 'working' })])
+    )
+    const third = selectWorkspaceAgentStates(
+      makeState(104, [makeAgentStatusEntry({ paneKey, state: 'done' })])
+    )
+    expect(second).toBe(first)
+    expect(third).not.toBe(first)
+    expect(third.get('repo::/wt-1')).toBe('needs-you')
   })
 })

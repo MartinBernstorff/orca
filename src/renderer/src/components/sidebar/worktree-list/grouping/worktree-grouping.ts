@@ -26,6 +26,14 @@ import {
   getWorkspaceEngagementLaneKey
 } from '../../workspace-engagement-meta'
 import { WORKSPACE_ENGAGEMENTS } from '../../../../../../shared/worktree/engagement'
+import { WORKSPACE_AGENT_STATES } from '../../../../../../shared/workspace-agent-state'
+import {
+  getWorkspaceAgentState,
+  getWorkspaceAgentStateFromLaneKey,
+  getWorkspaceAgentStateLabel,
+  getWorkspaceAgentStateLaneKey,
+  type WorkspaceAgentStates
+} from '../../workspace-agent-state-meta'
 import { PR_GROUP_META, PR_GROUP_ORDER, getPRGroupKey, getPRLaneKey } from './group-keys'
 import type { PRGroupKey } from './group-keys'
 import { addRepoIdToGroup, getProjectGroupingForRepo } from './project-grouping'
@@ -61,6 +69,9 @@ function getLaneLabelForKey(
   if (groupBy === 'engagement') {
     return getWorkspaceEngagementLabel(getWorkspaceEngagementFromLaneKey(key))
   }
+  if (groupBy === 'agent-state') {
+    return getWorkspaceAgentStateLabel(getWorkspaceAgentStateFromLaneKey(key))
+  }
   return key
 }
 
@@ -81,6 +92,7 @@ export function buildOrderedGroups(args: {
   projectOrderBy: ProjectOrderBy
   folderWorkspaces?: readonly RenderableFolderWorkspace[]
   showEmptyWorkspaceStatuses?: boolean
+  agentStates?: WorkspaceAgentStates
 }): OrderedGroupEntry[] {
   const {
     groupBy,
@@ -97,7 +109,8 @@ export function buildOrderedGroups(args: {
     repoOrder,
     projectOrderBy,
     folderWorkspaces = [],
-    showEmptyWorkspaceStatuses = false
+    showEmptyWorkspaceStatuses = false,
+    agentStates
   } = args
 
   const grouped = new Map<string, WorktreeGroupEntry>()
@@ -123,6 +136,10 @@ export function buildOrderedGroups(args: {
       const engagement = getWorkspaceEngagement(w)
       key = getWorkspaceEngagementLaneKey(engagement)
       label = getWorkspaceEngagementLabel(engagement)
+    } else if (groupBy === 'agent-state') {
+      const agentState = getWorkspaceAgentState(agentStates, w.id)
+      key = getWorkspaceAgentStateLaneKey(agentState)
+      label = getWorkspaceAgentStateLabel(agentState)
     } else {
       const prGroup = getPRGroupKey(w, repoMap, prCache, settings)
       key = getPRLaneKey(prGroup)
@@ -140,7 +157,7 @@ export function buildOrderedGroups(args: {
   // one — is what lets a folder workspace be the sole occupant of a lane (#15362).
   if (groupBy !== 'repo') {
     for (const pair of folderWorkspaces) {
-      const key = getFolderWorkspaceLaneKey(pair, groupBy, workspaceStatuses)
+      const key = getFolderWorkspaceLaneKey(pair, groupBy, workspaceStatuses, agentStates)
       if (!grouped.has(key)) {
         grouped.set(key, {
           label: getLaneLabelForKey(key, groupBy, workspaceStatuses),
@@ -246,6 +263,14 @@ export function buildOrderedGroups(args: {
   } else if (groupBy === 'priority') {
     for (const lane of WORKSPACE_PRIORITY_LANE_ORDER) {
       const key = getWorkspacePriorityLaneKey(lane)
+      const group = grouped.get(key)
+      if (group) {
+        orderedGroups.push([key, group])
+      }
+    }
+  } else if (groupBy === 'agent-state') {
+    for (const agentState of WORKSPACE_AGENT_STATES) {
+      const key = getWorkspaceAgentStateLaneKey(agentState)
       const group = grouped.get(key)
       if (group) {
         orderedGroups.push([key, group])

@@ -30,6 +30,7 @@ import { useSidebarExternalWorktreeCards } from './worktree-list/listing/use-ext
 import { useSidebarHostVisibleScope } from './worktree-list/listing/use-host-visible-scope'
 import { useSidebarRevealRequests } from './worktree-list/navigation/use-reveal-requests'
 import { useSidebarSectionRows } from './worktree-list/listing/use-section-rows'
+import { selectSidebarAgentStates } from './worktree-list/listing/agent-state-inputs'
 import { useSidebarWorktreeFilters } from './worktree-list/listing/use-filters'
 import { useSidebarWorktreeSelection } from './worktree-list/navigation/use-selection'
 import { useSidebarWorktreeSortOrder } from './worktree-list/listing/use-sort-order'
@@ -96,6 +97,7 @@ const WorktreeList = React.memo(function WorktreeList({
   const { prCache, hostedReviewCache } = useAppStore(
     useShallow((s) => selectWorktreeListReviewCacheInputs(s, groupBy, cardProps))
   )
+  const agentStates = useAppStore((s) => selectSidebarAgentStates(s, groupBy, nestedGroupBy))
   const pinnedDisplayPolicy = getPinnedWorktreeDisplayPolicy(settings)
   const defaultHostId = getSettingsFocusedExecutionHostId(settings)
   const projectHostSetupProjection = useProjectHostSetupProjection()
@@ -138,6 +140,7 @@ const WorktreeList = React.memo(function WorktreeList({
     worktreeMap,
     worktreeLineageById,
     prCache,
+    agentStates,
     workspaceStatuses,
     settings,
     projectGroups,
@@ -171,6 +174,7 @@ const WorktreeList = React.memo(function WorktreeList({
     worktreeMap,
     worktreeLineageById,
     prCache,
+    agentStates,
     settings,
     workspaceStatuses,
     showEmptyWorkspaceStatuses,
@@ -345,6 +349,7 @@ const WorktreeList = React.memo(function WorktreeList({
         onReorderHostSections={rowModel.handleReorderHostSections}
         onHostDragActiveChange={rowModel.setHostDragActive}
         prCache={prCache}
+        agentStates={agentStates}
         hostedReviewCache={hostedReviewCache}
         workspaceStatuses={workspaceStatuses}
         projectGrouping={projectGrouping}

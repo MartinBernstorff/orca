@@ -12,11 +12,16 @@ const NESTED_GROUP_BY_VALUES: Record<NestedSidebarGroupBy, true> = {
   repo: true,
   'pr-status': true,
   priority: true,
-  engagement: true
+  engagement: true,
+  'agent-state': true
 }
 
 // Why a control char: lane keys embed user-defined status ids and repo ids.
 const GROUP_PATH_SEPARATOR = '\u001f'
+
+export function isSidebarGroupBy(value: unknown): value is SidebarGroupBy {
+  return value === 'none' || isNestedSidebarGroupBy(value)
+}
 
 export function isNestedSidebarGroupBy(value: unknown): value is NestedSidebarGroupBy {
   return typeof value === 'string' && Object.hasOwn(NESTED_GROUP_BY_VALUES, value)

@@ -5350,6 +5350,7 @@
           "showEmptyStatusesAria": "Show statuses with no workspaces",
           "priority": "Priority",
           "engagement": "Engagement",
+          "agentState": "Agent state",
           "engagementSortDescription": "Most prompts submitted first, then the most recent prompt.",
           "prioritySortDescription": "Highest priority first, then most recent activity."
         },
@@ -6215,6 +6216,9 @@
         "workspaceEngagement": {
           "engaged": "Engaged",
           "queued": "Queued"
+        },
+        "workspaceAgentState": {
+          "polling": "Polling"
         },
         "workspacePriority": {
           "urgent": "Urgent",
