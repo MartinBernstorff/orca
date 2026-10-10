@@ -159,3 +159,19 @@ describe('agent-state section header count', () => {
     expect(countText()).toBe('1')
   })
 })
+
+describe('engagement section header count', () => {
+  it('renders the count on a top-level engagement header', () => {
+    render(
+      {
+        type: 'header',
+        key: 'engagement:engaged',
+        label: 'Engaged',
+        count: 5,
+        tone: 'text-foreground'
+      },
+      'engagement'
+    )
+    expect(countText()).toBe('5')
+  })
+})
