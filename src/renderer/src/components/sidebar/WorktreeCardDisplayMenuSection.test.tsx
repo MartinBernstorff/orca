@@ -3,17 +3,21 @@ import { act, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { WorktreeCardDisplayMenuSection } from './WorktreeCardDisplayMenuSection'
-
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
 const setWorktreeCardMode = vi.fn()
 const setWorktreeCardProperties = vi.fn()
 const setAgentActivityDisplayMode = vi.fn()
 const setWorktreeCardInteractions = vi.fn()
+const setWorktreeCardGroupingFields = vi.fn()
 
-let settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: false }
+let settings = {
+  compactWorktreeCards: false,
+  experimentalNewWorktreeCardStyle: false
+}
 let projectGroups: unknown[] = []
 let worktreeCardInteractions: string[] = []
+let worktreeCardGroupingFields: string[] = ['priority']
 let worktreeCardProperties = [
   'status',
   'unread',
@@ -35,9 +39,11 @@ vi.mock('@/store', () => ({
       setAgentActivityDisplayMode,
       setWorktreeCardMode,
       setWorktreeCardInteractions,
+      setWorktreeCardGroupingFields,
       setWorktreeCardProperties,
       settings,
       worktreeCardInteractions,
+      worktreeCardGroupingFields,
       worktreeCardProperties
     })
 }))
@@ -118,7 +124,10 @@ function renderMenu(): void {
 }
 
 beforeEach(() => {
-  settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: false }
+  settings = {
+    compactWorktreeCards: false,
+    experimentalNewWorktreeCardStyle: false
+  }
   projectGroups = []
   worktreeCardProperties = [
     'status',
@@ -133,8 +142,10 @@ beforeEach(() => {
     'inline-agents'
   ]
   worktreeCardInteractions = []
+  worktreeCardGroupingFields = ['priority']
   setAgentActivityDisplayMode.mockReset()
   setWorktreeCardInteractions.mockReset()
+  setWorktreeCardGroupingFields.mockReset()
   setWorktreeCardMode.mockReset()
   setWorktreeCardProperties.mockReset()
 })
@@ -166,7 +177,10 @@ describe('WorktreeCardDisplayMenuSection', () => {
   })
 
   it('keeps branch-only copy when project groups are unavailable', () => {
-    settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: true }
+    settings = {
+      compactWorktreeCards: false,
+      experimentalNewWorktreeCardStyle: true
+    }
 
     renderMenu()
 
@@ -175,7 +189,10 @@ describe('WorktreeCardDisplayMenuSection', () => {
   })
 
   it('toggles the hover delete interaction from the card display menu', () => {
-    settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: true }
+    settings = {
+      compactWorktreeCards: false,
+      experimentalNewWorktreeCardStyle: true
+    }
 
     renderMenu()
 
@@ -191,8 +208,43 @@ describe('WorktreeCardDisplayMenuSection', () => {
     expect(setWorktreeCardInteractions).toHaveBeenCalledWith(['delete'])
   })
 
+  it('toggles grouping fields on new-style cards without touching the others', () => {
+    settings = {
+      compactWorktreeCards: false,
+      experimentalNewWorktreeCardStyle: true
+    }
+
+    renderMenu()
+
+    const buttons = [...(container?.querySelectorAll<HTMLButtonElement>('button') ?? [])]
+    const statusButton = buttons.find((button) => button.textContent === 'Workspace status')
+    const priorityButton = buttons.find((button) => button.textContent === 'Priority')
+    expect(statusButton?.dataset.checked).toBe('false')
+    expect(priorityButton?.dataset.checked).toBe('true')
+
+    act(() => {
+      statusButton?.click()
+    })
+
+    expect(setWorktreeCardGroupingFields).toHaveBeenCalledWith(['priority', 'workspace-status'])
+  })
+
+  it('keeps grouping field toggles out of the legacy card menu', () => {
+    settings = {
+      compactWorktreeCards: false,
+      experimentalNewWorktreeCardStyle: false
+    }
+
+    renderMenu()
+
+    expect(container?.textContent).not.toContain('Workspace status')
+  })
+
   it('mentions folder paths when project groups can create folder workspaces', () => {
-    settings = { compactWorktreeCards: false, experimentalNewWorktreeCardStyle: true }
+    settings = {
+      compactWorktreeCards: false,
+      experimentalNewWorktreeCardStyle: true
+    }
     projectGroups = [{ id: 'group-1' }]
 
     renderMenu()

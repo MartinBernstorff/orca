@@ -5,6 +5,7 @@ import {
   normalizeWorktreeCardInteractions,
   normalizeWorktreeCardProperties
 } from '../../../shared/constants'
+import { normalizeWorktreeCardGroupingFields } from '../../../shared/worktree/card-grouping-fields'
 import {
   normalizeWorkspaceStatuses,
   clampWorkspaceBoardColumnWidth,
@@ -123,6 +124,10 @@ export function updatePersistedUI(
       sanitizedUpdates.worktreeCardInteractions !== undefined
         ? normalizeWorktreeCardInteractions(sanitizedUpdates.worktreeCardInteractions)
         : normalizeWorktreeCardInteractions(operations.state.ui?.worktreeCardInteractions),
+    worktreeCardGroupingFields:
+      sanitizedUpdates.worktreeCardGroupingFields !== undefined
+        ? normalizeWorktreeCardGroupingFields(sanitizedUpdates.worktreeCardGroupingFields)
+        : normalizeWorktreeCardGroupingFields(operations.state.ui?.worktreeCardGroupingFields),
     agentActivityDisplayMode:
       sanitizedUpdates.agentActivityDisplayMode !== undefined
         ? normalizeAgentActivityDisplayMode(sanitizedUpdates.agentActivityDisplayMode)

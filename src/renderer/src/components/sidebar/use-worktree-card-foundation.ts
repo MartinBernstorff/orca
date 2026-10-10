@@ -17,6 +17,7 @@ import {
   selectRuntimeAwareSshTargetRemoved
 } from '@/store/slices/runtime-environment-ssh'
 import { EMPTY_WORKSPACE_PORTS, type WorktreeCardProps } from './worktree-card-model'
+import { DEFAULT_WORKTREE_CARD_GROUPING_FIELDS } from '../../../../shared/worktree/card-grouping-fields'
 import type { WorktreeCardInteraction } from '../../../../shared/ui-chrome-types'
 import { getDeleteStateForWorktreeHost } from './worktree-delete-state-host-match'
 
@@ -43,6 +44,9 @@ export function useWorktreeCardFoundation({
   const cardProps = useAppStore((s) => s.worktreeCardProperties)
   const cardInteractions = useAppStore(
     (s) => s.worktreeCardInteractions ?? EMPTY_WORKTREE_CARD_INTERACTIONS
+  )
+  const cardGroupingFields = useAppStore(
+    (s) => s.worktreeCardGroupingFields ?? DEFAULT_WORKTREE_CARD_GROUPING_FIELDS
   )
   const agentActivityDisplayMode =
     useAppStore((s) => s.agentActivityDisplayMode) ?? DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE
@@ -214,6 +218,7 @@ export function useWorktreeCardFoundation({
     fetchLinearIssue,
     cardProps,
     cardInteractions,
+    cardGroupingFields,
     agentActivityDisplayMode,
     projectGroups,
     newCardStyle,

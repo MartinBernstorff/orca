@@ -1,6 +1,7 @@
 import type React from 'react'
 
 import type { Repo } from '../../../../shared/repo-types'
+import type { WorktreeCardGroupingField } from '../../../../shared/ui-chrome-types'
 import type { WorkspaceStatus, Worktree } from '../../../../shared/worktree/types'
 import type { WorktreeCardPrDisplay } from './worktree-card-pr-display'
 
@@ -23,6 +24,8 @@ export type WorktreeCardProps = {
   revealHighlightTone?: 'default' | 'ai'
   selectedWorktrees?: readonly Worktree[]
   hideRepoBadge?: boolean
+  /** Grouping fields a sidebar group header already shows for this card. */
+  groupedFields?: readonly WorktreeCardGroupingField[]
   hostContextLabel?: string
   inPinnedSection?: boolean
   activationRowKey?: string
@@ -62,6 +65,7 @@ type DefaultedWorktreeCardProp =
   | 'revealHighlightTone'
   | 'nativeDragEnabled'
   | 'inPinnedSection'
+  | 'groupedFields'
   | 'contentIndent'
   | 'flushSurface'
   | 'lineageChildCount'
@@ -78,6 +82,7 @@ export type ResolvedWorktreeCardProps = Omit<WorktreeCardProps, DefaultedWorktre
   revealHighlightTone: 'default' | 'ai'
   nativeDragEnabled: boolean
   inPinnedSection: boolean
+  groupedFields: readonly WorktreeCardGroupingField[]
   contentIndent: number
   flushSurface: boolean
   lineageChildCount: number
@@ -88,6 +93,7 @@ export type ResolvedWorktreeCardProps = Omit<WorktreeCardProps, DefaultedWorktre
 }
 
 export const EMPTY_WORKSPACE_PORTS = []
+export const EMPTY_GROUPED_FIELDS: readonly WorktreeCardGroupingField[] = []
 export const HOSTED_REVIEW_CARD_REFRESH_INTERVAL_MS = 60_000
 
 export function shouldBeginWorktreeRename(

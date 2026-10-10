@@ -28,6 +28,7 @@ import { EMPTY_PROJECT_GROUPS, type VirtualizedWorktreeViewportProps } from './v
 import { useWorktreeDropCommitContext } from '../drag/use-drop-commit-context'
 import { buildWorktreeVirtualRowContext } from './virtual-row-context'
 import { renderWorktreeVirtualRow } from '../rows/virtual-row-dispatch'
+import { getGroupedWorktreeCardFields } from '../../worktree-card-grouping-field-visibility'
 
 const WORKTREE_SIDEBAR_SCROLL_STYLE: React.CSSProperties = {
   // Why: TanStack Virtual owns scroll correction; native overflow anchoring fights it and causes jumps.
@@ -78,6 +79,11 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
           .map((group) => group.id)
       ),
     [projectGroups]
+  )
+  // Why: a stable array keeps memoized cards from re-rendering on unrelated viewport renders.
+  const groupedCardFields = useMemo(
+    () => getGroupedWorktreeCardFields(groupBy, nestedGroupBy),
+    [groupBy, nestedGroupBy]
   )
 
   const headerDrag = useWorktreeSidebarHeaderDrag({
@@ -307,6 +313,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     sshConnectionStates,
     newCardStyle,
     folderBackedProjectGroupIds,
+    groupedCardFields,
     projectGroups,
     session,
     runtime,

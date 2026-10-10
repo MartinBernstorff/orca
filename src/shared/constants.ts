@@ -11,6 +11,7 @@ import { DEFAULT_STATUS_BAR_ITEMS } from './status-bar-defaults'
 import type { VoiceSettings } from './speech-types'
 import { cloneDefaultWorkspaceStatuses } from './workspace-statuses'
 import { DEFAULT_WORKTREE_CARD_INTERACTIONS } from './worktree/card-interactions'
+import { DEFAULT_WORKTREE_CARD_GROUPING_FIELDS } from './worktree/card-grouping-fields'
 import { DEFAULT_WORKTREE_CARD_PROPERTIES } from './worktree/card-properties'
 import { DEFAULT_USAGE_PERCENTAGE_DISPLAY } from './usage-percentage-display'
 import { DEFAULT_STATUS_BAR_USAGE_MODE } from './status-bar-usage-mode'
@@ -285,6 +286,7 @@ export function getDefaultUIState(): PersistedUIState {
     editorFontZoomLevel: 0,
     worktreeCardProperties: [...DEFAULT_WORKTREE_CARD_PROPERTIES],
     worktreeCardInteractions: [...DEFAULT_WORKTREE_CARD_INTERACTIONS],
+    worktreeCardGroupingFields: [...DEFAULT_WORKTREE_CARD_GROUPING_FIELDS],
     _worktreeCardModeDefaulted: true,
     agentActivityDisplayMode: DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE,
     workspaceStatuses: cloneDefaultWorkspaceStatuses(),

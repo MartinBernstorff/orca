@@ -1,6 +1,7 @@
 import type React from 'react'
 import type { AppState } from '@/store/types'
 import type { ProjectGroup } from '../../../../../../shared/project-group-types'
+import type { WorktreeCardGroupingField } from '../../../../../../shared/ui-chrome-types'
 import type { Worktree } from '../../../../../../shared/worktree/types'
 import type { RenderRow } from '../listing/render-row'
 import type { LineageToggleHandler } from '../../worktree-lineage-toggle-handler-cache'
@@ -29,6 +30,7 @@ type BuildArgs = {
   sshConnectionStates: AppState['sshConnectionStates']
   newCardStyle: boolean
   folderBackedProjectGroupIds: ReadonlySet<string>
+  groupedCardFields: readonly WorktreeCardGroupingField[]
   session: WorktreeDragSession
   runtime: WorktreeDragRuntime
   primaryActive: ReturnType<typeof usePrimaryActiveWorktreeRow>
@@ -115,6 +117,7 @@ export function buildWorktreeVirtualRowContext(args: BuildArgs): WorktreeVirtual
     item: {
       settings: args.settings,
       groupBy: props.groupBy,
+      groupedCardFields: args.groupedCardFields,
       folderBackedProjectGroupIds: args.folderBackedProjectGroupIds,
       groupKeyByRowKey: session.groupKeyByRowKey,
       groupIndexByRowKey: session.groupIndexByRowKey,

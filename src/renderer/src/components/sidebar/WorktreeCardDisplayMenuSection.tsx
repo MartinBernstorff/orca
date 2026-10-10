@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import type {
   AgentActivityDisplayMode,
+  WorktreeCardGroupingField,
   WorktreeCardInteraction,
   WorktreeCardProperty
 } from '../../../../shared/ui-chrome-types'
@@ -22,6 +23,7 @@ import {
 } from './sidebar-workspace-option-items'
 import { PROPERTY_OPTIONS } from './worktree-card-display-property-options'
 import { INTERACTION_OPTIONS } from './worktree-card-interaction-options'
+import { GROUPING_FIELD_OPTIONS } from './worktree-card-grouping-field-options'
 import { translate } from '@/i18n/i18n'
 
 function WorktreeCardInteractionItems(): React.JSX.Element {
@@ -51,6 +53,36 @@ function WorktreeCardInteractionItems(): React.JSX.Element {
         <DropdownMenuCheckboxItem
           key={opt.id}
           checked={worktreeCardInteractions.includes(opt.id)}
+          onCheckedChange={(checked) => handleChange(opt.id, checked === true)}
+          onSelect={(e) => e.preventDefault()}
+        >
+          {opt.label}
+        </DropdownMenuCheckboxItem>
+      ))}
+    </>
+  )
+}
+
+function WorktreeCardGroupingFieldItems(): React.JSX.Element {
+  const worktreeCardGroupingFields = useAppStore((s) => s.worktreeCardGroupingFields)
+  const setWorktreeCardGroupingFields = useAppStore((s) => s.setWorktreeCardGroupingFields)
+  const handleChange = useCallback(
+    (field: WorktreeCardGroupingField, checked: boolean): void => {
+      setWorktreeCardGroupingFields(
+        checked
+          ? [...worktreeCardGroupingFields, field]
+          : worktreeCardGroupingFields.filter((entry) => entry !== field)
+      )
+    },
+    [setWorktreeCardGroupingFields, worktreeCardGroupingFields]
+  )
+
+  return (
+    <>
+      {GROUPING_FIELD_OPTIONS.map((opt) => (
+        <DropdownMenuCheckboxItem
+          key={opt.id}
+          checked={worktreeCardGroupingFields.includes(opt.id)}
           onCheckedChange={(checked) => handleChange(opt.id, checked === true)}
           onSelect={(e) => e.preventDefault()}
         >
@@ -126,6 +158,7 @@ export function WorktreeCardDisplayMenuSection({
               {opt.label}
             </DropdownMenuCheckboxItem>
           ))}
+          <WorktreeCardGroupingFieldItems />
           <WorktreeCardInteractionItems />
         </DropdownMenuSubContent>
       </DropdownMenuSub>

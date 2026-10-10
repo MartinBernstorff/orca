@@ -10,6 +10,10 @@ import {
   WORKTREE_CARD_INTERACTIONS
 } from '../../../../shared/worktree/card-interactions'
 import {
+  normalizeWorktreeCardGroupingFields,
+  WORKTREE_CARD_GROUPING_FIELDS
+} from '../../../../shared/worktree/card-grouping-fields'
+import {
   normalizeWorktreeCardProperties,
   WORKTREE_CARD_PROPERTIES
 } from '../../../../shared/worktree/card-properties'
@@ -35,6 +39,9 @@ const WorktreeCardProperties = z
 const WorktreeCardInteractions = z
   .array(z.enum(WORKTREE_CARD_INTERACTIONS))
   .transform((value) => normalizeWorktreeCardInteractions(value))
+const WorktreeCardGroupingFields = z
+  .array(z.enum(WORKTREE_CARD_GROUPING_FIELDS))
+  .transform((value) => normalizeWorktreeCardGroupingFields(value))
 const STATIC_RIGHT_SIDEBAR_TABS = [
   'explorer',
   'search',
@@ -156,6 +163,7 @@ const UiUpdateFields = z
     editorFontZoomLevel: z.number().finite().optional(),
     worktreeCardProperties: WorktreeCardProperties.optional(),
     worktreeCardInteractions: WorktreeCardInteractions.optional(),
+    worktreeCardGroupingFields: WorktreeCardGroupingFields.optional(),
     _worktreeCardModeDefaulted: z.boolean().optional(),
     agentActivityDisplayMode: AgentActivityDisplayMode.optional(),
     workspaceStatuses: z.array(WorkspaceStatusDefinition).optional(),
