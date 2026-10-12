@@ -45,7 +45,7 @@ function QuickActionButton({
   )
 }
 
-/** Hover-revealed Engage/Open/Delete affordances, shared by the linked refs row and the title row fallback. */
+/** Hover-revealed Engage/Waiting/Open/Delete affordances, shared by the linked refs row and the title row fallback. */
 export function WorktreeCardQuickActions({
   card
 }: {
@@ -55,6 +55,8 @@ export function WorktreeCardQuickActions({
     handleWorkspaceQuickAction,
     handleEngageQuickAction,
     handleOpenQuickAction,
+    handleWaitingQuickAction,
+    waitingQuickAction,
     showEngageQuickAction,
     showOpenQuickAction,
     showDeleteQuickAction
@@ -72,6 +74,32 @@ export function WorktreeCardQuickActions({
             'Engage workspace'
           )}
           label={translate('auto.components.sidebar.WorktreeCard.engageQuickAction', 'Engage')}
+        />
+      )}
+      {waitingQuickAction !== null && (
+        <QuickActionButton
+          card={card}
+          onClick={handleWaitingQuickAction}
+          className={NEUTRAL_TONE_CLASS}
+          ariaLabel={
+            waitingQuickAction === 'mark'
+              ? translate(
+                  'auto.components.sidebar.WorktreeCard.markWaitingQuickActionLabel',
+                  'Mark agents as waiting on others'
+                )
+              : translate(
+                  'auto.components.sidebar.WorktreeCard.clearWaitingQuickActionLabel',
+                  'Clear waiting on others'
+                )
+          }
+          label={
+            waitingQuickAction === 'mark'
+              ? translate('auto.components.sidebar.WorktreeCard.markWaitingQuickAction', 'Waiting')
+              : translate(
+                  'auto.components.sidebar.WorktreeCard.clearWaitingQuickAction',
+                  'Needs you'
+                )
+          }
         />
       )}
       {showOpenQuickAction && (

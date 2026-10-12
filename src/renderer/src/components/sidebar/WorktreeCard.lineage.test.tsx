@@ -51,6 +51,13 @@ vi.mock('./CacheTimer', () => ({
   usePromptCacheCountdownStartedAt: () => null
 }))
 
+vi.mock('./use-worktree-card-waiting-toggle', () => ({
+  useWorktreeCardWaitingToggle: () => ({
+    waitingQuickAction: null,
+    handleWaitingQuickAction: () => {}
+  })
+}))
+
 vi.mock('./WorktreeCardAgents', () => ({
   default: () => null
 }))

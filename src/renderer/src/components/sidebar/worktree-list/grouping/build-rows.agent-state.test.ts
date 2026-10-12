@@ -13,13 +13,13 @@ import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 import type { WorktreeGroupBy } from './row-types'
 
 const working: Worktree = { ...worktree, id: 'wt-working', path: '/tmp/working' }
-const polling: Worktree = { ...worktree, id: 'wt-polling', path: '/tmp/polling' }
+const waiting: Worktree = { ...worktree, id: 'wt-waiting', path: '/tmp/waiting' }
 const stopped: Worktree = { ...worktree, id: 'wt-stopped', path: '/tmp/stopped' }
 const idle: Worktree = { ...worktree, id: 'wt-idle', path: '/tmp/idle' }
 
 const agentStates: WorkspaceAgentStates = new Map([
   ['wt-working', 'working'],
-  ['wt-polling', 'polling'],
+  ['wt-waiting', 'waiting-on-others'],
   ['wt-stopped', 'needs-you']
 ])
 
@@ -62,12 +62,12 @@ function headers(rows: ReturnType<typeof buildRows>) {
 }
 
 describe('groupBy agent-state', () => {
-  it('orders Needs you, Working, Polling, with agentless workspaces in Needs you', () => {
-    const rows = rowsFor('agent-state', [polling, idle, working, stopped])
+  it('orders Needs you, Working, Waiting on others, with agentless workspaces in Needs you', () => {
+    const rows = rowsFor('agent-state', [waiting, idle, working, stopped])
     expect(headers(rows).map((row) => [row.key, row.label, row.count])).toEqual([
       ['agent-state:needs-you', 'Needs You', 2],
       ['agent-state:working', 'Working', 1],
-      ['agent-state:polling', 'Polling', 1]
+      ['agent-state:waiting-on-others', 'Waiting on others', 1]
     ])
   })
 
@@ -77,12 +77,12 @@ describe('groupBy agent-state', () => {
   })
 
   it('counts each nested agent-state lane under its parent', () => {
-    const rows = rowsFor('repo', [working, polling, idle], ['agent-state'])
+    const rows = rowsFor('repo', [working, waiting, idle], ['agent-state'])
     const lanes = headers(rows).filter((row) => row.laneGroupBy === 'agent-state')
     expect(lanes.map((row) => [row.laneKey, row.count, row.nestDepth])).toEqual([
       ['agent-state:needs-you', 1, 1],
       ['agent-state:working', 1, 1],
-      ['agent-state:polling', 1, 1]
+      ['agent-state:waiting-on-others', 1, 1]
     ])
   })
 
@@ -101,7 +101,7 @@ describe('groupBy agent-state', () => {
     expect(
       getGroupKeysForWorktree(
         'priority',
-        polling,
+        waiting,
         repoMap,
         null,
         undefined,
@@ -111,7 +111,10 @@ describe('groupBy agent-state', () => {
         ['agent-state'],
         agentStates
       )
-    ).toEqual(['priority:none', getNestedGroupKey('priority:none', 'agent-state:polling')])
+    ).toEqual([
+      'priority:none',
+      getNestedGroupKey('priority:none', 'agent-state:waiting-on-others')
+    ])
   })
 
   it('places a folder workspace by its own agent state', () => {

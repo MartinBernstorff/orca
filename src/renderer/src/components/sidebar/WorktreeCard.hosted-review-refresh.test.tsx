@@ -76,6 +76,13 @@ vi.mock('./use-worktree-activity-status', () => ({
   useWorktreeActivityStatus: () => 'active'
 }))
 
+vi.mock('./use-worktree-card-waiting-toggle', () => ({
+  useWorktreeCardWaitingToggle: () => ({
+    waitingQuickAction: null,
+    handleWaitingQuickAction: () => {}
+  })
+}))
+
 function makeRepo(): Repo {
   return {
     id: 'repo-1',

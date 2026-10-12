@@ -18,7 +18,10 @@ export function createWebAgentStatusApi(): Partial<PreloadApi> {
       dropByTabPrefix: () => {},
       retirePaneAuthority: () => {},
       restorePaneAuthority: () => {},
-      transferPaneAuthority: () => {}
+      transferPaneAuthority: () => {},
+      listWaitingDeclarations: () => Promise.resolve([]),
+      onWaitingDeclarationsChanged: () => noopUnsubscribe,
+      setWaiting: () => Promise.resolve()
     }
   }
 }

@@ -21,6 +21,7 @@ type WorktreeActivityStatusState = Pick<
   | 'agentStatusByPaneKey'
   | 'migrationUnsupportedByPtyId'
   | 'retainedAgentsByPaneKey'
+  | 'agentWaitingByPaneKey'
   | 'runtimeAgentOrchestrationByPaneKey'
 >
 

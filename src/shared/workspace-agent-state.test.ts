@@ -8,14 +8,18 @@ import {
   type WorkspaceAgentState
 } from './workspace-agent-state'
 
-type Pane = Pick<AgentStatusEntry, 'state' | 'workingMode'>
+type Pane = Pick<AgentStatusEntry, 'state' | 'workingMode'> & { waitingOnOthers?: boolean }
 
-const PANES: readonly Pane[] = [
+const HOOK_PANES: readonly Pane[] = [
   { state: 'working' },
   { state: 'working', workingMode: 'monitoring' },
   { state: 'done' },
   { state: 'blocked' },
   { state: 'waiting' }
+]
+const PANES: readonly Pane[] = [
+  ...HOOK_PANES,
+  ...HOOK_PANES.map((pane) => ({ ...pane, waitingOnOthers: true }))
 ]
 
 // Every pane list up to length 3 — small enough to check exhaustively instead of sampling.
@@ -44,14 +48,20 @@ function permutations<T>(items: readonly T[]): T[][] {
 const rank = (state: WorkspaceAgentState) => WORKSPACE_AGENT_STATES.indexOf(state)
 
 describe('getPaneAgentState', () => {
-  it('maps hook status to Needs you / Working / Polling', () => {
-    expect(PANES.map(getPaneAgentState)).toEqual([
+  it('maps undeclared hook status to Working only while a turn runs', () => {
+    expect(HOOK_PANES.map(getPaneAgentState)).toEqual([
       'working',
-      'polling',
+      'needs-you',
       'needs-you',
       'needs-you',
       'needs-you'
     ])
+  })
+
+  it('maps a declared pane to Waiting on others only once its turn ended', () => {
+    expect(HOOK_PANES.map((pane) => getPaneAgentState({ ...pane, waitingOnOthers: true }))).toEqual(
+      ['working', 'waiting-on-others', 'waiting-on-others', 'needs-you', 'needs-you']
+    )
   })
 })
 
@@ -89,7 +99,9 @@ describe('deriveWorkspaceAgentState', () => {
 })
 
 describe('suppressesAgentCompletionAttention', () => {
-  it('suppresses completion attention only while Polling', () => {
-    expect(WORKSPACE_AGENT_STATES.filter(suppressesAgentCompletionAttention)).toEqual(['polling'])
+  it('suppresses completion attention only while Waiting on others', () => {
+    expect(WORKSPACE_AGENT_STATES.filter(suppressesAgentCompletionAttention)).toEqual([
+      'waiting-on-others'
+    ])
   })
 })
