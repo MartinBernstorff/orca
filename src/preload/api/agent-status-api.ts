@@ -6,6 +6,7 @@ import type {
 import type { AgentInterruptInferenceRequest } from '../../shared/agent-interrupt-intent'
 import type { AgentQuestionAnsweredInferenceRequest } from '../../shared/agent-question-answered-intent'
 import type { ComputerAwakeStatus } from '../../shared/computer-awake-mode'
+import type { AgentWaitingDeclaration } from '../../shared/agent-waiting-declaration'
 
 export type AgentStatusApi = {
   /** Listen for agent status updates forwarded from native hook receivers. */
@@ -41,6 +42,12 @@ export type AgentStatusApi = {
   restorePaneAuthority: (paneKey: string) => void
   /** Move hook authority when a live pane is detached into another tab. */
   transferPaneAuthority: (args: { fromPaneKey: string; toPaneKey: string; ptyId?: string }) => void
+  /** Agent sessions currently declared as waiting on others. */
+  listWaitingDeclarations: () => Promise<AgentWaitingDeclaration[]>
+  onWaitingDeclarationsChanged: (
+    callback: (declarations: AgentWaitingDeclaration[]) => void
+  ) => () => void
+  setWaiting: (args: { paneKeys: string[]; waiting: boolean }) => Promise<void>
 }
 
 export type AgentTrustApi = {

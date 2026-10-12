@@ -23,6 +23,7 @@ import { devinHookService } from '../devin/hook-service'
 import { kimiHookService } from '../kimi/hook-service'
 import { openClaudeHookService } from '../openclaude/hook-service'
 import { registerAgentPaneAuthorityIpcHandlers } from './agent-pane-authority-ipc'
+import { registerAgentWaitingIpcHandlers } from '../agent-waiting/agent-waiting-ipc'
 import { registerAgentStatusRowTeardownIpcHandlers } from './agent-status-row-teardown-ipc'
 import { createAgentPaneAuthorityOwnership } from './agent-pane-authority-ownership'
 import {
@@ -67,6 +68,7 @@ export function registerAgentHookHandlers(
   ipcMain.removeHandler('agentStatus:inferQuestionAnswered')
   ipcMain.removeHandler('agentStatus:getMigrationUnsupportedSnapshot')
   registerAgentStatusRowTeardownIpcHandlers()
+  registerAgentWaitingIpcHandlers()
   registerAgentPaneAuthorityIpcHandlers({
     ownsPty: createAgentPaneAuthorityOwnership({
       getPtyIdForPaneKey: dependencies.getPtyIdForPaneKey,

@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer, webFrame, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { preloadE2EConfig } from './e2e-config'
 import { glApi } from './gitlab'
+import type { AgentWaitingDeclaration } from '../shared/agent-waiting-declaration'
 import type {
   SkillDeletePlan,
   SkillDeleteRequest,
@@ -5232,7 +5233,19 @@ const api = {
       ptyId?: string
     }): void => {
       ipcRenderer.send('agentStatus:transferPaneAuthority', args)
-    }
+    },
+    listWaitingDeclarations: (): Promise<AgentWaitingDeclaration[]> =>
+      ipcRenderer.invoke('agentWaiting:list'),
+    onWaitingDeclarationsChanged: (
+      callback: (declarations: AgentWaitingDeclaration[]) => void
+    ): (() => void) => {
+      const listener = (_event: Electron.IpcRendererEvent, data: AgentWaitingDeclaration[]) =>
+        callback(data)
+      ipcRenderer.on('agentWaiting:changed', listener)
+      return () => ipcRenderer.removeListener('agentWaiting:changed', listener)
+    },
+    setWaiting: (args: { paneKeys: string[]; waiting: boolean }): Promise<void> =>
+      ipcRenderer.invoke('agentWaiting:set', args)
   },
 
   speech: {

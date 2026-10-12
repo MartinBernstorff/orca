@@ -5425,6 +5425,10 @@
           "deleteQuickAction": "Delete",
           "engageQuickActionLabel": "Engage workspace",
           "engageQuickAction": "Engage",
+          "markWaitingQuickActionLabel": "Mark agents as waiting on others",
+          "markWaitingQuickAction": "Waiting",
+          "clearWaitingQuickActionLabel": "Clear waiting on others",
+          "clearWaitingQuickAction": "Needs you",
           "openQuickActionLabel": "Open workspace",
           "openQuickAction": "Open"
         },
@@ -6218,7 +6222,7 @@
           "queued": "Queued"
         },
         "workspaceAgentState": {
-          "polling": "Polling"
+          "waitingOnOthers": "Waiting on others"
         },
         "workspacePriority": {
           "urgent": "Urgent",

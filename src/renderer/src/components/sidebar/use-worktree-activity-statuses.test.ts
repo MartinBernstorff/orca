@@ -15,6 +15,7 @@ function makeStatusState(): StatusState {
     agentStatusByPaneKey: {},
     migrationUnsupportedByPtyId: {},
     retainedAgentsByPaneKey: {},
+    agentWaitingByPaneKey: {},
     runtimeAgentOrchestrationByPaneKey: {}
   }
 }

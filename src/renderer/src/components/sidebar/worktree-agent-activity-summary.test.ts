@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { shallow } from 'zustand/shallow'
-import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
+import {
+  AGENT_STATUS_STALE_AFTER_MS,
+  type AgentStatusEntry
+} from '../../../../shared/agent-status-types'
 import { makePaneKey } from '../../../../shared/stable-pane-id'
 import type { TerminalTab } from '../../../../shared/terminal-tab-types'
 import {
@@ -448,7 +451,11 @@ describe('selectWorkspaceAgentStates', () => {
     vi.restoreAllMocks()
   })
 
-  function makeState(epoch: number, entries: AgentStatusEntry[]): AgentActivityInput {
+  function makeState(
+    epoch: number,
+    entries: AgentStatusEntry[],
+    waitingPaneKeys: string[] = []
+  ): AgentActivityInput {
     return {
       tabsByWorktree: {
         'repo::/wt-1': [makeTab('tab-1', 'repo::/wt-1')],
@@ -457,7 +464,10 @@ describe('selectWorkspaceAgentStates', () => {
       agentStatusEpoch: epoch,
       agentStatusByPaneKey: Object.fromEntries(entries.map((entry) => [entry.paneKey, entry])),
       migrationUnsupportedByPtyId: {},
-      retainedAgentsByPaneKey: {}
+      retainedAgentsByPaneKey: {},
+      agentWaitingByPaneKey: Object.fromEntries(
+        waitingPaneKeys.map((paneKey) => [paneKey, true as const])
+      )
     }
   }
 
@@ -465,18 +475,77 @@ describe('selectWorkspaceAgentStates', () => {
     vi.spyOn(Date, 'now').mockReturnValue(2_000)
     const working = makePaneKey('tab-1', LEAF_ID)
     const done = makePaneKey('tab-1', '22222222-2222-4222-8222-222222222222')
-    const polling = makePaneKey('tab-2', LEAF_ID)
+    const monitoring = makePaneKey('tab-2', LEAF_ID)
     const states = selectWorkspaceAgentStates(
       makeState(101, [
         makeAgentStatusEntry({ paneKey: working, state: 'working' }),
         makeAgentStatusEntry({ paneKey: done, state: 'done' }),
-        makeAgentStatusEntry({ paneKey: polling, state: 'working', workingMode: 'monitoring' })
+        makeAgentStatusEntry({ paneKey: monitoring, state: 'working', workingMode: 'monitoring' })
       ])
     )
     expect(Object.fromEntries(states)).toEqual({
       'repo::/wt-1': 'needs-you',
-      'repo::/wt-2': 'polling'
+      'repo::/wt-2': 'needs-you'
     })
+  })
+
+  it('shows a declared ended turn as Waiting on others', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(2_000)
+    const working = makePaneKey('tab-1', LEAF_ID)
+    const monitoring = makePaneKey('tab-2', LEAF_ID)
+    const states = selectWorkspaceAgentStates(
+      makeState(
+        105,
+        [
+          makeAgentStatusEntry({ paneKey: working, state: 'working' }),
+          makeAgentStatusEntry({ paneKey: monitoring, state: 'working', workingMode: 'monitoring' })
+        ],
+        [working, monitoring]
+      )
+    )
+    expect(Object.fromEntries(states)).toEqual({
+      'repo::/wt-1': 'working',
+      'repo::/wt-2': 'waiting-on-others'
+    })
+  })
+
+  it('keeps a declared pane Waiting on others after its hook status goes stale', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000 + AGENT_STATUS_STALE_AFTER_MS + 1)
+    const declared = makePaneKey('tab-1', LEAF_ID)
+    const undeclared = makePaneKey('tab-2', LEAF_ID)
+    const states = selectWorkspaceAgentStates(
+      makeState(
+        106,
+        [
+          makeAgentStatusEntry({ paneKey: declared, state: 'done' }),
+          makeAgentStatusEntry({ paneKey: undeclared, state: 'done' })
+        ],
+        [declared]
+      )
+    )
+    expect(Object.fromEntries(states)).toEqual({ 'repo::/wt-1': 'waiting-on-others' })
+  })
+
+  it('lists ended-turn and declared panes for the card toggle', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(2_000)
+    const done = makePaneKey('tab-1', LEAF_ID)
+    const declared = makePaneKey('tab-1', '22222222-2222-4222-8222-222222222222')
+    const blocked = makePaneKey('tab-1', '33333333-3333-4333-8333-333333333333')
+    const summary = selectWorktreeAgentActivitySummary(
+      makeState(
+        107,
+        [
+          makeAgentStatusEntry({ paneKey: done, state: 'done' }),
+          makeAgentStatusEntry({ paneKey: declared, state: 'done' }),
+          makeAgentStatusEntry({ paneKey: blocked, state: 'blocked' })
+        ],
+        [declared]
+      ),
+      'repo::/wt-1'
+    )
+    expect(summary.endedTurnPaneKeys).toEqual([done])
+    expect(summary.waitingPaneKeys).toEqual([declared])
+    expect(summary.agentState).toBe('needs-you')
   })
 
   it('keeps the map identity when an epoch bump changes no workspace state', () => {

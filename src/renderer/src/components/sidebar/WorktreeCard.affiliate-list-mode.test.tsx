@@ -74,6 +74,13 @@ vi.mock('./use-worktree-activity-status', () => ({
   useWorktreeActivityStatus: () => 'idle'
 }))
 
+vi.mock('./use-worktree-card-waiting-toggle', () => ({
+  useWorktreeCardWaitingToggle: () => ({
+    waitingQuickAction: null,
+    handleWaitingQuickAction: () => {}
+  })
+}))
+
 vi.mock('./CacheTimer', () => ({
   default: () => null,
   usePromptCacheCountdownStartedAt: () => null

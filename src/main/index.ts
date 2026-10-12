@@ -305,6 +305,10 @@ import {
 } from './claude-accounts/live-pty-gate'
 import { StarNagService } from './star-nag/service'
 import { agentHookServer, type AgentHookProviderSessionIdentity } from './agent-hooks/server'
+import {
+  AGENT_WAITING_DECLARATIONS_FILE_NAME,
+  agentWaitingDeclarations
+} from './agent-waiting/agent-waiting-declarations'
 import { createHookProviderSessionInvalidator } from './agent-hooks/hook-provider-session-invalidation'
 import { createHookStatusSessionTabsInvalidator } from './agent-hooks/hook-status-session-tabs-invalidation'
 import { wslHookRelayManager } from './agent-hooks/wsl-hook-relay-manager'
@@ -2678,6 +2682,13 @@ void app.whenReady().then(async () => {
   })
   agentHookServer.subscribePaneStatusClear((clear) => {
     agentSessionRecorder.onCleared(clear)
+  })
+  agentWaitingDeclarations.load(join(app.getPath('userData'), AGENT_WAITING_DECLARATIONS_FILE_NAME))
+  agentWaitingDeclarations.attach(agentHookServer)
+  agentWaitingDeclarations.subscribe((declarations) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('agentWaiting:changed', declarations)
+    }
   })
   agentHookServer.subscribePromptSubmitted((event) => {
     const currentStore = store

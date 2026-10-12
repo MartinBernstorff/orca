@@ -1,5 +1,5 @@
 import type React from 'react'
-import { Activity, LoaderCircle, MessageCircleQuestion } from 'lucide-react'
+import { Hourglass, LoaderCircle, MessageCircleQuestion } from 'lucide-react'
 import {
   IDLE_WORKSPACE_AGENT_STATE,
   WORKSPACE_AGENT_STATES,
@@ -18,8 +18,11 @@ export function getWorkspaceAgentStateLabel(state: WorkspaceAgentState): string 
       return translate('dashboardPopout.bucket.attention', 'Needs You')
     case 'working':
       return translate('dashboardPopout.bucket.working', 'Working')
-    case 'polling':
-      return translate('auto.components.sidebar.workspaceAgentState.polling', 'Polling')
+    case 'waiting-on-others':
+      return translate(
+        'auto.components.sidebar.workspaceAgentState.waitingOnOthers',
+        'Waiting on others'
+      )
   }
 }
 
@@ -29,7 +32,7 @@ const AGENT_STATE_LANE_META: Record<
 > = {
   'needs-you': { icon: MessageCircleQuestion, tone: 'text-agent-question' },
   working: { icon: LoaderCircle, tone: 'text-foreground' },
-  polling: { icon: Activity, tone: 'text-yellow-500' }
+  'waiting-on-others': { icon: Hourglass, tone: 'text-muted-foreground' }
 }
 
 export function getWorkspaceAgentStateLaneHeaderMeta(state: WorkspaceAgentState): {
