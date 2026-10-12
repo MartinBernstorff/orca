@@ -8,7 +8,8 @@ import { getWorkspaceStatusGroupKey } from '../../../../../../shared/workspace-s
 import { getNestedGroupKey } from '../../../../../../shared/sidebar-group-by-levels'
 import type { GroupHeaderRow, WorktreeGroupBy } from '../grouping/row-types'
 import { PROJECT_GROUP_META } from '../grouping/group-keys'
-import { renderWorktreeSectionHeaderRow, type SectionHeaderRowContext } from './SectionHeader'
+import { renderWorktreeSectionHeaderRow } from './SectionHeader'
+import type { SectionHeaderRowContext } from './section-header-row-context'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -44,6 +45,15 @@ function makeContext(groupBy: WorktreeGroupBy): SectionHeaderRowContext {
     headerDrag: emptyDrag,
     getCachedFolderWorkspacePathStatus: () => null,
     toggleGroupWithScrollAnchor: vi.fn(),
+    hoverSections: {
+      openOnHoverGroups: new Set<string>(),
+      hoverOpenedGroups: new Set<string>(),
+      hoverPinnedGroups: new Set<string>(),
+      openHoverGroup: vi.fn(),
+      closeHoverGroup: vi.fn(),
+      toggleHoverGroupPin: vi.fn(),
+      toggleOpenOnHover: vi.fn()
+    },
     projectActions: {},
     onRenameProjectGroup: vi.fn(),
     onDeleteProjectGroup: vi.fn(),

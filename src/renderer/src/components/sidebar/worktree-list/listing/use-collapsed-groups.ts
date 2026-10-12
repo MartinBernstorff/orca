@@ -16,6 +16,8 @@ import { isPinnedSectionWorktree } from '../../pinned-section-worktrees'
 import { getWorktreeLineageAncestors } from '../../worktree-lineage-projection'
 import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
+const NO_GROUPS: ReadonlySet<string> = new Set()
+
 // While the agent send picker targets a workspace, force open every section that hides it.
 export function useEffectiveCollapsedGroups(args: {
   collapsedGroups: Set<string>
@@ -35,7 +37,7 @@ export function useEffectiveCollapsedGroups(args: {
   projectGrouping: ProjectGroupingModel
   folderWorkspaces: readonly FolderWorkspace[]
   defaultHostId: ExecutionHostId
-}): Set<string> {
+}): { effectiveCollapsedGroups: Set<string>; forcedOpenGroups: ReadonlySet<string> } {
   const {
     collapsedGroups,
     agentSendTargetWorktreeId,
@@ -55,35 +57,35 @@ export function useEffectiveCollapsedGroups(args: {
     folderWorkspaces,
     defaultHostId
   } = args
-  return useMemo(() => {
+  const forcedOpenGroups = useMemo((): ReadonlySet<string> => {
     if (!agentSendTargetWorktreeId) {
-      return collapsedGroups
+      return NO_GROUPS
     }
     const targetWorktree = worktreeMap.get(agentSendTargetWorktreeId)
     if (!targetWorktree) {
       // Why: folder workspaces are absent from worktreeMap, so without this the
       // agent-send picker could never open the section hiding one (#15362).
-      const folderKeys = getFolderWorkspaceRevealGroupKeys(
-        agentSendTargetWorktreeId,
-        folderWorkspaces,
-        projectGroups,
-        { groupBy, nestedGroupBy, workspaceStatuses, defaultHostId, agentStates }
+      return new Set(
+        getFolderWorkspaceRevealGroupKeys(
+          agentSendTargetWorktreeId,
+          folderWorkspaces,
+          projectGroups,
+          {
+            groupBy,
+            nestedGroupBy,
+            workspaceStatuses,
+            defaultHostId,
+            agentStates
+          }
+        )
       )
-      if (folderKeys.length === 0) {
-        return collapsedGroups
-      }
-      const nextForFolder = new Set(collapsedGroups)
-      for (const groupKey of folderKeys) {
-        nextForFolder.delete(groupKey)
-      }
-      return nextForFolder
     }
-    const next = new Set(collapsedGroups)
+    const forced = new Set<string>()
     if (
       pinnedDisplayPolicy === 'single-location' &&
       isPinnedSectionWorktree(targetWorktree, visibleWorktrees, worktreeLineageById, worktreeMap)
     ) {
-      next.delete(PINNED_GROUP_KEY)
+      forced.add(PINNED_GROUP_KEY)
     } else {
       for (const groupKey of getGroupKeysForWorktree(
         groupBy,
@@ -97,7 +99,7 @@ export function useEffectiveCollapsedGroups(args: {
         nestedGroupBy,
         agentStates
       )) {
-        next.delete(groupKey)
+        forced.add(groupKey)
       }
     }
 
@@ -106,12 +108,11 @@ export function useEffectiveCollapsedGroups(args: {
       worktreeLineageById,
       worktreeMap
     )) {
-      next.delete(getLineageGroupKey(parent.id))
+      forced.add(getLineageGroupKey(parent.id))
     }
-    return next
+    return forced
   }, [
     agentSendTargetWorktreeId,
-    collapsedGroups,
     groupBy,
     nestedGroupBy,
     pinnedDisplayPolicy,
@@ -128,4 +129,15 @@ export function useEffectiveCollapsedGroups(args: {
     folderWorkspaces,
     defaultHostId
   ])
+  const effectiveCollapsedGroups = useMemo(() => {
+    if (forcedOpenGroups.size === 0) {
+      return collapsedGroups
+    }
+    const next = new Set(collapsedGroups)
+    for (const groupKey of forcedOpenGroups) {
+      next.delete(groupKey)
+    }
+    return next
+  }, [collapsedGroups, forcedOpenGroups])
+  return { effectiveCollapsedGroups, forcedOpenGroups }
 }

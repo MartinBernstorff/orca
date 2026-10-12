@@ -6221,6 +6221,9 @@
           "engaged": "Engaged",
           "queued": "Queued"
         },
+        "sectionHeader": {
+          "openOnHover": "Open on hover"
+        },
         "workspaceAgentState": {
           "waitingOnOthers": "Waiting on others"
         },

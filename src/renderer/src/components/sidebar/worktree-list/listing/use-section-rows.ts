@@ -12,6 +12,7 @@ import type { ExecutionHostId } from '../../../../../../shared/execution-host'
 import { folderWorkspaceKey } from '../../../../../../shared/workspace-scope'
 import { getHostDisplayLabelOverrides } from '../../../../../../shared/host-setting-overrides'
 import { buildRows } from '../grouping/build-rows'
+import { useHoverSectionRows } from './use-hover-section-rows'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
 import type { PinnedWorktreeDisplayPolicy, Row, WorktreeGroupBy } from '../grouping/row-types'
 import type { NestedSidebarGroupBy } from '../../../../../../shared/sidebar-group-by-levels'
@@ -39,6 +40,12 @@ type SectionRowsArgs = {
   workspaceStatuses: readonly WorkspaceStatusDefinition[]
   showEmptyWorkspaceStatuses: boolean
   effectiveCollapsedGroups: Set<string>
+  openOnHoverByDefault: boolean
+  openOnHoverDisabledGroups: ReadonlySet<string>
+  /** Sections the agent send picker forces open; they never rest collapsed behind hover. */
+  forcedOpenGroups: ReadonlySet<string>
+  /** Open-on-hover sections currently opened; their contents render as overlays, not list rows. */
+  hoverOpenedGroups: ReadonlySet<string>
   projectGrouping: ProjectGroupingModel
   visibleReposForRows: readonly Repo[]
   visibleProjectGroupsForRows: readonly ProjectGroup[]
@@ -147,14 +154,14 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
     [hostOptions]
   )
 
-  const rows: Row[] = useMemo(
-    () =>
+  const buildRowsWithCollapsed = useCallback(
+    (collapsedGroups: Set<string>): Row[] =>
       buildRows(
         args.groupBy,
         worktrees,
         repoMap,
         args.prCache,
-        effectiveCollapsedGroups,
+        collapsedGroups,
         repoOrder,
         args.workspaceStatuses,
         args.projectOrderBy,
@@ -181,7 +188,6 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
       worktrees,
       repoMap,
       args.prCache,
-      effectiveCollapsedGroups,
       defaultHostId,
       repoOrder,
       args.workspaceStatuses,
@@ -203,6 +209,15 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
       args.agentStates
     ]
   )
+  const { rows, listCollapsedGroups, openOnHoverGroups, hoverOverlayRowsByHeaderKey } =
+    useHoverSectionRows({
+      buildRowsWithCollapsed,
+      effectiveCollapsedGroups,
+      openOnHoverByDefault: args.openOnHoverByDefault,
+      openOnHoverDisabledGroups: args.openOnHoverDisabledGroups,
+      forcedOpenGroups: args.forcedOpenGroups,
+      hoverOpenedGroups: args.hoverOpenedGroups
+    })
   const orderedHostOptions = useMemo(
     () => orderHostSectionOptions(hostOptions, workspaceHostOrder),
     [hostOptions, workspaceHostOrder]
@@ -258,6 +273,9 @@ export function useSidebarSectionRows(args: SectionRowsArgs) {
   return {
     rows,
     sectionRows,
+    listCollapsedGroups,
+    openOnHoverGroups,
+    hoverOverlayRowsByHeaderKey,
     renderedSidebarRowKeys,
     allRepoIds,
     placeholderRepoIds,

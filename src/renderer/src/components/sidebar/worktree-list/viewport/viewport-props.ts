@@ -23,12 +23,14 @@ import type { NewExternalWorktreesInboxActionState } from '../../new-external-wo
 import type { WorktreeDragGroup } from '../../worktree-manual-order'
 import type { WorktreeStatusDropAtIndexArgs } from '../drag/drop-commit-context'
 import type { ProjectGroupingModel } from '../grouping/project-grouping'
-import type { PinnedWorktreeDisplayPolicy, WorktreeGroupBy } from '../grouping/row-types'
+import type { PinnedWorktreeDisplayPolicy, Row, WorktreeGroupBy } from '../grouping/row-types'
 import type { WorkspaceAgentStates } from '../../workspace-agent-state-meta'
 
 export const EMPTY_PROJECT_GROUPS: readonly ProjectGroup[] = []
 export type VirtualizedWorktreeViewportProps = {
   rows: HostSectionRow[]
+  hoverOverlayRowsByHeaderKey: ReadonlyMap<string, Row[]>
+  openOnHoverGroups: ReadonlySet<string>
   activeWorktreeId: string | null
   activeWorkspaceExecutionHostId: ExecutionHostId | null
   currentWorktreeId: string | null

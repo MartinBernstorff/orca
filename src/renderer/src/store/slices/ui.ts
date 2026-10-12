@@ -983,6 +983,9 @@ export type UISlice = {
   setFilterRepoIds: (ids: readonly string[]) => void
   collapsedGroups: Set<string>
   toggleCollapsedGroup: (key: string) => void
+  /** Sections opted out of open-on-hover; every other section header opens on hover. */
+  openOnHoverDisabledGroups: Set<string>
+  toggleOpenOnHoverDisabledGroup: (key: string) => void
   worktreeCardProperties: WorktreeCardProperty[]
   _worktreeCardModeDefaulted: boolean
   setWorktreeCardMode: (mode: WorktreeCardMode) => void
@@ -2326,6 +2329,20 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
       return { collapsedGroups: next }
     }),
 
+  openOnHoverDisabledGroups: new Set<string>(),
+  toggleOpenOnHoverDisabledGroup: (key) =>
+    set((s) => {
+      const next = new Set(s.openOnHoverDisabledGroups)
+      if (next.has(key)) {
+        next.delete(key)
+      } else {
+        next.add(key)
+      }
+      // Why a call of its own: a strict older host rejects the unknown key, and must not take other fields down with it.
+      window.api.ui.set({ openOnHoverDisabledGroups: [...next] }).catch(console.error)
+      return { openOnHoverDisabledGroups: next }
+    }),
+
   worktreeCardProperties: [...DEFAULT_WORKTREE_CARD_PROPERTIES],
   _worktreeCardModeDefaulted: true,
   setWorktreeCardMode: (mode) => {
@@ -2770,6 +2787,7 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
             ? persistedFilterRepoIds
             : persistedFilterRepoIds.filter((repoId) => validRepoIds.has(repoId)),
         collapsedGroups: new Set(ui.collapsedGroups ?? []),
+        openOnHoverDisabledGroups: new Set(ui.openOnHoverDisabledGroups ?? []),
         uiZoomLevel: ui.uiZoomLevel ?? 0,
         editorFontZoomLevel: ui.editorFontZoomLevel ?? 0,
         worktreeCardProperties: normalizeWorktreeCardProperties(ui.worktreeCardProperties),

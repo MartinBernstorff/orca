@@ -270,6 +270,9 @@ function setLineageState(
     browserTabsByWorktree: {},
     clearPendingRevealWorktreeId: vi.fn(),
     collapsedGroups: new Set<string>(),
+    openOnHoverDisabledGroups: new Set<string>(),
+    hoverOpenedGroups: new Set<string>(),
+    hoverPinnedGroups: new Set<string>(),
     deleteStateByWorktreeId: options.deletingChild
       ? { [child.id]: { isDeleting: true, error: null, canForceDelete: false } }
       : {},

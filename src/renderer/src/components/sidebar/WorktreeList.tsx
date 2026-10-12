@@ -89,7 +89,10 @@ const WorktreeList = React.memo(function WorktreeList({
   const clearPendingRevealWorktreeId = useAppStore((s) => s.clearPendingRevealWorktreeId)
   const clearPendingRevealSidebarRow = useAppStore((s) => s.clearPendingRevealSidebarRow)
   const collapsedGroups = useAppStore((s) => s.collapsedGroups)
-  const toggleGroup = useAppStore((s) => s.toggleCollapsedGroup)
+  const toggleCollapsedGroup = useAppStore((s) => s.toggleCollapsedGroup)
+  const openOnHoverByDefault = useAppStore((s) => s.openOnHoverByDefault)
+  const openOnHoverDisabledGroups = useAppStore((s) => s.openOnHoverDisabledGroups)
+  const hoverOpenedGroups = useAppStore((s) => s.hoverOpenedGroups)
   const projectGroups = useAppStore((s) => s.projectGroups ?? EMPTY_PROJECT_GROUPS)
   const folderWorkspaces = useAppStore((s) => s.folderWorkspaces)
   const settings = useAppStore((s) => s.settings)
@@ -129,7 +132,7 @@ const WorktreeList = React.memo(function WorktreeList({
     settings,
     agentSendTargetWorktreeId
   })
-  const effectiveCollapsedGroups = useEffectiveCollapsedGroups({
+  const { effectiveCollapsedGroups, forcedOpenGroups } = useEffectiveCollapsedGroups({
     collapsedGroups,
     agentSendTargetWorktreeId,
     groupBy,
@@ -179,6 +182,10 @@ const WorktreeList = React.memo(function WorktreeList({
     workspaceStatuses,
     showEmptyWorkspaceStatuses,
     effectiveCollapsedGroups,
+    openOnHoverByDefault: openOnHoverByDefault === true,
+    openOnHoverDisabledGroups,
+    forcedOpenGroups,
+    hoverOpenedGroups,
     projectGrouping,
     visibleReposForRows: visibleScope.visibleReposForRows,
     visibleProjectGroupsForRows: visibleScope.visibleProjectGroupsForRows,
@@ -189,6 +196,16 @@ const WorktreeList = React.memo(function WorktreeList({
     visibleWorkspaceHostIds: filterState.visibleWorkspaceHostIds,
     workspaceHostScope: filterState.workspaceHostScope
   })
+  const { openOnHoverGroups } = rowModel
+  // Why: reveal and header toggles must not flip the hidden persisted flag of an open-on-hover section.
+  const toggleGroup = useCallback(
+    (key: string) => {
+      if (!openOnHoverGroups.has(key)) {
+        toggleCollapsedGroup(key)
+      }
+    },
+    [openOnHoverGroups, toggleCollapsedGroup]
+  )
   const selection = useSidebarWorktreeSelection({
     sectionRows: rowModel.sectionRows,
     pinnedDisplayPolicy
@@ -297,6 +314,8 @@ const WorktreeList = React.memo(function WorktreeList({
         // Why: status headers move during wake (inactive -> active); key only on grouping mode so row identity survives.
         key={`group:${groupBy}:host:${filterState.visibleWorkspaceHostIds?.join(',') ?? 'all'}:lineage`}
         rows={rowModel.sectionRows}
+        hoverOverlayRowsByHeaderKey={rowModel.hoverOverlayRowsByHeaderKey}
+        openOnHoverGroups={openOnHoverGroups}
         // Why: full-page nav views aren't scoped to a worktree, so no sidebar card should look selected.
         activeWorktreeId={
           activeView === 'tasks' || activeView === 'activity' ? null : currentSidebarWorktreeId
@@ -307,7 +326,7 @@ const WorktreeList = React.memo(function WorktreeList({
         pinnedDisplayPolicy={pinnedDisplayPolicy}
         projectOrderBy={projectOrderBy}
         toggleGroup={toggleGroup}
-        collapsedGroups={effectiveCollapsedGroups}
+        collapsedGroups={rowModel.listCollapsedGroups}
         handleCreateForRepo={handleCreateForRepo}
         handleOpenRepoSettings={handleOpenRepoSettings}
         handleOpenWorktreeVisibility={handleOpenWorktreeVisibility}

@@ -12,7 +12,7 @@ import {
   getWorktreeVirtualRowTransform,
   shouldUseHeaderTopSpacing
 } from '../viewport/virtual-rows'
-import type { RenderRow } from '../listing/render-row'
+import { getRenderRowKey, type RenderRow } from '../listing/render-row'
 import type { ImportedWorktreeCardActionState } from '../../imported-worktrees-card-actions'
 import type { NewExternalWorktreesInboxActionState } from '../../new-external-worktrees-inbox-actions'
 import type { useHostHeaderDrag } from '../../host-header-drag'
@@ -28,11 +28,13 @@ import {
   renderWorktreeLineageDescendants,
   type WorktreeItemRowContext
 } from './item-row'
-import { renderWorktreeSectionHeaderRow, type SectionHeaderRowContext } from './SectionHeader'
+import { renderWorktreeSectionHeaderRow } from './SectionHeader'
+import type { SectionHeaderRowContext } from './section-header-row-context'
 import type { WorktreeRowDragState } from '../drag/row-state'
 
 export type WorktreeVirtualRowContext = {
   renderRows: RenderRow[]
+  hoverOverlayRenderRowsByHeaderKey: ReadonlyMap<string, RenderRow[]>
   firstHeaderIndex: number
   activeStickyHeaderIndexRef: React.MutableRefObject<number | null>
   activeStickyHostIndexRef: React.MutableRefObject<number | null>
@@ -144,6 +146,60 @@ function renderLineageGroupVirtualRow(
   )
 }
 
+const NO_STICKY_INDEX: React.MutableRefObject<number | null> = { current: null }
+const NO_HOVER_OVERLAYS: ReadonlyMap<string, RenderRow[]> = new Map()
+const noop = (): void => {}
+
+function getOverlayVirtualItem(row: RenderRow, index: number): VirtualItem {
+  return { key: getRenderRowKey(row), index, start: 0, end: 0, size: 0, lane: 0 }
+}
+
+// Strips virtual-slot identity so scroll anchoring and row lookups never pick up overlay rows.
+function toOverlayRow(element: React.JSX.Element | null): React.JSX.Element | null {
+  if (!element) {
+    return null
+  }
+  const props = element.props as { className?: string }
+  return React.cloneElement(element, {
+    'data-worktree-virtual-row': undefined,
+    'data-worktree-virtual-row-key': undefined,
+    'data-worktree-virtual-row-start': undefined,
+    'data-worktree-sticky-header': undefined,
+    'data-index': undefined,
+    className: cn(props.className, 'relative'),
+    style: undefined
+  } as Partial<React.HTMLAttributes<HTMLDivElement>>)
+}
+
+// Renders an open-on-hover section's rows in normal flow inside a floating panel; they are
+// outside the virtualizer, so measurement and row dragging are disabled for them.
+function renderHoverSectionOverlay(
+  ctx: WorktreeVirtualRowContext,
+  rows: RenderRow[]
+): React.JSX.Element {
+  const overlayCtx: WorktreeVirtualRowContext = {
+    ...ctx,
+    renderRows: rows,
+    hoverOverlayRenderRowsByHeaderKey: NO_HOVER_OVERLAYS,
+    firstHeaderIndex: rows.findIndex((row) => row.type === 'header'),
+    activeStickyHeaderIndexRef: NO_STICKY_INDEX,
+    activeStickyHostIndexRef: NO_STICKY_INDEX,
+    measureVirtualRowElement: noop,
+    item: { ...ctx.item, onRowPointerDown: noop },
+    folderWorkspace: { ...ctx.folderWorkspace, onRowPointerDown: noop }
+  }
+  return (
+    <div
+      data-sidebar-hover-overlay=""
+      className="absolute left-0 right-0 top-full rounded-md border border-border bg-popover py-1 text-popover-foreground shadow-floating"
+    >
+      {rows.map((row, index) =>
+        toOverlayRow(renderWorktreeVirtualRow(overlayCtx, row, getOverlayVirtualItem(row, index)))
+      )}
+    </div>
+  )
+}
+
 // One virtual slot -> one row renderer. Every branch owns its own absolute/sticky frame
 // because sticky headers and lineage groups position differently from plain cards.
 export function renderWorktreeVirtualRow(
@@ -156,7 +212,9 @@ export function renderWorktreeVirtualRow(
   }
 
   if (row.type === 'header') {
+    const hoverOverlayRows = ctx.hoverOverlayRenderRowsByHeaderKey.get(row.key)
     return renderWorktreeSectionHeaderRow({
+      hoverOverlay: hoverOverlayRows ? renderHoverSectionOverlay(ctx, hoverOverlayRows) : null,
       ctx: ctx.header,
       row,
       vItem,

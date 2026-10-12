@@ -17,11 +17,13 @@ import type { WorktreeListVirtualizer } from './use-virtualizer'
 import type { VirtualizedWorktreeViewportProps } from './viewport-props'
 import type { WorktreeVirtualRowContext } from '../rows/virtual-row-dispatch'
 import { getRepoOwnerWorktreeVisibilityDefaults } from '../../../../store/worktree-visibility-defaults-by-host'
+import type { SidebarHoverSectionsContext } from '../rows/hover-section-header'
 
 type BuildArgs = {
   props: VirtualizedWorktreeViewportProps
   projectGroups: readonly ProjectGroup[]
   renderRows: RenderRow[]
+  hoverOverlayRenderRowsByHeaderKey: ReadonlyMap<string, RenderRow[]>
   firstHeaderIndex: number
   virtualization: WorktreeListVirtualizer
   measureVirtualRowElement: (element: HTMLDivElement | null) => void
@@ -41,6 +43,7 @@ type BuildArgs = {
   getCachedFolderWorkspacePathStatus: ReturnType<typeof useFolderWorkspacePathStatusRows>
   getLineageToggleHandler: (groupKey: string) => LineageToggleHandler
   toggleGroupWithScrollAnchor: (groupKey: string) => void
+  hoverSections: SidebarHoverSectionsContext
   onRowClickCapture: (event: React.MouseEvent<HTMLDivElement>) => void
   onRowPointerDown: (
     event: React.PointerEvent<HTMLDivElement>,
@@ -55,6 +58,7 @@ export function buildWorktreeVirtualRowContext(args: BuildArgs): WorktreeVirtual
   const { props, runtime, session, statusDrag, headerDrag, primaryActive, reveal } = args
   return {
     renderRows: args.renderRows,
+    hoverOverlayRenderRowsByHeaderKey: args.hoverOverlayRenderRowsByHeaderKey,
     firstHeaderIndex: args.firstHeaderIndex,
     activeStickyHeaderIndexRef: args.virtualization.activeStickyHeaderIndexRef,
     activeStickyHostIndexRef: args.virtualization.activeStickyHostIndexRef,
@@ -88,6 +92,7 @@ export function buildWorktreeVirtualRowContext(args: BuildArgs): WorktreeVirtual
       headerDrag,
       getCachedFolderWorkspacePathStatus: args.getCachedFolderWorkspacePathStatus,
       toggleGroupWithScrollAnchor: args.toggleGroupWithScrollAnchor,
+      hoverSections: args.hoverSections,
       projectActions: {
         getWorktreeVisibilityDefaults: (repo) =>
           getRepoOwnerWorktreeVisibilityDefaults(
