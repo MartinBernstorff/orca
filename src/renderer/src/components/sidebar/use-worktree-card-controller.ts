@@ -1,4 +1,5 @@
 import { canShowWorkspaceDeleteQuickAction } from './workspace-delete-quick-action'
+import { useWorktreeCardWaitingToggle } from './use-worktree-card-waiting-toggle'
 import { getWorkspaceEngagement } from './workspace-engagement-meta'
 import { useWorktreeCardDetailsHoverControl } from './worktree-card-details-hover-state'
 import type { ResolvedWorktreeCardProps } from './worktree-card-model'
@@ -100,6 +101,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
   const showEngageQuickAction =
     !props.affiliateListMode && !linked.isDeleting && getWorkspaceEngagement(worktree) === 'queued'
   const showOpenQuickAction = !props.affiliateListMode && !linked.isDeleting
+  const waitingToggle = useWorktreeCardWaitingToggle(worktree.id, showOpenQuickAction)
   const workspaceActions = useWorktreeCardWorkspaceActions({
     worktree,
     lineageChildCount: props.lineageChildCount,
@@ -170,6 +172,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     showDeleteQuickAction,
     showEngageQuickAction,
     showOpenQuickAction,
+    ...waitingToggle,
     ...workspaceActions,
     ...secondary
   }

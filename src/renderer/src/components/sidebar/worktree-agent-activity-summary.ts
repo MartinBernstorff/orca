@@ -6,6 +6,7 @@ import {
   parseAgentStatusPaneIdentity,
   resolveAgentStatusWorktreeId
 } from '@/lib/agent-status-worktree-attribution'
+import { summariesEqual } from './worktree-agent-activity-summary-equality'
 import {
   AGENT_STATUS_STALE_AFTER_MS,
   type AgentStatusEntry,
@@ -14,6 +15,7 @@ import {
 import {
   IDLE_WORKSPACE_AGENT_STATE,
   getPaneAgentState,
+  hasEndedTurn,
   mostUrgentAgentState,
   type WorkspaceAgentState
 } from '../../../../shared/workspace-agent-state'
@@ -26,12 +28,17 @@ export type WorktreeAgentActivitySummary = {
   hasInterrupted: boolean
   hasLiveDone: boolean
   hasRetainedDone: boolean
-  /** Most urgent state across fresh hook panes; null when none is fresh. */
+  /** Most urgent state across fresh hook panes and declared panes; null when there are none. */
   agentState: WorkspaceAgentState | null
+  /** Panes whose turn ended without a waiting-on-others declaration. */
+  endedTurnPaneKeys: readonly string[]
+  /** Panes whose agent session declared it is waiting on others. */
+  waitingPaneKeys: readonly string[]
   agentStatusPaneIdsByTabId: Record<string, ReadonlySet<string>>
 }
 
 const EMPTY_AGENT_STATUS_PANE_IDS_BY_TAB_ID: Record<string, ReadonlySet<string>> = {}
+const NO_PANE_KEYS: readonly string[] = []
 
 const EMPTY_SUMMARY: WorktreeAgentActivitySummary = {
   hasPermission: false,
@@ -41,6 +48,8 @@ const EMPTY_SUMMARY: WorktreeAgentActivitySummary = {
   hasLiveDone: false,
   hasRetainedDone: false,
   agentState: null,
+  endedTurnPaneKeys: NO_PANE_KEYS,
+  waitingPaneKeys: NO_PANE_KEYS,
   agentStatusPaneIdsByTabId: EMPTY_AGENT_STATUS_PANE_IDS_BY_TAB_ID
 }
 
@@ -52,16 +61,18 @@ export type AgentActivityInput = Pick<
   | 'agentStatusByPaneKey'
   | 'migrationUnsupportedByPtyId'
   | 'retainedAgentsByPaneKey'
-> & {
-  tabsByWorktree: AgentActivityTabsByWorktree
-  runtimeAgentOrchestrationByPaneKey?: AppState['runtimeAgentOrchestrationByPaneKey']
-}
+> &
+  Partial<Pick<AppState, 'agentWaitingByPaneKey'>> & {
+    tabsByWorktree: AgentActivityTabsByWorktree
+    runtimeAgentOrchestrationByPaneKey?: AppState['runtimeAgentOrchestrationByPaneKey']
+  }
 
 type AgentActivityCache = {
   tabsByWorktree: AgentActivityTabsByWorktree
   agentStatusEpoch: number
   migrationUnsupportedByPtyId: AppState['migrationUnsupportedByPtyId']
   retainedAgentsByPaneKey: AppState['retainedAgentsByPaneKey']
+  agentWaitingByPaneKey: AppState['agentWaitingByPaneKey'] | undefined
   runtimeAgentOrchestrationByPaneKey: AppState['runtimeAgentOrchestrationByPaneKey'] | undefined
   summaries: Map<string, WorktreeAgentActivitySummary>
 }
@@ -123,6 +134,7 @@ function getWorktreeAgentActivitySummaries(
     agentActivityCache.agentStatusEpoch === state.agentStatusEpoch &&
     agentActivityCache.migrationUnsupportedByPtyId === state.migrationUnsupportedByPtyId &&
     agentActivityCache.retainedAgentsByPaneKey === state.retainedAgentsByPaneKey &&
+    agentActivityCache.agentWaitingByPaneKey === state.agentWaitingByPaneKey &&
     agentActivityCache.runtimeAgentOrchestrationByPaneKey === runtimeAgentOrchestrationByPaneKey
   ) {
     return agentActivityCache.summaries
@@ -163,18 +175,30 @@ function getWorktreeAgentActivitySummaries(
       continue
     }
     const summary = summaryForWorktree(worktreeId)
-    if (entry.restoredUnconfirmed) {
-      addAgentStatusPaneId(summary, paneIdentity.tabId, paneIdentity.paneId)
-      continue
+    const waitingOnOthers = state.agentWaitingByPaneKey?.[paneKey] === true
+    if (waitingOnOthers) {
+      summary.waitingPaneKeys = [...summary.waitingPaneKeys, paneKey]
+    } else if (!entry.restoredUnconfirmed && hasEndedTurn(entry)) {
+      summary.endedTurnPaneKeys = [...summary.endedTurnPaneKeys, paneKey]
     }
-    if (!isExplicitAgentStatusFresh(entry, now, AGENT_STATUS_STALE_AFTER_MS)) {
+    const fresh =
+      !entry.restoredUnconfirmed &&
+      isExplicitAgentStatusFresh(entry, now, AGENT_STATUS_STALE_AFTER_MS)
+    if (!fresh) {
+      if (entry.restoredUnconfirmed) {
+        addAgentStatusPaneId(summary, paneIdentity.tabId, paneIdentity.paneId)
+      }
+      // Why: a declared wait outlives hook freshness and restarts; only the CLI or card clears it.
+      if (waitingOnOthers) {
+        summary.agentState = mostUrgentAgentState(summary.agentState, 'waiting-on-others')
+      }
       continue
     }
     addAgentStatusPaneId(summary, paneIdentity.tabId, paneIdentity.paneId)
     if (entry.state === 'done') {
       addParentPaneId(summary, orchestration, worktreeId, tabIdToWorktreeId)
     }
-    applyLiveAgentState(summary, entry)
+    applyLiveAgentState(summary, entry, waitingOnOthers)
   }
 
   for (const unsupported of Object.values(state.migrationUnsupportedByPtyId ?? {})) {
@@ -216,62 +240,22 @@ function getWorktreeAgentActivitySummaries(
     agentStatusEpoch: state.agentStatusEpoch,
     migrationUnsupportedByPtyId: state.migrationUnsupportedByPtyId,
     retainedAgentsByPaneKey: state.retainedAgentsByPaneKey,
+    agentWaitingByPaneKey: state.agentWaitingByPaneKey,
     runtimeAgentOrchestrationByPaneKey,
     summaries
   }
   return summaries
 }
 
-function summariesEqual(
-  previous: WorktreeAgentActivitySummary,
-  next: WorktreeAgentActivitySummary
-): boolean {
-  return (
-    previous.hasPermission === next.hasPermission &&
-    previous.hasLiveWorking === next.hasLiveWorking &&
-    previous.hasLiveMonitoring === next.hasLiveMonitoring &&
-    previous.hasInterrupted === next.hasInterrupted &&
-    previous.hasLiveDone === next.hasLiveDone &&
-    previous.hasRetainedDone === next.hasRetainedDone &&
-    previous.agentState === next.agentState &&
-    agentStatusPaneIdsByTabIdEqual(
-      previous.agentStatusPaneIdsByTabId,
-      next.agentStatusPaneIdsByTabId
-    )
-  )
-}
-
-function agentStatusPaneIdsByTabIdEqual(
-  previous: Record<string, ReadonlySet<string>>,
-  next: Record<string, ReadonlySet<string>>
-): boolean {
-  if (previous === next) {
-    return true
-  }
-  const previousKeys = Object.keys(previous)
-  if (previousKeys.length !== Object.keys(next).length) {
-    return false
-  }
-  for (const tabId of previousKeys) {
-    const previousPaneIds = previous[tabId]
-    const nextPaneIds = next[tabId]
-    if (!nextPaneIds || previousPaneIds.size !== nextPaneIds.size) {
-      return false
-    }
-    for (const paneId of previousPaneIds) {
-      if (!nextPaneIds.has(paneId)) {
-        return false
-      }
-    }
-  }
-  return true
-}
-
 function applyLiveAgentState(
   summary: WorktreeAgentActivitySummary,
-  entry: Pick<AgentStatusEntry, 'state' | 'workingMode' | 'interrupted'>
+  entry: Pick<AgentStatusEntry, 'state' | 'workingMode' | 'interrupted'>,
+  waitingOnOthers: boolean
 ): void {
-  summary.agentState = mostUrgentAgentState(summary.agentState, getPaneAgentState(entry))
+  summary.agentState = mostUrgentAgentState(
+    summary.agentState,
+    getPaneAgentState({ ...entry, waitingOnOthers })
+  )
   if (entry.state === 'blocked' || entry.state === 'waiting') {
     summary.hasPermission = true
   } else if (entry.interrupted === true) {

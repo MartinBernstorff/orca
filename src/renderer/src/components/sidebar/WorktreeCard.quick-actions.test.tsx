@@ -22,6 +22,7 @@ let settings: Partial<GlobalSettings> | null = null
 let projectGroups: unknown[] = []
 let workspaceDeleteModifierPressed = false
 let gitConflictOperationByWorktree: Record<string, GitConflictOperation> = {}
+let waitingQuickAction: 'mark' | 'clear' | null = null
 let WorktreeCard: typeof WorktreeCardComponent
 
 vi.mock('@/store', () => ({
@@ -59,6 +60,13 @@ vi.mock('@/components/ui/tooltip', () => ({
 
 vi.mock('./use-worktree-activity-status', () => ({
   useWorktreeActivityStatus: () => 'idle'
+}))
+
+vi.mock('./use-worktree-card-waiting-toggle', () => ({
+  useWorktreeCardWaitingToggle: () => ({
+    waitingQuickAction,
+    handleWaitingQuickAction: () => {}
+  })
 }))
 
 vi.mock('./CacheTimer', () => ({
@@ -142,6 +150,35 @@ describe('WorktreeCard quick actions', () => {
     projectGroups = []
     workspaceDeleteModifierPressed = false
     gitConflictOperationByWorktree = {}
+    waitingQuickAction = null
+  })
+
+  it('offers to mark a Needs You workspace as waiting on others', () => {
+    waitingQuickAction = 'mark'
+    const markup = renderToStaticMarkup(
+      <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
+    )
+
+    expect(markup).toContain('aria-label="Mark agents as waiting on others"')
+    expect(markup).toContain('>Waiting</button>')
+  })
+
+  it('offers to move a Waiting on others workspace back to Needs You', () => {
+    waitingQuickAction = 'clear'
+    const markup = renderToStaticMarkup(
+      <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
+    )
+
+    expect(markup).toContain('aria-label="Clear waiting on others"')
+    expect(markup).toContain('>Needs you</button>')
+  })
+
+  it('renders no waiting toggle when no agent turn has ended', () => {
+    const markup = renderToStaticMarkup(
+      <WorktreeCard worktree={makeWorktree()} repo={makeRepo()} isActive={false} />
+    )
+
+    expect(markup).not.toContain('waiting on others')
   })
 
   it('renders no unread toggle now that the status lane is gone', () => {

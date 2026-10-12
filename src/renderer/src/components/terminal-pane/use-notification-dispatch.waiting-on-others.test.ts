@@ -9,6 +9,7 @@ const siblingPaneKey = `tab-1:${SIBLING_LEAF_ID}`
 
 let mockState: Record<string, unknown> & {
   agentStatusByPaneKey: Record<string, AgentStatusEntry>
+  agentWaitingByPaneKey: Record<string, true>
   markWorktreeUnread: ReturnType<typeof vi.fn>
   markAgentCompletionPaneUnread: ReturnType<typeof vi.fn>
 }
@@ -35,7 +36,7 @@ function makeAgentStatus(key: string, overrides: Partial<AgentStatusEntry> = {})
   }
 }
 
-describe('dispatchTerminalNotification while the workspace is Polling', () => {
+describe('dispatchTerminalNotification while the workspace is Waiting on others', () => {
   beforeEach(() => {
     mockState = {
       activeWorktreeId: 'wt-other',
@@ -59,6 +60,7 @@ describe('dispatchTerminalNotification while the workspace is Polling', () => {
       browserTabsByWorktree: {},
       retainedAgentsByPaneKey: {},
       agentStatusByPaneKey: {},
+      agentWaitingByPaneKey: {},
       worktreesByRepo: { repo1: [{ id: 'wt-primary', repoId: 'repo1', displayName: 'main' }] },
       repos: [{ id: 'repo1', displayName: 'orca', connectionId: null }],
       settings: { notifications: {} },
@@ -76,7 +78,7 @@ describe('dispatchTerminalNotification while the workspace is Polling', () => {
     vi.unstubAllGlobals()
   })
 
-  it('suppresses the turn-end notification and unread marks', () => {
+  function dispatchTurnEndIntoMonitoring(): void {
     const workingStartedAt = Date.now() - 60_000
     mockState.agentStatusByPaneKey = {
       [paneKey]: makeAgentStatus(paneKey, {
@@ -85,7 +87,6 @@ describe('dispatchTerminalNotification while the workspace is Polling', () => {
         stateStartedAt: workingStartedAt
       })
     }
-
     // Shape of the announcement the coordinator synthesizes when a turn ends into monitoring.
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
@@ -96,10 +97,22 @@ describe('dispatchTerminalNotification while the workspace is Polling', () => {
         turnCompletedAt: Date.now()
       }
     })
+  }
+
+  it('suppresses the turn-end notification and unread marks for a declared pane', () => {
+    mockState.agentWaitingByPaneKey = { [paneKey]: true }
+
+    dispatchTurnEndIntoMonitoring()
 
     expect(window.api.notifications.dispatch).not.toHaveBeenCalled()
     expect(mockState.markWorktreeUnread).not.toHaveBeenCalled()
     expect(mockState.markAgentCompletionPaneUnread).not.toHaveBeenCalled()
+  })
+
+  it('notifies when a turn ends into monitoring without a declaration', () => {
+    dispatchTurnEndIntoMonitoring()
+
+    expect(window.api.notifications.dispatch).toHaveBeenCalledTimes(1)
   })
 
   it('still notifies when another pane in the workspace needs the user', () => {
@@ -110,6 +123,7 @@ describe('dispatchTerminalNotification while the workspace is Polling', () => {
         workingMode: 'monitoring'
       })
     }
+    mockState.agentWaitingByPaneKey = { [siblingPaneKey]: true }
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',

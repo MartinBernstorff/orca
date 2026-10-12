@@ -146,11 +146,11 @@ describe('agent-state section header count', () => {
     render(
       {
         type: 'header',
-        key: getNestedGroupKey('repo:one', 'agent-state:polling'),
-        label: 'Polling',
+        key: getNestedGroupKey('repo:one', 'agent-state:waiting-on-others'),
+        label: 'Waiting on others',
         count: 1,
         tone: 'text-yellow-500',
-        laneKey: 'agent-state:polling',
+        laneKey: 'agent-state:waiting-on-others',
         laneGroupBy: 'agent-state',
         nestDepth: 1
       },

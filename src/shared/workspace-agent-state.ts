@@ -1,21 +1,28 @@
 import type { AgentStatusEntry } from './agent-status-types'
 
 /** Display and urgency order: a workspace takes the first state any of its agent panes is in. */
-export const WORKSPACE_AGENT_STATES = ['needs-you', 'working', 'polling'] as const
+export const WORKSPACE_AGENT_STATES = ['needs-you', 'working', 'waiting-on-others'] as const
 export type WorkspaceAgentState = (typeof WORKSPACE_AGENT_STATES)[number]
 
 /** A workspace with no running agent is waiting on the user. */
 export const IDLE_WORKSPACE_AGENT_STATE: WorkspaceAgentState = 'needs-you'
 
-type PaneAgentStatus = Pick<AgentStatusEntry, 'state' | 'workingMode'>
+type PaneAgentStatus = Pick<AgentStatusEntry, 'state' | 'workingMode'> & {
+  /** The pane's agent session declared it is waiting on others (CLI or card toggle). */
+  waitingOnOthers?: boolean
+}
 
-/** Hook status only: a running turn or subagent is `working`; a stopped turn kept alive by a
- *  background shell or session cron reports `working` + `monitoring`. */
+/** A turn that stopped — including one kept alive only by a background shell or session cron
+ *  (`working` + `monitoring`) — is waiting on someone; only the agent's declaration says who. */
+export function hasEndedTurn(pane: Pick<AgentStatusEntry, 'state' | 'workingMode'>): boolean {
+  return pane.state === 'done' || (pane.state === 'working' && pane.workingMode === 'monitoring')
+}
+
 export function getPaneAgentState(pane: PaneAgentStatus): WorkspaceAgentState {
-  if (pane.state !== 'working') {
-    return 'needs-you'
+  if (pane.state === 'working' && pane.workingMode !== 'monitoring') {
+    return 'working'
   }
-  return pane.workingMode === 'monitoring' ? 'polling' : 'working'
+  return hasEndedTurn(pane) && pane.waitingOnOthers === true ? 'waiting-on-others' : 'needs-you'
 }
 
 export function mostUrgentAgentState(
@@ -38,7 +45,7 @@ export function deriveWorkspaceAgentState(panes: Iterable<PaneAgentStatus>): Wor
   return state ?? IDLE_WORKSPACE_AGENT_STATE
 }
 
-/** Why: a polling agent's turn already ended, but it is still watching its background work. */
+/** Why: the agent declared it is waiting on others, so its turn ending is not a call for the user. */
 export function suppressesAgentCompletionAttention(state: WorkspaceAgentState): boolean {
-  return state === 'polling'
+  return state === 'waiting-on-others'
 }

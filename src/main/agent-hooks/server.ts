@@ -897,6 +897,12 @@ export class AgentHookServer {
     return this.buildStatusChangeNotification().providerSessions
   }
 
+  /** Current status row for a pane, following legacy pane-key aliases. */
+  getStatusForPane(paneKey: string): AgentStatusIpcPayload | null {
+    const entry = this.state.lastStatusByPaneKey.get(this.resolvePaneKeyAlias(paneKey))
+    return entry ? toAgentStatusIpcPayload(entry as EnrichedAgentHookEventPayload) : null
+  }
+
   getStatusSnapshotForPane(paneKey: string): AgentStatusIpcPayload[] {
     const entry = this.state.lastStatusByPaneKey.get(paneKey)
     return entry ? [toAgentStatusIpcPayload(entry as EnrichedAgentHookEventPayload)] : []
