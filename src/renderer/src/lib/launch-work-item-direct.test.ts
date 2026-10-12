@@ -279,7 +279,8 @@ describe('launchWorkItemDirect', () => {
       undefined,
       undefined,
       undefined,
-      'refs/remotes/origin/main'
+      'refs/remotes/origin/main',
+      { engagement: 'engaged' }
     )
   })
 
@@ -360,7 +361,8 @@ describe('launchWorkItemDirect', () => {
       undefined,
       undefined,
       undefined,
-      undefined
+      undefined,
+      { engagement: 'engaged' }
     )
   })
 

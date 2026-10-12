@@ -1,18 +1,14 @@
 import type { UISlice } from '../../store/slices/ui'
 import type {
   CreateSparseCheckoutRequest,
-  CreateWorktreeArgs,
   CreateWorktreeResult,
   SetupDecision
 } from '../../../../shared/worktree/create-types'
 import type { WorktreeStartupLaunch } from '../../../../shared/worktree/launch-types'
-import type {
-  WorkspaceLinkedItem,
-  GitPushTarget,
-  WorkspaceStatus
-} from '../../../../shared/worktree/types'
+import type { GitPushTarget, WorkspaceStatus } from '../../../../shared/worktree/types'
 import type { WorktreeMeta } from '../../../../shared/worktree/meta-types'
 import type { RepoUpdate } from '../../store/repos/repo-state'
+import type { CreateWorktreeCallOptions } from '../../store/slices/worktrees/create/worktree-create-payload'
 import type { WorktreeMetaUpdateOptions } from '../../store/slices/worktree-helpers'
 import type { FolderWorkspace } from '../../../../shared/folder-workspace-types'
 import type { ExecutionHostId } from '../../../../shared/execution-host'
@@ -49,19 +45,7 @@ export type ComposerStoreActions = {
     linkedAzureDevOpsPR?: number | null,
     linkedGiteaPR?: number | null,
     compareBaseRef?: string,
-    options?: {
-      automationProvenanceRequest?: CreateWorktreeArgs['automationProvenanceRequest']
-      linkedWorkItem?: WorkspaceLinkedItem | null
-      linkedTaskSourceContext?: TaskSourceContext | null
-      startupDraft?: string
-      nameWasGenerated?: boolean
-      parentWorktreeId?: string
-      provisionedRoot?: {
-        runtimeId: string
-        executionHostId: ExecutionHostId
-        expectedPath: string
-      }
-    }
+    options?: CreateWorktreeCallOptions
   ) => Promise<CreateWorktreeResult>
   updateRepo: (
     projectId: string,

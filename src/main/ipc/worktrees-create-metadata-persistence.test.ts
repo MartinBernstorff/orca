@@ -337,6 +337,7 @@ describe('registerWorktreeHandlers', () => {
       linkedIssue: 123,
       linkedPR: 456,
       linkedLinearIssue: 'ENG-123',
+      engagement: 'engaged',
       manualOrder: 123_456
     })
 
@@ -346,6 +347,7 @@ describe('registerWorktreeHandlers', () => {
         linkedIssue: 123,
         linkedPR: 456,
         linkedLinearIssue: 'ENG-123',
+        engagement: 'engaged',
         manualOrder: 123_456
       })
     )
@@ -354,6 +356,7 @@ describe('registerWorktreeHandlers', () => {
         linkedIssue: 123,
         linkedPR: 456,
         linkedLinearIssue: 'ENG-123',
+        engagement: 'engaged',
         manualOrder: 123_456
       })
     })

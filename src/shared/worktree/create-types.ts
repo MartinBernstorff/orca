@@ -3,6 +3,7 @@ import type { WorkspaceSource } from '../workspace-source'
 import type { TaskSourceContext } from '../task-source-context'
 import type { WorkspaceKey } from '../folder-workspace-types'
 import type { TuiAgent } from '../tui-agent'
+import type { WorkspaceEngagement } from './engagement'
 import type {
   AutomationWorkspaceProvenanceRequest,
   GitPushTarget,
@@ -91,6 +92,8 @@ export type CreateWorktreeArgs = {
   linkedTaskSourceContext?: TaskSourceContext | null
   pushTarget?: GitPushTarget
   workspaceStatus?: WorkspaceStatus
+  /** Initial engagement; absent reads as Queued. */
+  engagement?: WorkspaceEngagement
   manualOrder?: number
   /** Parent workspace for in-app creates launched from a folder workspace. */
   parentWorkspace?: WorkspaceKey

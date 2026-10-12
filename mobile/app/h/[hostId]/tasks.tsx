@@ -5597,9 +5597,13 @@ export default function MobileTasksScreen() {
             sparseCheckout: sparseCheckoutOverride
           })
         }
-        const response = await client.sendRequest('worktree.create', params, {
-          timeoutMs: WORKTREE_CREATE_TIMEOUT_MS
-        })
+        const response = await client.sendRequest(
+          'worktree.create',
+          { ...params, engagement: 'engaged' },
+          {
+            timeoutMs: WORKTREE_CREATE_TIMEOUT_MS
+          }
+        )
         if (!isSuccess(response)) {
           throw new Error(response.error.message)
         }
