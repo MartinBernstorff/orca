@@ -19,7 +19,8 @@ import type { WorktreeDropCommitContext } from '../drag/drop-commit-context'
 import type { WorktreePointerDrag } from '../drag/row-state'
 import { getPointerDropStatusTarget } from '../drag/status-target'
 import type { GroupHeaderRow, WorktreeGroupBy } from '../grouping/row-types'
-import { renderWorktreeSectionHeaderRow, type SectionHeaderRowContext } from './SectionHeader'
+import { renderWorktreeSectionHeaderRow } from './SectionHeader'
+import type { SectionHeaderRowContext } from './section-header-row-context'
 
 globalThis.IS_REACT_ACT_ENVIRONMENT = true
 
@@ -54,6 +55,15 @@ function makeHeaderContext(groupBy: WorktreeGroupBy): SectionHeaderRowContext {
     dragOverEngagement: null,
     pinDragOver: false,
     headerDrag: emptyHeaderDrag,
+    hoverSections: {
+      openOnHoverGroups: new Set<string>(),
+      hoverOpenedGroups: new Set<string>(),
+      hoverPinnedGroups: new Set<string>(),
+      openHoverGroup: vi.fn(),
+      closeHoverGroup: vi.fn(),
+      toggleHoverGroupPin: vi.fn(),
+      toggleOpenOnHover: vi.fn()
+    },
     getCachedFolderWorkspacePathStatus: () => null
   } as unknown as SectionHeaderRowContext
 }

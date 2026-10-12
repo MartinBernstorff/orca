@@ -78,6 +78,11 @@ export function getGroupKeyPathSegments(key: string): string[] {
   return key.split(GROUP_PATH_SEPARATOR)
 }
 
+/** True when `key` is `ancestorKey` itself or a lane nested anywhere under it. */
+export function isGroupKeyWithin(key: string, ancestorKey: string): boolean {
+  return key === ancestorKey || key.startsWith(`${ancestorKey}${GROUP_PATH_SEPARATOR}`)
+}
+
 /** 0 for a top-level group key, 1 for a key nested once, and so on. */
 export function getGroupKeyLevel(key: string): number {
   return key.split(GROUP_PATH_SEPARATOR).length - 1

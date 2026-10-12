@@ -103,6 +103,9 @@ export function setLineageFixtureState(
     browserTabsByWorktree: {},
     clearPendingRevealWorktreeId: vi.fn(),
     collapsedGroups: new Set<string>(),
+    openOnHoverDisabledGroups: new Set<string>(),
+    hoverOpenedGroups: new Set<string>(),
+    hoverPinnedGroups: new Set<string>(),
     deleteStateByWorktreeId: Object.fromEntries(
       (options.deletingWorktreeIds ?? []).map((worktreeId) => [
         worktreeId,

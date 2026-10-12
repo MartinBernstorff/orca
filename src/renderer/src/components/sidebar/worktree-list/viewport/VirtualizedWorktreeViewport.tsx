@@ -29,6 +29,7 @@ import { useWorktreeDropCommitContext } from '../drag/use-drop-commit-context'
 import { buildWorktreeVirtualRowContext } from './virtual-row-context'
 import { renderWorktreeVirtualRow } from '../rows/virtual-row-dispatch'
 import { getGroupedWorktreeCardFields } from '../../worktree-card-grouping-field-visibility'
+import { useSidebarHoverSectionsContext } from '../rows/hover-section-header'
 
 const WORKTREE_SIDEBAR_SCROLL_STYLE: React.CSSProperties = {
   // Why: TanStack Virtual owns scroll correction; native overflow anchoring fights it and causes jumps.
@@ -62,11 +63,23 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
   const sshConnectionStates = useAppStore((s) => s.sshConnectionStates)
   const newCardStyle = settings?.experimentalNewWorktreeCardStyle === true
 
+  const hoverSections = useSidebarHoverSectionsContext(props.openOnHoverGroups)
   const reveal = useSidebarRevealHighlight()
   const scrollSuppression = useWorktreeSidebarScrollSuppression(scrollRef)
   const { markDirectScrollInput, markScrollMovement } = scrollSuppression
 
   const renderRows = useMemo(() => buildRenderableRows(rows), [rows])
+  const { hoverOverlayRowsByHeaderKey } = props
+  const hoverOverlayRenderRowsByHeaderKey = useMemo(
+    () =>
+      new Map(
+        [...hoverOverlayRowsByHeaderKey].map(([key, overlayRows]) => [
+          key,
+          buildRenderableRows(overlayRows)
+        ])
+      ),
+    [hoverOverlayRowsByHeaderKey]
+  )
   const firstHeaderIndex = useMemo(
     () => renderRows.findIndex((row) => row.type === 'header' || row.type === 'host-header'),
     [renderRows]
@@ -306,6 +319,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
   const rowContext = buildWorktreeVirtualRowContext({
     props,
     renderRows,
+    hoverOverlayRenderRowsByHeaderKey,
     firstHeaderIndex,
     virtualization,
     measureVirtualRowElement,
@@ -326,6 +340,7 @@ export const VirtualizedWorktreeViewport = React.memo(function VirtualizedWorktr
     getCachedFolderWorkspacePathStatus,
     getLineageToggleHandler,
     toggleGroupWithScrollAnchor,
+    hoverSections,
     onRowClickCapture: handleWorktreeRowClickCapture,
     onRowPointerDown: handleWorktreeRowPointerDown
   })

@@ -88,6 +88,8 @@ export type PersistedUIState = {
   showDotfilesByWorktree?: Record<string, boolean>
   filterRepoIds: string[]
   collapsedGroups: string[]
+  /** Sidebar section keys opted out of the default open-on-hover overlay. */
+  openOnHoverDisabledGroups?: string[]
   uiZoomLevel: number
   editorFontZoomLevel: number
   worktreeCardProperties: WorktreeCardProperty[]
