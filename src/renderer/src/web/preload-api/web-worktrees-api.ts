@@ -89,6 +89,7 @@ export function createWorktreesApi(): NonNullable<Partial<PreloadApi>['worktrees
         // Why: every create through this API is an in-app action, never the CLI's parent flag.
         ...(args.parentWorkspace ? { parentWorkspaceOrigin: 'manual' } : {}),
         workspaceStatus: args.workspaceStatus,
+        engagement: args.engagement,
         manualOrder: args.manualOrder,
         automationProvenanceRequest: args.automationProvenanceRequest
       })

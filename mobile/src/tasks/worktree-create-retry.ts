@@ -73,7 +73,8 @@ export async function createWorktreeWithNameRetry(
     const candidateName = args.nameWasGenerated
       ? getGeneratedWorktreeCreateRetryCandidate(baseName, attempt)
       : getClientWorktreeCreateCandidate(baseName, attempt)
-    const candidateParams = buildParams(candidateName)
+    // Why: every mobile create is user-initiated, so it starts Engaged.
+    const candidateParams = { ...buildParams(candidateName), engagement: 'engaged' }
     // Why: older hosts strip unknown fields, so only stamp and replay when the
     // host advertises idempotency. One key per candidate makes cutover retries
     // safe while a name-collision bump remains a genuinely new create.

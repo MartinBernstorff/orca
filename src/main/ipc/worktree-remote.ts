@@ -1988,7 +1988,8 @@ export async function createRemoteWorktree(
     ...(args.linkedTaskSourceContext !== undefined
       ? { linkedTaskSourceContext: args.linkedTaskSourceContext }
       : {}),
-    ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {})
+    ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {}),
+    ...(args.engagement !== undefined ? { engagement: args.engagement } : {})
   }
   const { worktree } = timing.timeSync('persist_metadata', () => {
     const meta = store.setWorktreeMeta(worktreeId, metaUpdates)
@@ -2641,7 +2642,8 @@ export async function createLocalWorktree(
     ...(args.linkedTaskSourceContext !== undefined
       ? { linkedTaskSourceContext: args.linkedTaskSourceContext }
       : {}),
-    ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {})
+    ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {}),
+    ...(args.engagement !== undefined ? { engagement: args.engagement } : {})
   }
   const { worktree } = timing.timeSync('persist_metadata', () => {
     const meta = store.setWorktreeMeta(worktreeId, metaUpdates)

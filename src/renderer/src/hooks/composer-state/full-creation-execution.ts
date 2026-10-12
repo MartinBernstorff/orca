@@ -155,6 +155,7 @@ export function useFullCreationExecution(input: FullCreationExecutionInput) {
           linkedWorkItem: toFolderWorkspaceLinkedTask(submitLinkedWorkItem),
           linkedTaskSourceContext: taskSourceContext,
           nameWasGenerated,
+          engagement: 'engaged',
           ...(!backendStartup && startupPlan?.draftPrompt
             ? { startupDraft: startupPlan.draftPrompt }
             : {}),

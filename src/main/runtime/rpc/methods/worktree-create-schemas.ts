@@ -5,6 +5,7 @@ import { sleepingAgentLaunchConfigSchema } from '../../../../shared/workspace-se
 import { RUNTIME_NAVIGATION_TARGETS } from '../../../../shared/runtime-navigation'
 import { TaskSourceContextSchema } from '../../../../shared/task-source-context-schema'
 import { WorkspaceLinkedItemSchema } from '../../../../shared/workspace-linked-item-schema'
+import { WorkspaceEngagementSchema } from '../../../../shared/worktree/engagement-schema'
 import {
   OptionalBoolean,
   OptionalFiniteNumber,
@@ -53,6 +54,7 @@ export const WorktreeCreate = z
       })
       .optional(),
     workspaceStatus: OptionalString,
+    engagement: WorkspaceEngagementSchema.optional(),
     manualOrder: OptionalFiniteNumber,
     sparseCheckout: z
       .object({

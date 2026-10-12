@@ -420,6 +420,7 @@ import type {
   WorktreeLineageWarning
 } from '../../shared/worktree/lineage-types'
 import type { WorktreeMeta } from '../../shared/worktree/meta-types'
+import type { WorkspaceEngagement } from '../../shared/worktree/engagement'
 import type {
   AutomationWorkspaceProvenance,
   CliWorkspaceProvenance,
@@ -26531,6 +26532,7 @@ export class OrcaRuntimeService {
     displayName?: string
     telemetrySource?: WorkspaceCreateTelemetrySource
     workspaceStatus?: string
+    engagement?: WorkspaceEngagement
     manualOrder?: number
     sparseCheckout?: { directories: string[]; presetId?: string }
     pushTarget?: GitPushTarget
@@ -26646,7 +26648,8 @@ export class OrcaRuntimeService {
         ...(effectiveCreatedWithAgent ? { createdWithAgent: effectiveCreatedWithAgent } : {}),
         ...(args.comment !== undefined ? { comment: args.comment } : {}),
         ...(args.manualOrder !== undefined ? { manualOrder: args.manualOrder } : {}),
-        ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {})
+        ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {}),
+        ...(args.engagement !== undefined ? { engagement: args.engagement } : {})
       })
       const worktree = mergeRuntimeFolderWorkspace(repo, worktreeId, meta)
       this.invalidateResolvedWorktreeCache()
@@ -27288,7 +27291,8 @@ export class OrcaRuntimeService {
       creatorProvenance: args.creatorProvenance ?? { kind: 'host' },
       ...(args.comment !== undefined ? { comment: args.comment } : {}),
       ...(args.manualOrder !== undefined ? { manualOrder: args.manualOrder } : {}),
-      ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {})
+      ...(args.workspaceStatus !== undefined ? { workspaceStatus: args.workspaceStatus } : {}),
+      ...(args.engagement !== undefined ? { engagement: args.engagement } : {})
     })
     const worktree = {
       ...mergeWorktree(repo.id, created, meta),
@@ -27681,6 +27685,7 @@ export class OrcaRuntimeService {
       comment?: string
       displayName?: string
       workspaceStatus?: string
+      engagement?: WorkspaceEngagement
       manualOrder?: number
       sparseCheckout?: { directories: string[]; presetId?: string }
       pushTarget?: GitPushTarget
@@ -27745,6 +27750,7 @@ export class OrcaRuntimeService {
           : {}),
         ...(args.pushTarget ? { pushTarget: args.pushTarget } : {}),
         ...(args.workspaceStatus ? { workspaceStatus: args.workspaceStatus as never } : {}),
+        ...(args.engagement ? { engagement: args.engagement } : {}),
         ...(args.manualOrder !== undefined ? { manualOrder: args.manualOrder } : {}),
         ...(args.createdWithAgent ? { createdWithAgent: args.createdWithAgent } : {}),
         ...(args.pendingFirstAgentMessageRename === true

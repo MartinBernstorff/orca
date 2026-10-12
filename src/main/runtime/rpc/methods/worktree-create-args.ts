@@ -41,6 +41,7 @@ export function buildManagedWorktreeCreateArgs(
     displayName: params.displayName,
     telemetrySource: params.telemetrySource,
     workspaceStatus: params.workspaceStatus,
+    engagement: params.engagement,
     manualOrder: params.manualOrder,
     sparseCheckout: params.sparseCheckout,
     pushTarget: params.pushTarget,

@@ -248,7 +248,22 @@ export async function startAgentSessionFork(fork: PreparedAgentSessionFork): Pro
       undefined,
       undefined,
       undefined,
-      fork.agent ?? undefined
+      fork.agent ?? undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      { engagement: 'engaged' }
     )
   } catch (error) {
     toast.error(

@@ -189,7 +189,8 @@ export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Prom
       undefined,
       undefined,
       undefined,
-      resolvedCompareBaseRef
+      resolvedCompareBaseRef,
+      { engagement: 'engaged' }
     )
     worktreeId = result.worktree.id
     const worktreePath = result.worktree.path

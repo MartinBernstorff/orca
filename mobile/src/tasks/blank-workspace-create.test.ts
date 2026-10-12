@@ -51,6 +51,7 @@ describe('createBlankWorkspace', () => {
         repo: 'id:repo-1',
         setupDecision: 'inherit',
         name: 'octopus',
+        engagement: 'engaged',
         // Idempotency key so a create interrupted by a connection migration can be
         // safely retried without the host spawning a duplicate worktree.
         clientMutationId: expect.any(String)

@@ -3,12 +3,15 @@ import type { ExecutionHostId } from '../../../../../../shared/execution-host'
 import type { WorkspaceKey } from '../../../../../../shared/folder-workspace-types'
 import type { TaskSourceContext } from '../../../../../../shared/task-source-context'
 import type { WorkspaceLinkedItem } from '../../../../../../shared/worktree/types'
+import type { WorkspaceEngagement } from '../../../../../../shared/worktree/engagement'
 
 /** Trailing bag for `createWorktree` args that outgrew its positional list. */
 export type CreateWorktreeCallOptions = {
   automationProvenanceRequest?: CreateWorktreeArgs['automationProvenanceRequest']
   linkedWorkItem?: WorkspaceLinkedItem | null
   linkedTaskSourceContext?: TaskSourceContext | null
+  /** Set by user-initiated creates; automation and CLI creates stay Queued. */
+  engagement?: WorkspaceEngagement
   /** Lets the owning runtime launch and prefill a task agent without first creating an idle shell. */
   startupDraft?: string
   /** True only when `name` came from the creature-name generator; gates host-side retirement. */
@@ -73,6 +76,7 @@ function sharedCreateFields(
     ...(attempt.manualOrder !== undefined ? { manualOrder: attempt.manualOrder } : {}),
     ...(attempt.parentWorkspace ? { parentWorkspace: attempt.parentWorkspace } : {}),
     ...(request.workspaceStatus !== undefined ? { workspaceStatus: request.workspaceStatus } : {}),
+    ...(options?.engagement ? { engagement: options.engagement } : {}),
     ...(request.linkedGitLabMR !== undefined ? { linkedGitLabMR: request.linkedGitLabMR } : {}),
     ...(request.linkedGitLabIssue !== undefined
       ? { linkedGitLabIssue: request.linkedGitLabIssue }
