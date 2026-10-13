@@ -15,6 +15,7 @@ import { WorktreeCardSshHostControl } from './WorktreeCardSshHostControl'
 import { WorktreeTitleInlineRename } from './WorktreeTitleInlineRename'
 import { WorkspacePriorityIcon, getWorkspacePriorityLane } from './workspace-priority-meta'
 import { WorktreeCardWorkspaceStatusIcon } from './worktree-card-workspace-status-icon'
+import { WorktreeCardBackgroundTaskIcon } from './worktree-card-background-task-icon'
 import type { WorktreeCardController } from './use-worktree-card-controller'
 
 // Why: pinned repo icon and compact inline badge share this chip shell so both repo cues read as the same affordance.
@@ -174,6 +175,8 @@ export function WorktreeCardHeader({
         {showPriority && priorityLane !== 'none' && (
           <WorkspacePriorityIcon lane={priorityLane} className="size-3.5" />
         )}
+
+        <WorktreeCardBackgroundTaskIcon worktreeId={worktree.id} />
 
         {/* Why: unread alert lives in the left status lane; title-row contrast comes from weight and dimmed read titles. */}
         <WorktreeTitleInlineRename

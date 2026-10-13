@@ -24,6 +24,8 @@ export type WorktreeAgentActivitySummary = {
   hasPermission: boolean
   hasLiveWorking: boolean
   hasLiveMonitoring: boolean
+  /** A pane's ended turn is kept alive by a background shell or session cron (e.g. a CI watcher). */
+  hasRunningBackgroundTask: boolean
   /** Fresh interrupted completion, kept separate from clean done outcomes. */
   hasInterrupted: boolean
   hasLiveDone: boolean
@@ -44,6 +46,7 @@ const EMPTY_SUMMARY: WorktreeAgentActivitySummary = {
   hasPermission: false,
   hasLiveWorking: false,
   hasLiveMonitoring: false,
+  hasRunningBackgroundTask: false,
   hasInterrupted: false,
   hasLiveDone: false,
   hasRetainedDone: false,
@@ -180,6 +183,14 @@ function getWorktreeAgentActivitySummaries(
       summary.waitingPaneKeys = [...summary.waitingPaneKeys, paneKey]
     } else if (!entry.restoredUnconfirmed && hasEndedTurn(entry)) {
       summary.endedTurnPaneKeys = [...summary.endedTurnPaneKeys, paneKey]
+    }
+    // Why: not freshness-gated — a running background task emits no hooks; its exit starts a new turn that clears this.
+    if (
+      !entry.restoredUnconfirmed &&
+      entry.state === 'working' &&
+      entry.workingMode === 'monitoring'
+    ) {
+      summary.hasRunningBackgroundTask = true
     }
     const fresh =
       !entry.restoredUnconfirmed &&

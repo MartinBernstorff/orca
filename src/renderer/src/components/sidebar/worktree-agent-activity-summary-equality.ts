@@ -8,6 +8,7 @@ export function summariesEqual(
     previous.hasPermission === next.hasPermission &&
     previous.hasLiveWorking === next.hasLiveWorking &&
     previous.hasLiveMonitoring === next.hasLiveMonitoring &&
+    previous.hasRunningBackgroundTask === next.hasRunningBackgroundTask &&
     previous.hasInterrupted === next.hasInterrupted &&
     previous.hasLiveDone === next.hasLiveDone &&
     previous.hasRetainedDone === next.hasRetainedDone &&

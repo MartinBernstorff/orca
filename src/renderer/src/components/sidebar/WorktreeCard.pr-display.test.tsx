@@ -68,6 +68,10 @@ vi.mock('./use-worktree-card-waiting-toggle', () => ({
   })
 }))
 
+vi.mock('./worktree-card-background-task-icon', () => ({
+  WorktreeCardBackgroundTaskIcon: () => null
+}))
+
 vi.mock('./CacheTimer', () => ({
   default: () => null,
   usePromptCacheCountdownStartedAt: () => null

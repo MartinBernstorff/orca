@@ -83,6 +83,10 @@ vi.mock('./use-worktree-card-waiting-toggle', () => ({
   })
 }))
 
+vi.mock('./worktree-card-background-task-icon', () => ({
+  WorktreeCardBackgroundTaskIcon: () => null
+}))
+
 function makeRepo(): Repo {
   return {
     id: 'repo-1',
