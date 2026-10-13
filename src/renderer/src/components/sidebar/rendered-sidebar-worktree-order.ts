@@ -8,8 +8,11 @@ import {
 import { getRepoMapFromState, getWorktreeMapFromState } from '@/store/selectors'
 import { getProjectHostSetupProjectionFromState } from '@/store/project-host-setup-selector'
 import { buildRows } from './worktree-list/grouping/build-rows'
-import { getPinnedWorktreeDisplayPolicy } from './worktree-list/grouping/row-types'
-import { addHostSectionRows } from './host-section-rows'
+import {
+  getPinnedWorktreeDisplayPolicy,
+  type PinnedWorktreeDisplayPolicy
+} from './worktree-list/grouping/row-types'
+import { addHostSectionRows, type HostSectionRow } from './host-section-rows'
 import { orderHostSectionOptions } from './host-section-order'
 import { buildSidebarHostOptions } from './sidebar-host-options'
 import { getLogicalRepoOrderRankById } from './project-header-drop'
@@ -40,6 +43,20 @@ export function computeRenderedSidebarWorktrees(
   state: AppState,
   visibleWorktrees: readonly Worktree[]
 ): Worktree[] {
+  const { sectionRows, pinnedDisplayPolicy } = buildRenderedSidebarRows(
+    state,
+    visibleWorktrees,
+    state.collapsedGroups
+  )
+  return getRenderedWorktreesInSidebarOrder(sectionRows, pinnedDisplayPolicy)
+}
+
+/** Replays the sidebar row pipeline; `collapsedGroups` lets callers list rows the sidebar elides. */
+export function buildRenderedSidebarRows(
+  state: AppState,
+  visibleWorktrees: readonly Worktree[],
+  collapsedGroups: AppState['collapsedGroups']
+): { sectionRows: HostSectionRow[]; pinnedDisplayPolicy: PinnedWorktreeDisplayPolicy } {
   const defaultHostId = getSettingsFocusedExecutionHostId(state.settings)
   const pinnedDisplayPolicy = getPinnedWorktreeDisplayPolicy(state.settings)
   const projection = getProjectHostSetupProjectionFromState(state)
@@ -59,7 +76,7 @@ export function computeRenderedSidebarWorktrees(
     [...visibleWorktrees],
     getRepoMapFromState(state),
     prCache,
-    state.collapsedGroups,
+    collapsedGroups,
     getLogicalRepoOrderRankById(state.repos.map((repo) => repo.id)),
     state.workspaceStatuses,
     state.projectOrderBy,
@@ -111,13 +128,13 @@ export function computeRenderedSidebarWorktrees(
         workspaceHostScope: state.workspaceHostScope,
         visibleWorkspaceHostIds: state.visibleWorkspaceHostIds,
         defaultHostId,
-        collapsedHostKeys: state.collapsedGroups,
+        collapsedHostKeys: collapsedGroups,
         forceCollapseHosts: false,
         preferProjectGrouping: true
       })
     : rows
 
-  return getRenderedWorktreesInSidebarOrder(sectionRows, pinnedDisplayPolicy)
+  return { sectionRows, pinnedDisplayPolicy }
 }
 
 export function computeRenderedSidebarWorktreeOrder(

@@ -29,7 +29,7 @@ describe('feature wall shortcut labels', () => {
       renderToStaticMarkup(<ReviewPRViewAnimatedVisual reducedMotion />)
     ].join('\n')
 
-    expect(html).toContain('Ctrl+Shift+B')
+    expect(html).toContain('Ctrl+Alt+B')
     expect(html).toContain('Ctrl+Shift+D')
     expect(html).toContain('Alt+Shift+D')
     expect(html).toContain('Ctrl+B')

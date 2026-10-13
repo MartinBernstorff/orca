@@ -121,7 +121,7 @@ describe('browserManager grab operations', () => {
   })
 
   describe('guest app shortcut forwarding', () => {
-    it('forwards Cmd/Ctrl+Shift+B to the renderer and prevents the guest default', () => {
+    it('forwards Cmd/Ctrl+Alt+B to the renderer and prevents the guest default', () => {
       const handlers = guestOnMock.mock.calls
         .filter(([eventName]) => eventName === 'before-input-event')
         .map(([, handler]) => handler)
@@ -135,10 +135,10 @@ describe('browserManager grab operations', () => {
           type: 'keyDown',
           meta: process.platform === 'darwin',
           control: process.platform !== 'darwin',
-          shift: true,
-          alt: false,
+          shift: false,
+          alt: true,
           code: 'KeyB',
-          key: 'B'
+          key: 'b'
         } as never
       )
 

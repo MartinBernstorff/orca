@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Check, Server } from 'lucide-react'
 import {
   Command,
@@ -50,6 +50,15 @@ export function SidebarProjectFilterPanel({
   onToggleRepo
 }: SidebarProjectFilterPanelProps): React.JSX.Element {
   const [query, setQuery] = useState('')
+  // Why: sort by the selection at open time only, so toggling a row doesn't move it under the cursor.
+  const [initiallySelectedIds] = useState(() => new Set(selectedRepoIds))
+  const orderedRepos = useMemo(
+    () => [
+      ...repos.filter((repo) => initiallySelectedIds.has(repo.id)),
+      ...repos.filter((repo) => !initiallySelectedIds.has(repo.id))
+    ],
+    [repos, initiallySelectedIds]
+  )
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Why: `autoFocus` loses to the popover's own open-time focus of its content;
@@ -80,7 +89,7 @@ export function SidebarProjectFilterPanel({
             'No projects match'
           )}
         </CommandEmpty>
-        {repos.map((repo) => {
+        {orderedRepos.map((repo) => {
           const selected = selectedRepoIds.has(repo.id)
           return (
             <CommandItem

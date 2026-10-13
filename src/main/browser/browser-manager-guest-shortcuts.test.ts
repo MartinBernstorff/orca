@@ -203,8 +203,8 @@ describe('browserManager', () => {
         key: 'b',
         meta: isDarwin,
         control: !isDarwin,
-        alt: false,
-        shift: true
+        alt: true,
+        shift: false
       },
       {
         type: 'keyDown',
@@ -333,7 +333,7 @@ describe('browserManager', () => {
     })
     browserManager.setSettingsResolver(() => ({
       keybindings: {
-        'tab.newBrowser': ['Mod+Alt+B'],
+        'tab.newBrowser': ['Mod+Shift+B'],
         'worktree.quickOpen': ['Mod+Shift+O']
       }
     }))
@@ -361,8 +361,8 @@ describe('browserManager', () => {
         code: 'KeyB',
         key: 'b',
         ...primary,
-        alt: false,
-        shift: true
+        alt: true,
+        shift: false
       }
     )
     expect(defaultBrowserPreventDefault).not.toHaveBeenCalled()
@@ -375,8 +375,8 @@ describe('browserManager', () => {
         code: 'KeyB',
         key: 'b',
         ...primary,
-        alt: true,
-        shift: false
+        alt: false,
+        shift: true
       }
     )
     expect(customBrowserPreventDefault).toHaveBeenCalledTimes(1)

@@ -49,6 +49,8 @@ export type KeybindingActionId =
   | 'sidebar.checks.toggle'
   | 'sidebar.ports.toggle'
   | 'sidebar.sleepingWorkspaces.toggle'
+  | 'sidebar.projectFilter.open'
+  | 'sidebar.workspaceJump.open'
   | 'sidebar.focusWorktreeList'
   | 'floatingTerminal.toggle'
   | 'floatingWorkspace.maximize'
@@ -455,6 +457,22 @@ export const KEYBINDING_DEFINITIONS: readonly KeybindingDefinition[] = [
     defaultBindings: platformBindings([])
   },
   {
+    id: 'sidebar.projectFilter.open',
+    title: 'Open Project Filter',
+    group: 'Global',
+    scope: 'global',
+    searchKeywords: ['shortcut', 'sidebar', 'project', 'filter', 'select', 'repo', 'workspaces'],
+    defaultBindings: platformBindings(['Mod+Shift+B'])
+  },
+  {
+    id: 'sidebar.workspaceJump.open',
+    title: 'Jump to Sidebar Workspace',
+    group: 'Global',
+    scope: 'global',
+    searchKeywords: ['shortcut', 'sidebar', 'workspace', 'worktree', 'jump', 'switch', 'go to'],
+    defaultBindings: platformBindings(['Mod+K'])
+  },
+  {
     id: 'sidebar.focusWorktreeList',
     title: 'Focus worktree list',
     group: 'Global',
@@ -587,7 +605,8 @@ export const KEYBINDING_DEFINITIONS: readonly KeybindingDefinition[] = [
     group: 'Tabs',
     scope: 'tabs',
     searchKeywords: ['shortcut', 'tab', 'browser', 'new'],
-    defaultBindings: platformBindings(['Mod+Shift+B'])
+    // Why: Mod+Shift+B opens the sidebar project filter.
+    defaultBindings: platformBindings(['Mod+Alt+B'])
   },
   {
     id: 'tab.newSimulator',
@@ -1017,7 +1036,8 @@ export const KEYBINDING_DEFINITIONS: readonly KeybindingDefinition[] = [
     group: 'Terminal Panes',
     scope: 'terminal',
     searchKeywords: ['shortcut', 'pane', 'clear'],
-    defaultBindings: platformBindings(['Mod+K'])
+    // Why: Mod+K jumps to a sidebar workspace; ship unbound so users can assign their own chord.
+    defaultBindings: platformBindings([])
   },
   {
     id: 'terminal.focusNextPane',

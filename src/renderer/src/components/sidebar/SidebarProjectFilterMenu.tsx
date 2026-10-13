@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { ChevronsUpDown } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
@@ -6,6 +6,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RepoIconGlyph } from '@/components/repo/repo-icon'
 import { resolveRepoHeaderColor } from './project-header-color'
 import { SidebarProjectFilterPanel } from './SidebarProjectFilterPanel'
+import {
+  consumeProjectFilterOpenRequest,
+  subscribeProjectFilterOpenRequest
+} from './project-filter-open-request'
 import type { Repo } from '../../../../shared/repo-types'
 import { translate } from '@/i18n/i18n'
 
@@ -46,6 +50,13 @@ const SidebarProjectFilterMenu = React.memo(function SidebarProjectFilterMenu() 
   const filterRepoIds = useAppStore((s) => s.filterRepoIds)
   const setFilterRepoIds = useAppStore((s) => s.setFilterRepoIds)
   const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    if (consumeProjectFilterOpenRequest()) {
+      setOpen(true)
+    }
+    return subscribeProjectFilterOpenRequest(() => setOpen(true))
+  }, [])
 
   // Why: derive from current repos so stale ids (e.g. lingering after a repo
   // is removed) don't inflate counts or falsely signal an applied filter.
