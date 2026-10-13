@@ -4,6 +4,7 @@ import { TooltipProvider } from '@/components/ui/tooltip'
 import { useSidebarResize } from '@/hooks/useSidebarResize'
 import SidebarHeader from './SidebarHeader'
 import SidebarProjectFilterMenu from './SidebarProjectFilterMenu'
+import SidebarWorkspaceJumpMenu from './SidebarWorkspaceJumpMenu'
 import SidebarNav from './SidebarNav'
 import SetupScriptPromptCard from './SetupScriptPromptCard'
 import WorktreeList from './WorktreeList'
@@ -120,6 +121,7 @@ function Sidebar({
             <SidebarNav />
             <SidebarHeader onWorkspaceBoardMenuOpenChange={setWorkspaceBoardMenuOpen} />
             <SidebarProjectFilterMenu />
+            <SidebarWorkspaceJumpMenu />
 
             <WorktreeList
               scrollOffsetRef={worktreeScrollOffsetRef}

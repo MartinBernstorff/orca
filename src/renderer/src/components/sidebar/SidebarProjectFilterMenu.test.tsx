@@ -19,6 +19,9 @@ vi.mock('@/store', () => ({
 }))
 
 import SidebarProjectFilterMenu from './SidebarProjectFilterMenu'
+import { SidebarProjectFilterPanel } from './SidebarProjectFilterPanel'
+import { requestOpenProjectFilter } from './project-filter-open-request'
+import type { Repo } from '../../../../shared/repo-types'
 
 const REPOS = [
   { id: 'r1', displayName: 'alpha', path: '/tmp/alpha', badgeColor: '#111111' },
@@ -181,6 +184,51 @@ describe('SidebarProjectFilterMenu', () => {
 
     expect(repoRows()).toEqual(['alpha', 'beta', 'gamma'])
     expect(checkedRepoIds()).toEqual(['r1'])
+  })
+
+  it('lists selected projects first when the menu opens', async () => {
+    setState({ filterRepoIds: ['r3'] })
+    render()
+    openMenu()
+    await settle()
+
+    expect(repoRows()).toEqual(['gamma', 'alpha', 'beta'])
+  })
+
+  it('keeps the row order while toggling projects in an open menu', async () => {
+    // Why the panel directly: the mocked store doesn't re-render the memoized menu.
+    const renderPanel = (selected: string[]): void =>
+      act(() =>
+        root.render(
+          <SidebarProjectFilterPanel
+            repos={REPOS as unknown as Repo[]}
+            selectedRepoIds={new Set(selected)}
+            onToggleRepo={() => {}}
+          />
+        )
+      )
+    renderPanel(['r3'])
+    await settle()
+    renderPanel(['r3', 'r2'])
+
+    expect(repoRows()).toEqual(['gamma', 'alpha', 'beta'])
+    expect(checkedRepoIds()).toEqual(['r3', 'r2'])
+  })
+
+  it('opens when the shortcut requests it', async () => {
+    render()
+    act(() => requestOpenProjectFilter())
+    await settle()
+
+    expect(searchInput()).not.toBeNull()
+  })
+
+  it('opens on mount for a shortcut request made while the sidebar was closed', async () => {
+    requestOpenProjectFilter()
+    render()
+    await settle()
+
+    expect(searchInput()).not.toBeNull()
   })
 
   it('deselects a checked project from the list', async () => {

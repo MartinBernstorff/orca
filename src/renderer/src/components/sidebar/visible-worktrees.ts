@@ -25,6 +25,7 @@ import type { Worktree } from '../../../../shared/worktree/types'
 import { buildWorktreeComparator } from './smart-sort'
 import { getWorktreeIdsWithLiveAgent, isInactiveWorkspace } from '@/lib/worktree-activity-state'
 import { useAppStore } from '@/store'
+import type { AppState } from '@/store/types'
 import { getAllWorktreesFromState, getRepoMapFromState } from '@/store/selectors'
 import {
   ALL_EXECUTION_HOSTS_SCOPE,
@@ -281,6 +282,12 @@ export function getVisibleWorktreeIds(): string[] {
   }
 
   const state = useAppStore.getState()
+  // Why the row pipeline: grouping, pinning and main-worktree hoisting reorder cards, so a flat sort numbers the wrong workspace.
+  return computeRenderedSidebarWorktreeOrder(state, getFilteredSidebarWorktrees(state))
+}
+
+/** Worktrees the sidebar shows under its current filters, in sort order but before grouping. */
+export function getFilteredSidebarWorktrees(state: AppState): Worktree[] {
   const allWorktrees = getAllWorktreesFromState(state).filter((w) => !w.isArchived)
 
   // Hoist repoMap so it's built once and reused across all branches below.
@@ -325,15 +332,13 @@ export function getVisibleWorktreeIds(): string[] {
   const visibleIdRank = new Map(visibleIds.map((id, index) => [id, index]))
   const visibleHostIds = getVisibleWorkspaceHostIdSet(state)
   const defaultHostId = getSettingsFocusedExecutionHostId(state.settings)
-  const visibleWorktrees = allWorktrees
+  return allWorktrees
     .filter(
       (worktree) =>
         visibleIdRank.has(worktree.id) &&
         worktreeMatchesVisibleHost(worktree, visibleHostIds, repoMap, defaultHostId)
     )
     .sort((a, b) => (visibleIdRank.get(a.id) ?? 0) - (visibleIdRank.get(b.id) ?? 0))
-  // Why the row pipeline: grouping, pinning and main-worktree hoisting reorder cards, so a flat sort numbers the wrong workspace.
-  return computeRenderedSidebarWorktreeOrder(state, visibleWorktrees)
 }
 
 export function getVisibleWorktreeShortcutTargets(): VisibleWorktreeShortcutTarget[] {

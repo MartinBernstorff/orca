@@ -6221,6 +6221,10 @@
           "engaged": "Engaged",
           "queued": "Queued"
         },
+        "workspaceJump": {
+          "placeholder": "Go to workspace...",
+          "empty": "No workspaces match"
+        },
         "sectionHeader": {
           "openOnHover": "Open on hover"
         },

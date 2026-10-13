@@ -5,6 +5,8 @@ import { requestScrollToCurrentWorkspaceRevealAndRename } from '@/lib/scroll-to-
 import { showTerminalShortcutCaptureNotification } from '@/lib/terminal-shortcut-capture-notification'
 import { shouldShowWorktreeHistoryControls } from '../lib/titlebar-worktree-history-controls'
 import { TOGGLE_WORKSPACE_BOARD_EVENT } from '../components/sidebar/useWorkspaceBoardPanel'
+import { requestOpenProjectFilter } from '../components/sidebar/project-filter-open-request'
+import { requestOpenWorkspaceJump } from '../components/sidebar/workspace-jump-open-request'
 import {
   deleteHoveredWorkspaceImmediately,
   resolveHoveredWorkspaceDeleteTarget
@@ -158,6 +160,32 @@ export function createAppCommandHandlers(
             store.setSidebarOpen(true)
           }
         })
+    ],
+    [
+      'sidebar.projectFilter.open',
+      () => {
+        const store = useAppStore.getState()
+        // Why: the filter is hidden with a single project.
+        if (activeView === 'settings' || store.repos.length <= 1) {
+          return false
+        }
+        return claim('sidebar.projectFilter.open', () => {
+          store.setSidebarOpen(true)
+          requestOpenProjectFilter()
+        })
+      }
+    ],
+    [
+      'sidebar.workspaceJump.open',
+      () => {
+        if (activeView === 'settings') {
+          return false
+        }
+        return claim('sidebar.workspaceJump.open', () => {
+          useAppStore.getState().setSidebarOpen(true)
+          requestOpenWorkspaceJump()
+        })
+      }
     ],
     [
       'floatingWorkspace.maximize',
