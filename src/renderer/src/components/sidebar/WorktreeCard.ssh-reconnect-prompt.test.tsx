@@ -80,6 +80,10 @@ vi.mock('./use-worktree-card-waiting-toggle', () => ({
   })
 }))
 
+vi.mock('./worktree-card-background-task-icon', () => ({
+  WorktreeCardBackgroundTaskIcon: () => null
+}))
+
 vi.mock('./WorktreeContextMenu', () => ({
   default: ({ children }: { children: ReactNode }) => <>{children}</>,
   CLOSE_ALL_CONTEXT_MENUS_EVENT: 'orca:test-close-context-menus',

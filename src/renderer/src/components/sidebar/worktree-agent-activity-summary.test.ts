@@ -199,6 +199,34 @@ describe('selectWorktreeAgentActivitySummary', () => {
     expect(summary).toMatchObject({ hasLiveWorking: false, hasLiveMonitoring: true })
   })
 
+  it('reports a running background task past hook freshness, but not from an unconfirmed restore', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(1_000 + AGENT_STATUS_STALE_AFTER_MS + 1)
+    const summarize = (restoredUnconfirmed?: true) => {
+      const paneKey = makePaneKey('tab-1', LEAF_ID)
+      return selectWorktreeAgentActivitySummary(
+        {
+          tabsByWorktree: { 'repo::/wt-1': [makeTab('tab-1', 'repo::/wt-1')] },
+          agentStatusEpoch: restoredUnconfirmed ? 2 : 1,
+          agentStatusByPaneKey: {
+            [paneKey]: makeAgentStatusEntry({
+              paneKey,
+              state: 'working',
+              workingMode: 'monitoring',
+              restoredUnconfirmed
+            })
+          },
+          migrationUnsupportedByPtyId: {},
+          runtimeAgentOrchestrationByPaneKey: {},
+          retainedAgentsByPaneKey: {}
+        },
+        'repo::/wt-1'
+      )
+    }
+
+    expect(summarize()).toMatchObject({ hasLiveMonitoring: false, hasRunningBackgroundTask: true })
+    expect(summarize(true).hasRunningBackgroundTask).toBe(false)
+  })
+
   it('separates interrupted outcomes from clean completion', () => {
     vi.spyOn(Date, 'now').mockReturnValue(2_000)
     const paneKey = makePaneKey('tab-1', LEAF_ID)
