@@ -271,7 +271,7 @@ export const SORT_OPTIONS = [
     get description() {
       return translate(
         'auto.components.sidebar.SidebarWorkspaceOptionsMenu.prioritySortDescription',
-        'Highest priority first, then most recent activity.'
+        'Highest priority first, then oldest created.'
       )
     }
   },

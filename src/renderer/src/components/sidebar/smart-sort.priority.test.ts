@@ -26,13 +26,14 @@ describe('priority sort', () => {
     ).toEqual(['urgent', 'high', 'medium', 'low', 'none'])
   })
 
-  it('breaks ties by recent activity, then name', () => {
+  it('breaks ties by creation time, oldest first, then name', () => {
     expect(
       sortIds([
-        make('b-old', { priority: 'high', lastActivityAt: 1 }),
-        make('b-new', { priority: 'high', lastActivityAt: 2 }),
-        make('a-old', { priority: 'high', lastActivityAt: 1 })
+        make('b-new', { priority: 'high', createdAt: 2, lastActivityAt: 9 }),
+        make('b-old', { priority: 'high', createdAt: 1 }),
+        make('a-old', { priority: 'high', createdAt: 1 }),
+        make('legacy', { priority: 'high' })
       ])
-    ).toEqual(['b-new', 'a-old', 'b-old'])
+    ).toEqual(['legacy', 'a-old', 'b-old', 'b-new'])
   })
 })

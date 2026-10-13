@@ -5352,7 +5352,7 @@
           "engagement": "Engagement",
           "agentState": "Agent state",
           "engagementSortDescription": "Most prompts submitted first, then the most recent prompt.",
-          "prioritySortDescription": "Highest priority first, then most recent activity."
+          "prioritySortDescription": "Highest priority first, then oldest created."
         },
         "SshTargetRow": {
           "4677394048": "Connecting…",

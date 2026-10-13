@@ -131,7 +131,8 @@ export function buildWorktreeComparator(
       case 'priority':
         return (
           getWorkspacePriorityRank(a.priority) - getWorkspacePriorityRank(b.priority) ||
-          effectiveRecentActivity(b, now) - effectiveRecentActivity(a, now) ||
+          // Why oldest first: new workspaces join the bottom of their priority instead of overtaking in-progress ones.
+          (a.createdAt ?? 0) - (b.createdAt ?? 0) ||
           compareWorktreeSortLabel(a, b)
         )
       case 'manual':
