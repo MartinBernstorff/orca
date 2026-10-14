@@ -8,11 +8,14 @@ import {
   type WorkspaceAgentState
 } from './workspace-agent-state'
 
-type Pane = Pick<AgentStatusEntry, 'state' | 'workingMode'> & { waitingOnOthers?: boolean }
+type Pane = Pick<AgentStatusEntry, 'state' | 'workingMode' | 'leadTurnEnded'> & {
+  waitingOnOthers?: boolean
+}
 
 const HOOK_PANES: readonly Pane[] = [
   { state: 'working' },
   { state: 'working', workingMode: 'monitoring' },
+  { state: 'working', leadTurnEnded: true },
   { state: 'done' },
   { state: 'blocked' },
   { state: 'waiting' }
@@ -52,6 +55,7 @@ describe('getPaneAgentState', () => {
     expect(HOOK_PANES.map(getPaneAgentState)).toEqual([
       'working',
       'needs-you',
+      'working',
       'needs-you',
       'needs-you',
       'needs-you'
@@ -60,7 +64,14 @@ describe('getPaneAgentState', () => {
 
   it('maps a declared pane to Waiting on others only once its turn ended', () => {
     expect(HOOK_PANES.map((pane) => getPaneAgentState({ ...pane, waitingOnOthers: true }))).toEqual(
-      ['working', 'waiting-on-others', 'waiting-on-others', 'needs-you', 'needs-you']
+      [
+        'working',
+        'waiting-on-others',
+        'waiting-on-others',
+        'waiting-on-others',
+        'needs-you',
+        'needs-you'
+      ]
     )
   })
 })

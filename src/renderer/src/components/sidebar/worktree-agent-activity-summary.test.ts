@@ -21,6 +21,7 @@ function makeAgentStatusEntry(args: {
   parentPaneKey?: string
   restoredUnconfirmed?: true
   workingMode?: AgentStatusEntry['workingMode']
+  leadTurnEnded?: true
   interrupted?: true
 }): AgentStatusEntry {
   return {
@@ -33,6 +34,7 @@ function makeAgentStatusEntry(args: {
     worktreeId: args.worktreeId,
     restoredUnconfirmed: args.restoredUnconfirmed,
     workingMode: args.workingMode,
+    leadTurnEnded: args.leadTurnEnded,
     interrupted: args.interrupted,
     orchestration: args.parentPaneKey
       ? {
@@ -534,6 +536,26 @@ describe('selectWorkspaceAgentStates', () => {
     expect(Object.fromEntries(states)).toEqual({
       'repo::/wt-1': 'working',
       'repo::/wt-2': 'waiting-on-others'
+    })
+  })
+
+  it('lets a declaration outrank background sub-agents left by an ended turn', () => {
+    vi.spyOn(Date, 'now').mockReturnValue(2_000)
+    const declared = makePaneKey('tab-1', LEAF_ID)
+    const undeclared = makePaneKey('tab-2', LEAF_ID)
+    const states = selectWorkspaceAgentStates(
+      makeState(
+        107,
+        [
+          makeAgentStatusEntry({ paneKey: declared, state: 'working', leadTurnEnded: true }),
+          makeAgentStatusEntry({ paneKey: undeclared, state: 'working', leadTurnEnded: true })
+        ],
+        [declared]
+      )
+    )
+    expect(Object.fromEntries(states)).toEqual({
+      'repo::/wt-1': 'waiting-on-others',
+      'repo::/wt-2': 'working'
     })
   })
 

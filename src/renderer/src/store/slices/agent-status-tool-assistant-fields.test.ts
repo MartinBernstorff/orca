@@ -294,6 +294,28 @@ describe('agent status tool + assistant fields', () => {
     expect(store.getState().sortEpoch).toBe(firstSortEpoch)
   })
 
+  it('marks a working row whose lead turn ended and bumps the status epoch', () => {
+    vi.useFakeTimers()
+    const store = createTestStore()
+    store.getState().setAgentStatus('tab-1:1', { state: 'working', prompt: 'p' }, 'claude', {
+      updatedAt: 1_000,
+      stateStartedAt: 1_000
+    })
+    const firstEpoch = store.getState().agentStatusEpoch
+
+    store
+      .getState()
+      .setAgentStatus(
+        'tab-1:1',
+        { state: 'working', turnCompletedAt: 1_500, prompt: 'p' },
+        'claude',
+        { updatedAt: 2_000, stateStartedAt: 1_000 }
+      )
+
+    expect(store.getState().agentStatusByPaneKey['tab-1:1'].leadTurnEnded).toBe(true)
+    expect(store.getState().agentStatusEpoch).toBe(firstEpoch + 1)
+  })
+
   it('bumps the status epoch, not sort epoch, for same-state done updates', () => {
     vi.useFakeTimers()
     const store = createTestStore()

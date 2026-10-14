@@ -2325,6 +2325,9 @@ export const createAgentStatusSlice: StateCreator<AppState, [], [], AgentStatusS
         const entry: AgentStatusEntry = {
           state: payload.state,
           workingMode: payload.workingMode,
+          ...(payload.state === 'working' && payload.turnCompletedAt !== undefined
+            ? { leadTurnEnded: true as const }
+            : {}),
           prompt: payload.prompt,
           updatedAt,
           stateStartedAt,
@@ -2435,7 +2438,9 @@ export const createAgentStatusSlice: StateCreator<AppState, [], [], AgentStatusS
           existing?.state === 'done' &&
           entry.state === 'done' &&
           agentEntryCompletionAt(existing) !== agentEntryCompletionAt(entry)
-        const workingModeChanged = existing?.workingMode !== entry.workingMode
+        const workingModeChanged =
+          existing?.workingMode !== entry.workingMode ||
+          existing?.leadTurnEnded !== entry.leadTurnEnded
         const sortRelevantChange =
           !existing ||
           existing.state !== payload.state ||

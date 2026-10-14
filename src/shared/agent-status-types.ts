@@ -101,6 +101,9 @@ export type AgentStatusEntry = {
   state: AgentStatusState
   /** Ongoing work that does not require foreground agent execution. Only valid while working. */
   workingMode?: AgentWorkingMode
+  /** The lead turn ended; only background work (e.g. sub-agents) keeps this `working` row alive.
+   *  Derived from the payload's `turnCompletedAt`. */
+  leadTurnEnded?: true
   /** The user's most recent prompt. Cached across the turn — later tool-use events
    *  omit it, so the last value persists until a new prompt or pane reset. Empty when unknown. */
   prompt: string
