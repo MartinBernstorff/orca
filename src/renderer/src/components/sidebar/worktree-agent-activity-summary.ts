@@ -260,7 +260,7 @@ function getWorktreeAgentActivitySummaries(
 
 function applyLiveAgentState(
   summary: WorktreeAgentActivitySummary,
-  entry: Pick<AgentStatusEntry, 'state' | 'workingMode' | 'interrupted'>,
+  entry: Pick<AgentStatusEntry, 'state' | 'workingMode' | 'leadTurnEnded' | 'interrupted'>,
   waitingOnOthers: boolean
 ): void {
   summary.agentState = mostUrgentAgentState(
