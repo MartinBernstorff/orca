@@ -58,7 +58,7 @@ describe('WorktreeTitleInlineRename', () => {
       </TooltipProvider>
     )
 
-    expect(markup).toContain('font-normal text-foreground')
+    expect(markup).toContain('font-light text-foreground')
     expect(markup).not.toContain('text-foreground/80')
     expect(markup).not.toContain('Unread:')
   })
@@ -74,7 +74,7 @@ describe('WorktreeTitleInlineRename', () => {
       </TooltipProvider>
     )
 
-    expect(markup).toContain('font-normal text-foreground/80')
+    expect(markup).toContain('font-light text-foreground/80')
     expect(markup).not.toContain('Unread:')
   })
 })

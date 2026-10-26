@@ -196,7 +196,7 @@ describe('WorktreeCard linked PR display', () => {
     const readTitleTag = getInlineRenameTitleTag(readMarkup)
 
     expect(getInlineRenameTitleTag(unreadMarkup)).toContain('font-semibold')
-    expect(readTitleTag).toContain('font-normal text-foreground')
+    expect(readTitleTag).toContain('font-light text-foreground')
     expect(readTitleTag).not.toContain('text-foreground/80')
   }, 20_000)
 
@@ -224,7 +224,7 @@ describe('WorktreeCard linked PR display', () => {
     expect(unreadMarkup).not.toContain('aria-label="Mark as read"')
     expect(unreadMarkup).not.toContain('lucide-bell')
     expect(getInlineRenameTitleTag(unreadMarkup)).toContain('font-semibold text-foreground')
-    expect(getInlineRenameTitleTag(readMarkup)).toContain('font-normal text-foreground/80')
+    expect(getInlineRenameTitleTag(readMarkup)).toContain('font-light text-foreground/80')
   }, 20_000)
 
   it('does not show cached branch PR details when the worktree has no linked PR', async () => {

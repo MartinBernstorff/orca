@@ -269,7 +269,7 @@ export function WorktreeTitleInlineRename({
           ref={handleRootRef}
           className={cn(
             'relative grid min-w-0 truncate leading-tight text-foreground',
-            showUnreadEmphasis ? 'font-semibold' : 'font-normal',
+            showUnreadEmphasis ? 'font-semibold' : 'font-light',
             className,
             editingClassName
           )}
@@ -339,8 +339,8 @@ export function WorktreeTitleInlineRename({
   const titleEmphasisClassName = showUnreadEmphasis
     ? 'font-semibold text-foreground'
     : dimReadTitle
-      ? 'font-normal text-foreground/80'
-      : 'font-normal text-foreground'
+      ? 'font-light text-foreground/80'
+      : 'font-light text-foreground'
 
   const title = (
     <span

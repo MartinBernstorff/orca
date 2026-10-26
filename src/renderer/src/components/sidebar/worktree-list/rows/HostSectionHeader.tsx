@@ -129,7 +129,7 @@ export function HostSectionHeader({
         <div className="flex min-w-0 flex-1 items-baseline gap-1.5">
           <span
             className={cn(
-              'min-w-0 truncate text-[12px] font-semibold leading-none',
+              'min-w-0 truncate text-[12px] font-light leading-none',
               isDisconnected ? 'text-muted-foreground' : 'text-foreground'
             )}
           >
