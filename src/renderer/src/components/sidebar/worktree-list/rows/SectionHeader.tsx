@@ -310,11 +310,8 @@ export function renderWorktreeSectionHeaderRow(args: {
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-1.5">
                 <div
-                  className={cn(
-                    'min-w-0 truncate text-[13px] leading-none',
-                    // Why: bold status lane labels read like unhandled-reply workspace rows.
-                    headerGroupBy === 'workspace-status' ? 'font-medium' : 'font-semibold'
-                  )}
+                  // Why: bold header labels read like unread workspace rows.
+                  className="min-w-0 truncate text-[13px] font-light leading-none"
                 >
                   {row.label}
                 </div>
