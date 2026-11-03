@@ -112,7 +112,7 @@ export type Worktree = {
   promptCount?: number
   /** Epoch ms of the newest counted prompt; Engagement sort tie-breaker. */
   lastPromptAt?: number
-  /** User-set engagement. Absent means Queued; nothing changes it automatically. */
+  /** User-set engagement. Absent means Inbox; nothing changes it automatically. */
   engagement?: WorkspaceEngagement
   sortOrder: number
   /** User-authored sidebar ordering. Higher values render earlier in Manual sort. */

@@ -173,10 +173,10 @@ describe('folderWorkspaceToWorktree', () => {
     expect(gitlabMr.linkedGitLabIssue).toBeNull()
   })
 
-  it('projects engagement, defaulting a missing one to queued', () => {
+  it('projects engagement, defaulting a missing one to inbox', () => {
     expect(
       folderWorkspaceToWorktree(makeFolderWorkspace({ engagement: 'engaged' })).engagement
     ).toBe('engaged')
-    expect(folderWorkspaceToWorktree(makeFolderWorkspace()).engagement).toBe('queued')
+    expect(folderWorkspaceToWorktree(makeFolderWorkspace()).engagement).toBe('inbox')
   })
 })

@@ -14,11 +14,12 @@ describe('getOptionalWorkspaceEngagementFlag', () => {
 
   it('accepts each value case-insensitively', () => {
     expect(parse('Engaged')).toBe('engaged')
+    expect(parse('inbox')).toBe('inbox')
     expect(parse('queued')).toBe('queued')
   })
 
   it('rejects unknown values and a bare flag', () => {
-    expect(() => parse('none')).toThrow(/engaged, queued/)
+    expect(() => parse('none')).toThrow(/engaged, inbox, queued/)
     expect(() => parse(true)).toThrow(/Invalid --engagement/)
   })
 })

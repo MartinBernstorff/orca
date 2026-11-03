@@ -62,7 +62,7 @@ describe('normalizeFolderWorkspaces host attribution', () => {
 })
 
 describe('normalizeFolderWorkspaces engagement', () => {
-  it('keeps a stored engagement and defaults a missing one to queued', () => {
+  it('keeps a stored engagement and defaults a missing one to inbox', () => {
     // Why: look up by id; a missing sortOrder defaults to Date.now() per item, so order can flip.
     const byId = new Map(
       normalizeFolderWorkspaces(
@@ -75,6 +75,6 @@ describe('normalizeFolderWorkspaces engagement', () => {
     )
 
     expect(byId.get('ws-1')?.engagement).toBe('engaged')
-    expect(byId.get('ws-2')?.engagement).toBe('queued')
+    expect(byId.get('ws-2')?.engagement).toBe('inbox')
   })
 })

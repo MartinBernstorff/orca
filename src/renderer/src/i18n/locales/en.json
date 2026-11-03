@@ -6219,6 +6219,7 @@
         },
         "workspaceEngagement": {
           "engaged": "Engaged",
+          "inbox": "Inbox",
           "queued": "Queued"
         },
         "workspaceJump": {

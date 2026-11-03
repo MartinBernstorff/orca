@@ -13,6 +13,7 @@ const engaged: Worktree = {
   path: '/tmp/engaged',
   engagement: 'engaged'
 }
+const inbox: Worktree = { ...worktree, id: 'wt-inbox', path: '/tmp/inbox', engagement: 'inbox' }
 const unset: Worktree = { ...worktree, id: 'wt-unset', path: '/tmp/unset' }
 
 function headers(rows: ReturnType<typeof buildRows>) {
@@ -20,11 +21,12 @@ function headers(rows: ReturnType<typeof buildRows>) {
 }
 
 describe('groupBy engagement', () => {
-  it('orders the Engaged lane before the Queued lane, with unset workspaces in Queued', () => {
-    const rows = buildRows('engagement', [queued, unset, engaged], repoMap, null, new Set())
+  it('orders the Engaged, Inbox, and Queued lanes, with unset workspaces in Inbox', () => {
+    const rows = buildRows('engagement', [queued, unset, inbox, engaged], repoMap, null, new Set())
     expect(headers(rows).map((row) => [row.key, row.label, row.count])).toEqual([
       ['engagement:engaged', 'Engaged', 1],
-      ['engagement:queued', 'Queued', 2]
+      ['engagement:inbox', 'Inbox', 2],
+      ['engagement:queued', 'Queued', 1]
     ])
   })
 
@@ -32,11 +34,12 @@ describe('groupBy engagement', () => {
     const rows = buildRows('engagement', [queued], repoMap, null, new Set())
     expect(headers(rows).map((row) => [row.key, row.count])).toEqual([
       ['engagement:engaged', 0],
+      ['engagement:inbox', 0],
       ['engagement:queued', 1]
     ])
   })
 
-  it('renders both lanes when engagement is a nested level', () => {
+  it('renders all lanes when engagement is a nested level', () => {
     const rows = buildRows(
       'repo',
       [engaged],
@@ -66,6 +69,7 @@ describe('groupBy engagement', () => {
     const lanes = headers(rows).filter((row) => row.laneGroupBy === 'engagement')
     expect(lanes.map((row) => [row.laneKey, row.count])).toEqual([
       ['engagement:engaged', 1],
+      ['engagement:inbox', 0],
       ['engagement:queued', 0]
     ])
   })
@@ -76,6 +80,6 @@ describe('groupBy engagement', () => {
     const laneKey = (folderWorkspace: ReturnType<typeof makeFolderWorkspace>) =>
       getFolderWorkspaceLaneKey({ folderWorkspace, projectGroup }, 'engagement', [])
     expect(laneKey(makeFolderWorkspace({ engagement: 'engaged' }))).toBe('engagement:engaged')
-    expect(laneKey(makeFolderWorkspace())).toBe('engagement:queued')
+    expect(laneKey(makeFolderWorkspace())).toBe('engagement:inbox')
   })
 })

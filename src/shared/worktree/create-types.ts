@@ -92,7 +92,7 @@ export type CreateWorktreeArgs = {
   linkedTaskSourceContext?: TaskSourceContext | null
   pushTarget?: GitPushTarget
   workspaceStatus?: WorkspaceStatus
-  /** Initial engagement; absent reads as Queued. */
+  /** Initial engagement; absent reads as Inbox. */
   engagement?: WorkspaceEngagement
   manualOrder?: number
   /** Parent workspace for in-app creates launched from a folder workspace. */
