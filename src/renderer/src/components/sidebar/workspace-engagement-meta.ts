@@ -1,5 +1,5 @@
 import type React from 'react'
-import { Hourglass, Zap } from 'lucide-react'
+import { Hourglass, Inbox, Zap } from 'lucide-react'
 import {
   normalizeWorkspaceEngagement,
   type WorkspaceEngagement
@@ -11,6 +11,7 @@ export const WORKSPACE_ENGAGEMENT_ICONS: Record<
   React.ComponentType<{ className?: string }>
 > = {
   engaged: Zap,
+  inbox: Inbox,
   queued: Hourglass
 }
 
@@ -18,6 +19,8 @@ export function getWorkspaceEngagementLabel(engagement: WorkspaceEngagement): st
   switch (engagement) {
     case 'engaged':
       return translate('auto.components.sidebar.workspaceEngagement.engaged', 'Engaged')
+    case 'inbox':
+      return translate('auto.components.sidebar.workspaceEngagement.inbox', 'Inbox')
     case 'queued':
       return translate('auto.components.sidebar.workspaceEngagement.queued', 'Queued')
   }

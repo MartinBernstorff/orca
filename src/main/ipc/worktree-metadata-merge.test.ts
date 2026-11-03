@@ -122,10 +122,10 @@ describe('mergeWorktree priority and engagement projection', () => {
     )
   })
 
-  it('projects a missing or unknown engagement as queued', () => {
-    expect(mergeWorktree('repo-1', git, undefined).engagement).toBe('queued')
+  it('projects a missing or unknown engagement as inbox', () => {
+    expect(mergeWorktree('repo-1', git, undefined).engagement).toBe('inbox')
     expect(mergeWorktree('repo-1', git, { ...meta, engagement: 'busy' as never }).engagement).toBe(
-      'queued'
+      'inbox'
     )
   })
 })

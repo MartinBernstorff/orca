@@ -223,8 +223,8 @@ function readEngagement(worktreeId: string): WorkspaceEngagement {
 // Parent + its visible lineage child are Queued; the bystander is Engaged.
 function setEngagementState(grouping: { groupBy: string; nestedGroupBy: string[] }): void {
   const repo = makeRepo()
-  const parent = makeWorktree({ id: 'parent', sortOrder: 30 })
-  const child = makeWorktree({ id: 'child', sortOrder: 20 })
+  const parent = makeWorktree({ id: 'parent', sortOrder: 30, engagement: 'queued' })
+  const child = makeWorktree({ id: 'child', sortOrder: 20, engagement: 'queued' })
   const bystander = makeWorktree({ id: 'bystander', sortOrder: 10, engagement: 'engaged' })
   mockStore.state = {
     ...makeFolderWorkspacePathStatusMockState(),

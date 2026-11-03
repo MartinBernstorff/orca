@@ -99,7 +99,7 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
       isMainWorktree: worktree.isMainWorktree
     })
   const showEngageQuickAction =
-    !props.affiliateListMode && !linked.isDeleting && getWorkspaceEngagement(worktree) === 'queued'
+    !props.affiliateListMode && !linked.isDeleting && getWorkspaceEngagement(worktree) !== 'engaged'
   const showOpenQuickAction = !props.affiliateListMode && !linked.isDeleting
   const waitingToggle = useWorktreeCardWaitingToggle(worktree.id, showOpenQuickAction)
   const workspaceActions = useWorktreeCardWorkspaceActions({

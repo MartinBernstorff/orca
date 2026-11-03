@@ -91,9 +91,11 @@ describe('groupBy agent-state', () => {
     const nested = headers(rows).filter((row) => row.laneGroupBy === 'engagement')
     expect(nested.map((row) => [row.key, row.count])).toEqual([
       [getNestedGroupKey('agent-state:needs-you', 'engagement:engaged'), 0],
-      [getNestedGroupKey('agent-state:needs-you', 'engagement:queued'), 1],
+      [getNestedGroupKey('agent-state:needs-you', 'engagement:inbox'), 1],
+      [getNestedGroupKey('agent-state:needs-you', 'engagement:queued'), 0],
       [getNestedGroupKey('agent-state:working', 'engagement:engaged'), 0],
-      [getNestedGroupKey('agent-state:working', 'engagement:queued'), 1]
+      [getNestedGroupKey('agent-state:working', 'engagement:inbox'), 1],
+      [getNestedGroupKey('agent-state:working', 'engagement:queued'), 0]
     ])
   })
 

@@ -97,7 +97,7 @@ function formatCommandFlagHelp(flag: string, commandPath: string[]): string {
     return '--priority <level>     Workspace priority: urgent, high, medium, low, or none to clear'
   }
   if (command === 'worktree set' && flag === 'engagement') {
-    return '--engagement <value>   Workspace engagement: engaged or queued'
+    return '--engagement <value>   Workspace engagement: engaged, inbox, or queued'
   }
   if (command === 'linear list-issues' && flag === 'priority') {
     return '--priority <0-4>       0=none, 1=urgent, 2=high, 3=medium, 4=low'

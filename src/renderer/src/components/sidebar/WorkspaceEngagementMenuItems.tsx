@@ -29,7 +29,7 @@ export function WorkspaceEngagementMenuItems({
   onSetEngagement: (engagement: WorkspaceEngagement) => void
 }): JSX.Element {
   const [first, ...rest] = worktrees
-  const current = first ? getWorkspaceEngagement(first) : 'queued'
+  const current = first ? getWorkspaceEngagement(first) : 'inbox'
   // Why '': a mixed multi-selection has no single current engagement to check.
   const value = rest.every((item) => getWorkspaceEngagement(item) === current) ? current : ''
   return (
