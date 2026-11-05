@@ -26,7 +26,7 @@ vi.mock('./workspace-jump-sections', () => ({
       key: 'working',
       headingPath: ['Working'],
       worktrees: [
-        { id: 'wt-b', repoId: 'r1', displayName: 'beta-task' },
+        { id: 'wt-b', repoId: 'r1', displayName: 'beta-task', linkedPR: 101 },
         {
           id: 'wt-a',
           repoId: 'r2',
@@ -38,7 +38,9 @@ vi.mock('./workspace-jump-sections', () => ({
     {
       key: 'waiting',
       headingPath: ['Waiting on others'],
-      worktrees: [{ id: 'wt-c', repoId: 'r1', displayName: 'alpha-later' }]
+      worktrees: [
+        { id: 'wt-c', repoId: 'r1', displayName: 'alpha-later', linkedLinearIssue: 'ENG-42' }
+      ]
     }
   ]
 }))
@@ -77,6 +79,16 @@ async function settle(): Promise<void> {
   })
 }
 
+async function typeQuery(query: string): Promise<void> {
+  const input = searchInput()!
+  const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+  act(() => {
+    setValue.call(input, query)
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+  })
+  await settle()
+}
+
 async function openMenu(): Promise<void> {
   act(() => root.render(<SidebarWorkspaceJumpMenu />))
   act(() => requestOpenWorkspaceJump())
@@ -107,7 +119,7 @@ describe('SidebarWorkspaceJumpMenu', () => {
     await openMenu()
 
     expect(headings()).toEqual(['Working', 'Waiting on others'])
-    expect(rows()).toEqual(['beta-taskorca', 'alpha-taskapi', 'alpha-laterorca'])
+    expect(rows()).toEqual(['beta-taskorca#101', 'alpha-taskapi', 'alpha-laterorcaENG-42'])
   })
 
   it('opens on mount for a request made while the sidebar was closed', async () => {
@@ -131,5 +143,19 @@ describe('SidebarWorkspaceJumpMenu', () => {
     })
     expect(mocks.queueWorkspaceActivationTerminalFocus).toHaveBeenCalledWith('wt-a', false)
     expect(searchInput()).toBeNull()
+  })
+
+  it('filters by linked Linear issue', async () => {
+    await openMenu()
+    await typeQuery('eng-42')
+
+    expect(rows()).toEqual(['alpha-laterorcaENG-42'])
+  })
+
+  it('filters by linked PR number', async () => {
+    await openMenu()
+    await typeQuery('#101')
+
+    expect(rows()).toEqual(['beta-taskorca#101'])
   })
 })
