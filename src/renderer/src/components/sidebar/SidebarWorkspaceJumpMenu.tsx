@@ -15,6 +15,9 @@ import { queueWorkspaceActivationTerminalFocus } from '@/lib/workspace-activatio
 import { getWorktreeHostIdentity } from '../../../../shared/worktree/host-qualified-identity'
 import type { Worktree } from '../../../../shared/worktree/types'
 import { getFilteredSidebarWorktrees } from './visible-worktrees'
+import { getRepoHostIdentity } from '@/store/slices/repo-host-identity'
+import { buildWorktreeChecksReviewIndex } from '@/components/cmd-j/worktree-checks-review-index'
+import { resolveWorkspaceJumpLinks } from './workspace-jump-links'
 import { computeWorkspaceJumpSections } from './workspace-jump-sections'
 import {
   consumeWorkspaceJumpOpenRequest,
@@ -35,12 +38,23 @@ function WorkspaceJumpPanel({
   onSelect: (worktree: Worktree) => void
 }): React.JSX.Element {
   // Why: snapshot at open time so rows don't reorder under the cursor while agents change state.
-  const [{ sections, repoNameById }] = useState(() => {
+  const [{ sections, repoNameById, reviewByWorktree }] = useState(() => {
     const state = useAppStore.getState()
     const repoMap = getRepoMapFromState(state)
+    const sections = computeWorkspaceJumpSections(state, getFilteredSidebarWorktrees(state))
     return {
-      sections: computeWorkspaceJumpSections(state, getFilteredSidebarWorktrees(state)),
-      repoNameById: (repoId: string) => repoMap.get(repoId)?.displayName
+      sections,
+      repoNameById: (repoId: string) => repoMap.get(repoId)?.displayName,
+      // Why: same review metadata Checks/Cmd+J already resolved, so PR search costs no provider lookup.
+      reviewByWorktree: buildWorktreeChecksReviewIndex({
+        worktrees: sections.flatMap((section) => section.worktrees),
+        repoByHostIdentity: new Map(
+          (state.repos ?? []).map((repo) => [getRepoHostIdentity(repo), repo])
+        ),
+        prCache: state.prCache,
+        hostedReviewCache: state.hostedReviewCache,
+        settings: state.settings
+      })
     }
   })
   const inputRef = useRef<HTMLInputElement>(null)
@@ -75,18 +89,29 @@ function WorkspaceJumpPanel({
           >
             {section.worktrees.map((worktree) => {
               const repoName = repoNameById(worktree.repoId)
+              const { taskId, reviewId, keywords } = resolveWorkspaceJumpLinks(
+                worktree,
+                repoName,
+                reviewByWorktree.get(worktree)
+              )
               return (
                 <CommandItem
                   key={getWorktreeHostIdentity(worktree)}
                   value={getWorktreeHostIdentity(worktree)}
-                  keywords={[worktree.displayName, repoName ?? '']}
+                  keywords={keywords}
                   onSelect={() => onSelect(worktree)}
                   className="mx-1 my-0.5 gap-2 rounded-[7px] px-2 py-1 text-[12px] leading-5 font-medium data-[selected=true]:bg-black/8 dark:data-[selected=true]:bg-white/14"
                 >
                   <span className="min-w-0 flex-1 truncate">{worktree.displayName}</span>
                   {repoName && (
-                    <span className="max-w-[45%] shrink-0 truncate text-[11px] font-normal text-muted-foreground">
+                    <span className="max-w-[35%] shrink-0 truncate text-[11px] font-normal text-muted-foreground">
                       {repoName}
+                    </span>
+                  )}
+                  {(taskId || reviewId) && (
+                    <span className="flex shrink-0 gap-2 font-mono text-[11px] font-normal text-muted-foreground">
+                      {taskId && <span>{taskId}</span>}
+                      {reviewId && <span>{reviewId}</span>}
                     </span>
                   )}
                 </CommandItem>
@@ -127,7 +152,8 @@ const SidebarWorkspaceJumpMenu = React.memo(function SidebarWorkspaceJumpMenu() 
       <PopoverContent
         align="start"
         sideOffset={0}
-        className="w-[var(--radix-popover-trigger-width)] p-0 py-1"
+        // Why: wider than the sidebar so names and linked IDs fit; capped to the window.
+        className="w-[min(800px,calc(100vw-16px))] min-w-[var(--radix-popover-trigger-width)] p-0 py-1"
         onCloseAutoFocus={(event) => {
           // Why: after a jump, focus belongs to the destination terminal, not the pre-open element.
           if (jumpedRef.current) {
